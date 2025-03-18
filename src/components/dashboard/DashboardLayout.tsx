@@ -14,7 +14,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, className }
   const isMobile = useIsMobile();
 
   return (
-    <Layout noFooter>
+    
+    // <Layout noFooter>
       <div className="flex h-full w-full">
         <Sidebar />
         <div className={cn(
@@ -25,7 +26,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, className }
           <main className="p-4 sm:p-6">{children}</main>
         </div>
       </div>
-    </Layout>
+    // </Layout>
   );
 };
 
