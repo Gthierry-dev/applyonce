@@ -55,7 +55,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
               <div className="rounded-md bg-primary p-1.5">
-                <span className="text-primary-foreground font-bold text-sm">A1</span>
+                <span className="text-primary-foreground font-bold text-sm">AO</span>
               </div>
               <span className="font-display font-semibold text-lg">ApplyOnce</span>
             </Link>
