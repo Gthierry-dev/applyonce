@@ -11,10 +11,11 @@ import { useToast } from '@/hooks/use-toast';
 import Layout from '@/components/layout/Layout';
 
 const Signup = () => {
-  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -22,10 +23,19 @@ const Signup = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!agreeToTerms) {
+    if (password !== confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please check your passwords and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!agreeTerms) {
       toast({
         title: "Terms agreement required",
-        description: "You must agree to the terms and privacy policy to continue.",
+        description: "Please agree to the terms and conditions to continue.",
         variant: "destructive",
       });
       return;
@@ -36,17 +46,17 @@ const Signup = () => {
     try {
       // Simulating registration
       // In a real app, this would be replaced with an actual auth call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
         title: "Account created",
-        description: "Welcome to ApplyOnce! Your account has been created successfully.",
+        description: "Welcome to ApplyOnce! You can now log in.",
       });
       
-      navigate('/dashboard');
+      navigate('/login');
     } catch (error) {
       toast({
-        title: "Sign up failed",
+        title: "Signup failed",
         description: "There was an error creating your account. Please try again.",
         variant: "destructive",
       });
@@ -70,20 +80,21 @@ const Signup = () => {
                 <span className="text-primary-foreground font-bold text-sm">A1</span>
               </div>
             </div>
-            <CardTitle className="text-2xl">Create an account</CardTitle>
+            <CardTitle className="text-2xl">Create your account</CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
-              Get started with ApplyOnce to streamline your application process
+              Enter your details to create your ApplyOnce account
             </p>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="name">Full Name</Label>
                 <Input
-                  id="fullName"
+                  id="name"
+                  type="text"
                   placeholder="John Doe"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
                 />
               </div>
@@ -108,18 +119,29 @@ const Signup = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <p className="text-xs text-muted-foreground">
-                  Password must be at least 8 characters long with a mix of letters, numbers, and symbols.
-                </p>
               </div>
-              <div className="flex items-start space-x-2 pt-2">
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex items-center space-x-2 pt-2">
                 <Checkbox
                   id="terms"
-                  checked={agreeToTerms}
-                  onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
-                  className="mt-1"
+                  checked={agreeTerms}
+                  onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
+                  required
                 />
-                <label htmlFor="terms" className="text-sm text-muted-foreground">
+                <label
+                  htmlFor="terms"
+                  className="text-sm font-medium leading-none cursor-pointer"
+                >
                   I agree to the{' '}
                   <Link to="/terms" className="text-primary hover:underline">
                     Terms of Service

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check, Search, FileText, Zap, User, Settings } from 'lucide-react';
@@ -248,31 +247,34 @@ const Index = () => {
           
           <div className="max-w-4xl mx-auto">
             <div className="relative rounded-xl bg-card border border-border p-8 shadow-sm overflow-hidden">
-              <div 
-                className="absolute transition-all duration-500"
-                style={{ 
-                  opacity: 1,
-                }}
-              >
-                <div className="relative">
-                  <div className="text-4xl text-primary/20 font-serif absolute -top-6 -left-4">"</div>
-                  <p className="text-lg sm:text-xl mb-6 relative z-10">
-                    {testimonialsData[currentTestimonial].quote}
-                  </p>
-                  <div className="flex items-center">
-                    <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-                      {testimonialsData[currentTestimonial].author.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="font-semibold">{testimonialsData[currentTestimonial].author}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {testimonialsData[currentTestimonial].title}
-                        {testimonialsData[currentTestimonial].company && `, ${testimonialsData[currentTestimonial].company}`}
+              {testimonialsData.map((testimonial, index) => (
+                <div 
+                  key={index}
+                  className={cn(
+                    "absolute inset-0 p-8 transition-opacity duration-500",
+                    index === currentTestimonial ? "opacity-100" : "opacity-0 pointer-events-none"
+                  )}
+                >
+                  <div className="relative">
+                    <div className="text-4xl text-primary/20 font-serif absolute -top-6 -left-4">"</div>
+                    <p className="text-lg sm:text-xl mb-6 relative z-10">
+                      {testimonial.quote}
+                    </p>
+                    <div className="flex items-center">
+                      <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                        {testimonial.author.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-semibold">{testimonial.author}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {testimonial.title}
+                          {testimonial.company && `, ${testimonial.company}`}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
             
             <div className="flex justify-center space-x-2 mt-6">
