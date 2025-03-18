@@ -15,7 +15,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, className }
 
   return (
     
-    <Layout noFooter>
+    <Layout noNavbar noFooter>
       <div className="flex h-full w-full">
         <Sidebar />
         <div className={cn(
