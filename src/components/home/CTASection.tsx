@@ -32,6 +32,14 @@ const CTASection = () => {
           >
             <Link to="/explore">Browse Opportunities</Link>
           </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline" 
+            className="bg-transparent border-primary-foreground/20 hover:bg-primary-foreground/10 text-primary-foreground font-medium"
+          >
+            <Link to="/dashboard">Continue as Guest</Link>
+          </Button>
         </div>
       </div>
     </section>

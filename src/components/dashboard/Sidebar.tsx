@@ -14,6 +14,7 @@ import {
   LogOut,
   ChevronLeft,
   Menu,
+  ClipboardList
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -30,7 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   const location = useLocation();
   const isMobile = useIsMobile();
 
-  const isAdmin = true; // Replace with actual admin check
+  const isAdmin = false; // Replace with actual admin check
 
   const adminLinks = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin' },
@@ -41,10 +42,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   ];
 
   const userLinks = [
-    { name: 'Dashboard', icon: <Home size={20} />, path: '/dashboard' },
-    { name: 'Explore', icon: <Search size={20} />, path: '/explore' },
+    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { name: 'Applications', icon: <FileText size={20} />, path: '/applications' },
-    { name: 'Notifications', icon: <Bell size={20} />, path: '/notifications' },
+    { name: 'Categories', icon: <Folder size={20} />, path: '/categories' },
+    { name: 'Application Status', icon: <ClipboardList size={20} />, path: '/application-status' },
     { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
   ];
 
@@ -134,11 +135,11 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
 
             <div className="mt-auto">
               <Link
-                to="/logout"
+                to="/"
                 className="flex items-center px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
               >
                 <LogOut size={20} className="mr-3" />
-                <span>Log out</span>
+                <span>Back to Home</span>
               </Link>
             </div>
           </nav>
@@ -245,22 +246,22 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  to="/logout"
+                  to="/"
                   className="flex items-center justify-center py-2 rounded-md text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
                 >
                   <LogOut size={20} />
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Log out</TooltipContent>
+              <TooltipContent side="right">Back to Home</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         ) : (
           <Link
-            to="/logout"
+            to="/"
             className="flex items-center px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
           >
             <LogOut size={20} className="mr-3" />
-            <span>Log out</span>
+            <span>Back to Home</span>
           </Link>
         )}
       </div>
