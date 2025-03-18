@@ -115,7 +115,8 @@ const Login = () => {
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Log in'}
               </Button>
-              <Link to="/dashboard">Continue as Guest</Link>
+              <p className="text-center text-sm mt-4"> Continue as <Link to="/dashboard"> Guest</Link></p>
+              
               <p className="text-center text-sm mt-4">
                 Don't have an account?{' '}
                 <Link to="/signup" className="text-primary hover:underline">
