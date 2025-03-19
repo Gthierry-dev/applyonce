@@ -14,6 +14,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import Applications from "./pages/dashboard/Applications";
 import Categories from "./pages/dashboard/Categories";
 import ApplicationStatus from "./pages/dashboard/ApplicationStatus";
+import Opportunities from "./pages/dashboard/Opportunities";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/applications" element={<Applications />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/application-status" element={<ApplicationStatus />} />
+          <Route path="/opportunities" element={<Opportunities />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

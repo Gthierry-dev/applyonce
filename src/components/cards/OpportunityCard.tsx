@@ -1,20 +1,13 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Clock, Tag, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import OpportunityDrawer, { OpportunityDetails } from './OpportunityDrawer';
 
-export interface OpportunityCardProps {
-  id: string;
-  title: string;
-  organization: string;
-  category: string;
-  deadline: string;
-  logo?: string;
-  description: string;
+export interface OpportunityCardProps extends OpportunityDetails {
   className?: string;
 }
 
@@ -27,6 +20,7 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
   logo,
   description,
   className,
+  ...rest
 }) => {
   // Format the deadline
   const formatDeadline = (dateString: string) => {
@@ -36,6 +30,18 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
       day: 'numeric',
       year: 'numeric',
     }).format(date);
+  };
+
+  // Combined opportunity object to pass to drawer
+  const opportunity: OpportunityDetails = {
+    id,
+    title,
+    organization,
+    category,
+    deadline,
+    logo,
+    description,
+    ...rest
   };
 
   return (
@@ -73,15 +79,23 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between items-center">
-        <Button asChild variant="ghost" size="sm" className="h-8 px-2 text-xs">
-          <Link to={`/explore/${id}`}>View Details</Link>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-8 px-2 text-xs"
+          onClick={(e) => e.stopPropagation()}
+        >
+          Save
         </Button>
-        <Button asChild variant="default" size="sm" className="h-8 px-3 text-xs">
-          <Link to={`/apply/${id}`}>
-            Apply Now
-            <ArrowRight className="ml-1 h-3 w-3" />
-          </Link>
-        </Button>
+        <OpportunityDrawer 
+          opportunity={opportunity}
+          trigger={
+            <Button variant="default" size="sm" className="h-8 px-3 text-xs">
+              Apply Now
+              <ArrowRight className="ml-1 h-3 w-3" />
+            </Button>
+          }
+        />
       </CardFooter>
     </Card>
   );
