@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ExternalLink } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OpportunityDetails } from './OpportunityDrawer';
 
@@ -18,10 +18,13 @@ export const OpportunityDrawerFooter: React.FC<OpportunityDrawerFooterProps> = (
       <Button variant="outline" className="gap-2" asChild>
         <a href={`https://example.com/jobs/${opportunity.id}`} target="_blank" rel="noopener noreferrer">
           View Full Details
-          <ExternalLink className="h-4 w-4" />
+          <Send className="h-4 w-4" />
         </a>
       </Button>
-      <Button onClick={handleApply}>Apply Now</Button>
+      <Button onClick={handleApply} className="gap-2">
+        Apply Now
+        <Send className="h-4 w-4" />
+      </Button>
     </div>
   );
 };
