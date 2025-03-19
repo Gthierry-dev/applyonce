@@ -152,7 +152,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   return (
     <aside
       className={cn(
-        'h-screen sticky top-0 flex flex-col bg-sidebar text-sidebar-foreground transition-all duration-300',
+        'h-screen sticky top-0 flex flex-col bg-sidebar text-sidebar-foreground transition-all duration-300 overflow-y-auto',
         collapsed ? 'w-[70px]' : 'w-64',
         className
       )}

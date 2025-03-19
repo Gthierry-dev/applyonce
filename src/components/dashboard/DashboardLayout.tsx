@@ -14,12 +14,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, className }
   const isMobile = useIsMobile();
 
   return (
-    
     <Layout noNavbar noFooter>
-      <div className="flex h-full w-full">
+      <div className="flex h-screen w-full overflow-hidden">
         <Sidebar />
         <div className={cn(
-          'flex-1 overflow-auto', 
+          'flex-1 overflow-auto h-screen', 
           isMobile && 'pt-16', 
           className
         )}>
