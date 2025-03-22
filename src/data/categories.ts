@@ -83,5 +83,5 @@ export const categoryData: CategoryData[] = [
     count: 22,
     icon: <PenTool className="h-5 w-5 text-teal-600" />,
     color: "bg-teal-100"
-  },
+  }
 ];
