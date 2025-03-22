@@ -7,12 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { ArrowRight, CheckCircle, Settings } from 'lucide-react';
 import CategoryFormDrawer from '@/components/categories/CategoryFormDrawer';
+import { iconMap } from '@/data/categories';
 
 interface CategoryCardProps {
   title: string;
   description: string;
   count: number;
-  icon: React.ReactNode;
+  iconName: string;
   color: string;
   enabled: boolean;
   onToggle: (enabled: boolean) => void;
@@ -23,7 +24,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   title, 
   description, 
   count, 
-  icon, 
+  iconName, 
   color,
   enabled,
   onToggle,
@@ -33,18 +34,20 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
     e.stopPropagation();
   };
 
+  const IconComponent = iconMap[iconName];
+
   return (
     <Card className="overflow-hidden hover:shadow-md transition-all duration-300 relative">
       <CategoryFormDrawer 
         categoryName={title}
-        categoryIcon={icon}
+        categoryIcon={<IconComponent className="h-5 w-5" />}
         trigger={
           <div>
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
                   <div className={`p-2 rounded-md ${color}`}>
-                    {icon}
+                    <IconComponent className="h-5 w-5 text-blue-600" />
                   </div>
                   <div className="space-y-1">
                     <h3 className="font-semibold text-lg flex items-center">
