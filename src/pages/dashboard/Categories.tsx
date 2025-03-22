@@ -19,7 +19,8 @@ import {
   HeartHandshake, 
   PenTool,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  Settings
 } from 'lucide-react';
 
 interface CategoryCardProps {
@@ -53,7 +54,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         categoryName={title}
         categoryIcon={icon}
         trigger={
-          <div className="cursor-pointer">
+          <div>
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
@@ -81,8 +82,16 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="p-6 pt-0">
-              <Button asChild variant="ghost" size="sm" className="ml-auto">
+            <CardFooter className="p-6 pt-0 flex justify-between">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-1"
+              >
+                <Settings className="h-3 w-3" />
+                Configure
+              </Button>
+              <Button asChild variant="ghost" size="sm">
                 <Link to={`/opportunities?category=${encodeURIComponent(title)}`}>
                   Browse
                   <ArrowRight className="ml-1 h-3 w-3" />
