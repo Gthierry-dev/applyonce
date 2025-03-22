@@ -9,6 +9,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Layout from '@/components/layout/Layout';
+import SocialLoginButton from '@/components/auth/SocialLoginButton';
+import { Separator } from '@/components/ui/separator';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -45,6 +47,15 @@ const Login = () => {
     }
   };
 
+  const handleSocialLogin = (provider: 'google' | 'linkedin') => {
+    toast({
+      title: `${provider.charAt(0).toUpperCase() + provider.slice(1)} login`,
+      description: `This would connect to ${provider} in a real implementation.`,
+    });
+    // In a real app, this would trigger the OAuth flow
+    navigate('/dashboard');
+  };
+
   return (
     <Layout noFooter className="bg-background">
       <div className="container max-w-lg mx-auto flex-1 flex flex-col justify-center py-12 px-4">
@@ -65,8 +76,28 @@ const Login = () => {
               Enter your credentials to access your account
             </p>
           </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <SocialLoginButton 
+                provider="google" 
+                onClick={() => handleSocialLogin('google')} 
+              />
+              <SocialLoginButton 
+                provider="linkedin" 
+                onClick={() => handleSocialLogin('linkedin')} 
+              />
+            </div>
+            
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-card px-2 text-xs text-muted-foreground">OR CONTINUE WITH EMAIL</span>
+              </div>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -110,22 +141,22 @@ const Login = () => {
                   Remember me
                 </label>
               </div>
-            </CardContent>
-            <CardFooter className="flex flex-col">
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Log in'}
               </Button>
-              <p className="text-center text-sm mt-4"> Continue as <Link to="/dashboard"  className="text-primary hover:underline"> Guest</Link></p>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col">
+            <p className="text-center text-sm mt-4"> Continue as <Link to="/dashboard"  className="text-primary hover:underline"> Guest</Link></p>
+            
+            <p className="text-center text-sm mt-4">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-primary hover:underline">
+                Sign up
+              </Link>
               
-              <p className="text-center text-sm mt-4">
-                Don't have an account?{' '}
-                <Link to="/signup" className="text-primary hover:underline">
-                  Sign up
-                </Link>
-                
-              </p>
-            </CardFooter>
-          </form>
+            </p>
+          </CardFooter>
         </Card>
         
         <div className="text-center text-xs text-muted-foreground mt-8">
