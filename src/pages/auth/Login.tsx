@@ -77,7 +77,7 @@ const Login = () => {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               <SocialLoginButton 
                 provider="google" 
                 onClick={() => handleSocialLogin('google')} 

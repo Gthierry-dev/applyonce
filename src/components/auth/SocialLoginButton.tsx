@@ -53,11 +53,11 @@ const SocialLoginButton: React.FC<SocialLoginButtonProps> = ({
     <Button
       type="button"
       variant="outline"
-      className={cn("w-full flex items-center justify-center gap-2", className)}
+      className={cn("flex items-center justify-center gap-2", className)}
       onClick={onClick}
     >
       {getProviderIcon()}
-      <span>Continue with {getProviderName()}</span>
+      <span className="sm:inline">{getProviderName()}</span>
     </Button>
   );
 };
