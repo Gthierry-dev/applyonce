@@ -17,6 +17,12 @@ import ApplicationStatus from "./pages/dashboard/ApplicationStatus";
 import Opportunities from "./pages/dashboard/Opportunities";
 import Settings from "./pages/dashboard/Settings";
 
+// New routes for navigation
+import Community from "./pages/Community";
+import Resources from "./pages/Resources";
+import Pricing from "./pages/Pricing";
+import Support from "./pages/Support";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,6 +43,12 @@ const App = () => (
           <Route path="/application-status" element={<ApplicationStatus />} />
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/settings" element={<Settings />} />
+          
+          {/* New Navigation Routes */}
+          <Route path="/community" element={<Community />} />
+          <Route path="/resources" element={<Resources />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/support" element={<Support />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
