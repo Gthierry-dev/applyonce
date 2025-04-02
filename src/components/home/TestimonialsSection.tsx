@@ -65,8 +65,7 @@ const TestimonialsSection = () => {
           </p>
         </div>
         
-        <div className="flex justify-center">
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial) => (
             <Card key={testimonial.id} className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-xl p-6 hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start mb-4">
