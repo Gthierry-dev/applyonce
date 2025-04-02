@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
@@ -13,7 +14,8 @@ import {
   LogOut,
   ChevronLeft,
   Menu,
-  ClipboardList
+  ClipboardList,
+  BarChart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -22,21 +24,21 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 interface SidebarProps {
   className?: string;
+  isAdmin?: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ className }) => {
+const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
 
-  const isAdmin = false; // Replace with actual admin check
-
   const adminLinks = [
-    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin' },
-    { name: 'Forms', icon: <FileText size={20} />, path: '/admin/forms' },
+    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
+    { name: 'Opportunities', icon: <FileText size={20} />, path: '/admin/opportunities' },
     { name: 'Categories', icon: <Folder size={20} />, path: '/admin/categories' },
     { name: 'Users', icon: <Users size={20} />, path: '/admin/users' },
+    { name: 'Analytics', icon: <BarChart size={20} />, path: '/admin/analytics' },
     { name: 'Settings', icon: <Settings size={20} />, path: '/admin/settings' },
   ];
 
@@ -45,10 +47,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     { name: 'Applications', icon: <FileText size={20} />, path: '/applications' },
     { name: 'Categories', icon: <Folder size={20} />, path: '/categories' },
     { name: 'Application Status', icon: <ClipboardList size={20} />, path: '/application-status' },
+    { name: 'Opportunities', icon: <Search size={20} />, path: '/opportunities' },
     { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
   ];
 
   const links = isAdmin ? adminLinks : userLinks;
+  const homeLink = isAdmin ? '/admin/dashboard' : '/dashboard';
 
   const handleToggleCollapse = () => {
     setCollapsed(!collapsed);
@@ -59,11 +63,20 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   };
 
   // Close mobile menu when changing routes
-  React.useEffect(() => {
+  useEffect(() => {
     if (isMobile && mobileOpen) {
       setMobileOpen(false);
     }
   }, [location.pathname, isMobile]);
+
+  // Determine if we're in the admin section
+  useEffect(() => {
+    const isCurrentlyAdmin = location.pathname.startsWith('/admin');
+    if (isAdmin !== isCurrentlyAdmin && location.pathname !== '/') {
+      // This is a prop-based check, you might want to handle this differently
+      // in a real implementation with authentication
+    }
+  }, [location.pathname, isAdmin]);
 
   // Mobile overlay
   if (isMobile) {
@@ -98,11 +111,13 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
           {/* Sidebar content */}
           <nav className="relative w-64 h-full bg-sidebar text-sidebar-foreground p-4 flex flex-col overflow-y-auto">
             <div className="flex items-center justify-between mb-8">
-              <Link to="/" className="flex items-center gap-2">
+              <Link to={homeLink} className="flex items-center gap-2">
                 <div className="rounded-md bg-primary p-1.5">
                   <span className="text-primary-foreground font-bold text-sm">A1</span>
                 </div>
-                <span className="font-display font-semibold text-lg text-sidebar-foreground">ApplyOnce</span>
+                <span className="font-display font-semibold text-lg text-sidebar-foreground">
+                  {isAdmin ? 'Admin Panel' : 'ApplyOnce'}
+                </span>
               </Link>
               <Button
                 variant="ghost"
@@ -158,11 +173,13 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
     >
       <div className="p-4 flex items-center justify-between">
         {!collapsed && (
-          <Link to="/" className="flex items-center gap-2">
+          <Link to={homeLink} className="flex items-center gap-2">
             <div className="rounded-md bg-primary p-1.5">
               <span className="text-primary-foreground font-bold text-sm">A1</span>
             </div>
-            <span className="font-display font-semibold text-lg text-sidebar-foreground">ApplyOnce</span>
+            <span className="font-display font-semibold text-lg text-sidebar-foreground">
+              {isAdmin ? 'Admin Panel' : 'ApplyOnce'}
+            </span>
           </Link>
         )}
         {collapsed && (

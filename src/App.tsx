@@ -17,6 +17,13 @@ import ApplicationStatus from "./pages/dashboard/ApplicationStatus";
 import Opportunities from "./pages/dashboard/Opportunities";
 import Settings from "./pages/dashboard/Settings";
 
+// Admin dashboard routes
+import AdminDashboard from "./pages/admin/Dashboard";
+import AdminOpportunities from "./pages/admin/Opportunities";
+import AdminCategories from "./pages/admin/Categories";
+import AdminUsers from "./pages/admin/Users";
+import AdminSettings from "./pages/admin/Settings";
+
 // New routes for navigation
 import Community from "./pages/Community";
 import Resources from "./pages/Resources";
@@ -43,6 +50,13 @@ const App = () => (
           <Route path="/application-status" element={<ApplicationStatus />} />
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/settings" element={<Settings />} />
+
+          {/* Admin Dashboard Routes */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/opportunities" element={<AdminOpportunities />} />
+          <Route path="/admin/categories" element={<AdminCategories />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
           
           {/* New Navigation Routes */}
           <Route path="/community" element={<Community />} />
