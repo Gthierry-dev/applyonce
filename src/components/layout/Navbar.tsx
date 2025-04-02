@@ -45,7 +45,6 @@ const Navbar = () => {
   const navItems = [
     { name: 'Home', path: '/' },
     // Opportunities is handled separately as a dropdown
-    { name: 'Features', path: '/#features' },
     { name: 'Community', path: '/community' },
     { name: 'Resources', path: '/resources' },
     { name: 'Pricing', path: '/pricing' },
