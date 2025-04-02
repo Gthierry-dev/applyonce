@@ -86,7 +86,7 @@ const Opportunities = () => {
           <Button>Filter Opportunities</Button>
         </div>
         
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6">
           {opportunities.map((opportunity) => (
             <OpportunityCard 
               key={opportunity.id}
