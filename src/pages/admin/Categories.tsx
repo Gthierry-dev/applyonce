@@ -4,8 +4,9 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Search, Edit, Trash } from 'lucide-react';
+import { Search, Edit, Trash } from 'lucide-react';
 import { iconMap } from '@/data/categories';
+import CategoryFormDrawer from '@/components/admin/CategoryFormDrawer';
 
 const categories = [
   { id: 1, title: 'Scholarships', description: 'Financial aid for students', count: 12, iconName: 'graduationCap', color: 'bg-blue-100' },
@@ -22,10 +23,7 @@ const AdminCategories = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Manage Categories</h1>
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Add Category
-          </Button>
+          <CategoryFormDrawer />
         </div>
 
         <div className="relative">

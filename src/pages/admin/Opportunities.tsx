@@ -4,7 +4,8 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Search, Edit, Trash } from 'lucide-react';
+import { Search, Edit, Trash } from 'lucide-react';
+import OpportunityFormDrawer from '@/components/admin/OpportunityFormDrawer';
 
 const opportunities = [
   { id: 1, title: 'Summer Research Fellowship', category: 'Research', deadline: '2023-06-30', status: 'Active' },
@@ -20,10 +21,7 @@ const AdminOpportunities = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Manage Opportunities</h1>
-          <Button className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Add Opportunity
-          </Button>
+          <OpportunityFormDrawer />
         </div>
 
         <div className="flex items-center gap-2">
