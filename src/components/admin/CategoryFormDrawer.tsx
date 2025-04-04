@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -70,13 +70,57 @@ const categorySections: FormSection[] = [
 
 interface CategoryFormDrawerProps {
   trigger?: React.ReactNode;
+  isOpen?: boolean;
+  onClose?: () => void;
+  isEditing?: boolean;
+  initialData?: {
+    id: number;
+    title: string;
+    description: string;
+    iconName: string;
+    color: string;
+    count?: number;
+  };
 }
 
 const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({ 
-  trigger
+  trigger,
+  isOpen,
+  onClose,
+  isEditing = false,
+  initialData
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [formValues, setFormValues] = useState<Record<string, any>>({});
+
+  // Control the drawer open state
+  useEffect(() => {
+    if (isOpen !== undefined) {
+      setOpen(isOpen);
+    }
+  }, [isOpen]);
+
+  // Set initial form values when editing
+  useEffect(() => {
+    if (isEditing && initialData) {
+      setFormValues({
+        title: initialData.title,
+        description: initialData.description,
+        iconName: initialData.iconName,
+        color: initialData.color,
+      });
+    }
+  }, [isEditing, initialData]);
+
+  // Handle drawer close
+  const handleClose = () => {
+    setOpen(false);
+    if (onClose) {
+      onClose();
+    }
+  };
 
   const handleSubmit = (formData: Record<string, any>) => {
     setLoading(true);
@@ -87,15 +131,20 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
     // Simulate API call
     setTimeout(() => {
       setLoading(false);
+      
       toast({
-        title: "Category Added",
-        description: "The category has been successfully created",
+        title: isEditing ? "Category Updated" : "Category Added",
+        description: isEditing 
+          ? "The category has been successfully updated" 
+          : "The category has been successfully created",
       });
+      
+      handleClose();
     }, 1000);
   };
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {trigger || (
           <Button className="flex items-center gap-2">
@@ -106,25 +155,26 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Add New Category</SheetTitle>
+          <SheetTitle>{isEditing ? 'Edit Category' : 'Add New Category'}</SheetTitle>
           <SheetDescription>
-            Create a new category for opportunities
+            {isEditing ? 'Update category details' : 'Create a new category for opportunities'}
           </SheetDescription>
         </SheetHeader>
         
         <div className="py-6">
           <DynamicForm
-            title="New Category"
+            title={isEditing ? 'Edit Category' : 'New Category'}
             sections={categorySections}
             onSubmit={handleSubmit}
             loading={loading}
-            submitButtonText="Add Category"
+            submitButtonText={isEditing ? 'Update Category' : 'Add Category'}
+            initialValues={formValues}
           />
         </div>
         
         <SheetFooter className="pt-2">
           <SheetClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" onClick={handleClose}>Cancel</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

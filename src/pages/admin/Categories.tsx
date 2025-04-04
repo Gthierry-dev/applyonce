@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,19 @@ const categories = [
 ];
 
 const AdminCategories = () => {
+  const [categoryToEdit, setCategoryToEdit] = useState<typeof categories[0] | null>(null);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  
+  const handleEditClick = (category: typeof categories[0]) => {
+    setCategoryToEdit(category);
+    setIsEditDrawerOpen(true);
+  };
+  
+  const handleEditDrawerClose = () => {
+    setIsEditDrawerOpen(false);
+    setCategoryToEdit(null);
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -54,7 +67,12 @@ const AdminCategories = () => {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => handleEditClick(category)}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -67,6 +85,16 @@ const AdminCategories = () => {
             );
           })}
         </div>
+
+        {/* Edit Category Drawer */}
+        {categoryToEdit && (
+          <CategoryFormDrawer 
+            isOpen={isEditDrawerOpen}
+            onClose={handleEditDrawerClose}
+            isEditing={true}
+            initialData={categoryToEdit}
+          />
+        )}
       </div>
     </AdminLayout>
   );

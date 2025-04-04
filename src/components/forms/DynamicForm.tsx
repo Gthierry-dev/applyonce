@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import FormField, { FieldType, Option } from './FormField';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,6 +32,7 @@ export interface DynamicFormProps {
   onCancel?: () => void;
   className?: string;
   loading?: boolean;
+  initialValues?: Record<string, any>;
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({
@@ -44,11 +45,19 @@ const DynamicForm: React.FC<DynamicFormProps> = ({
   onCancel,
   className,
   loading = false,
+  initialValues = {},
 }) => {
   // Initialize form values with empty state
-  const [formValues, setFormValues] = useState<Record<string, any>>({});
+  const [formValues, setFormValues] = useState<Record<string, any>>(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [currentSection, setCurrentSection] = useState(0);
+
+  // Update form values when initialValues change
+  useEffect(() => {
+    if (Object.keys(initialValues).length > 0) {
+      setFormValues(initialValues);
+    }
+  }, [initialValues]);
 
   const handleFieldChange = (fieldId: string, value: any) => {
     setFormValues((prev) => ({
