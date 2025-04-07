@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          color: string
+          count: number | null
+          created_at: string | null
+          description: string | null
+          icon_name: string
+          id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string
+          count?: number | null
+          created_at?: string | null
+          description?: string | null
+          icon_name: string
+          id?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string
+          count?: number | null
+          created_at?: string | null
+          description?: string | null
+          icon_name?: string
+          id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       opportunities: {
         Row: {
           category: string
@@ -92,7 +125,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_admin_login: {
+        Args: { email: string; password: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

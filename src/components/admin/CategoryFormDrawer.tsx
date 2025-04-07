@@ -13,7 +13,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import DynamicForm, { FormSection } from '@/components/forms/DynamicForm';
-import { Plus } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 // Form configuration for category creation
 const categorySections: FormSection[] = [
@@ -37,7 +38,7 @@ const categorySections: FormSection[] = [
         required: true,
       },
       {
-        id: 'iconName',
+        id: 'icon_name',
         type: 'select',
         label: 'Icon',
         required: true,
@@ -64,23 +65,36 @@ const categorySections: FormSection[] = [
           { label: 'Indigo', value: 'bg-indigo-100' },
         ],
       },
+      {
+        id: 'count',
+        type: 'number',
+        label: 'Opportunity Count',
+        placeholder: 'Number of opportunities',
+        required: false,
+      },
     ],
   },
 ];
+
+interface Category {
+  id: string;
+  title: string;
+  description: string | null;
+  count: number | null;
+  icon_name: string;
+  color: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
 interface CategoryFormDrawerProps {
   trigger?: React.ReactNode;
   isOpen?: boolean;
   onClose?: () => void;
   isEditing?: boolean;
-  initialData?: {
-    id: number;
-    title: string;
-    description: string;
-    iconName: string;
-    color: string;
-    count?: number;
-  };
+  initialData?: Category;
+  onCategoryAdded?: (category: Category) => void;
+  onCategoryUpdated?: (category: Category) => void;
 }
 
 const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({ 
@@ -88,10 +102,12 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
   isOpen,
   onClose,
   isEditing = false,
-  initialData
+  initialData,
+  onCategoryAdded,
+  onCategoryUpdated
 }) => {
   const { toast } = useToast();
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [formValues, setFormValues] = useState<Record<string, any>>({});
 
@@ -107,9 +123,10 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
     if (isEditing && initialData) {
       setFormValues({
         title: initialData.title,
-        description: initialData.description,
-        iconName: initialData.iconName,
+        description: initialData.description || '',
+        icon_name: initialData.icon_name,
         color: initialData.color,
+        count: initialData.count || 0,
       });
     }
   }, [isEditing, initialData]);
@@ -122,25 +139,81 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
     }
   };
 
-  const handleSubmit = (formData: Record<string, any>) => {
+  const handleSubmit = async (formData: Record<string, any>) => {
     setLoading(true);
     
-    // Process form data
-    console.log('Submitted category:', formData);
-
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const categoryData = {
+        title: formData.title,
+        description: formData.description,
+        icon_name: formData.icon_name,
+        color: formData.color,
+        count: formData.count || 0,
+        updated_at: new Date().toISOString()
+      };
       
-      toast({
-        title: isEditing ? "Category Updated" : "Category Added",
-        description: isEditing 
-          ? "The category has been successfully updated" 
-          : "The category has been successfully created",
-      });
+      let result;
+      
+      if (isEditing && initialData) {
+        // Update existing category
+        const { data, error } = await supabase
+          .from('categories')
+          .update(categoryData)
+          .eq('id', initialData.id)
+          .select('*')
+          .single();
+        
+        if (error) {
+          throw error;
+        }
+        
+        result = data;
+        
+        toast({
+          title: "Category Updated",
+          description: "The category has been successfully updated",
+        });
+        
+        // Call the callback with the updated category
+        if (onCategoryUpdated && result) {
+          onCategoryUpdated(result);
+        }
+      } else {
+        // Create new category
+        const { data, error } = await supabase
+          .from('categories')
+          .insert(categoryData)
+          .select('*')
+          .single();
+        
+        if (error) {
+          throw error;
+        }
+        
+        result = data;
+        
+        toast({
+          title: "Category Added",
+          description: "The category has been successfully created",
+        });
+        
+        // Call the callback with the new category
+        if (onCategoryAdded && result) {
+          onCategoryAdded(result);
+        }
+      }
       
       handleClose();
-    }, 1000);
+    } catch (error: any) {
+      console.error('Error saving category:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to ${isEditing ? 'update' : 'create'} category: ${error.message || 'Unknown error'}`,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -167,14 +240,19 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
             sections={categorySections}
             onSubmit={handleSubmit}
             loading={loading}
-            submitButtonText={isEditing ? 'Update Category' : 'Add Category'}
+            submitButtonText={
+              <>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isEditing ? 'Update Category' : 'Add Category'}
+              </>
+            }
             initialValues={formValues}
           />
         </div>
         
         <SheetFooter className="pt-2">
           <SheetClose asChild>
-            <Button variant="outline" onClick={handleClose}>Cancel</Button>
+            <Button variant="outline" onClick={handleClose} disabled={loading}>Cancel</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

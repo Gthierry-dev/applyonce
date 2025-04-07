@@ -149,7 +149,7 @@ const Login = () => {
           <CardFooter className="flex flex-col">
             <p className="text-center text-sm mt-4"> 
               Continue as <Link to="/dashboard" className="text-primary hover:underline">Guest</Link> or 
-              <Link to="/admin/dashboard" className="text-primary hover:underline ml-1">Admin</Link>
+              <Link to="/admin/login" className="text-primary hover:underline ml-1">Admin</Link>
             </p>
             
             <p className="text-center text-sm mt-4">

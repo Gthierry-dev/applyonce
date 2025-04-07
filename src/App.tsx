@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
+import AdminLogin from "./pages/auth/AdminLogin";
 
 // Dashboard routes
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           
           {/* Dashboard Routes */}
           <Route path="/dashboard" element={<Dashboard />} />
