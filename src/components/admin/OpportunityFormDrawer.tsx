@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import DynamicForm, { FormSection } from '@/components/forms/DynamicForm';
 import { Plus } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 // Form configuration for opportunity creation
 const opportunitySections: FormSection[] = [
@@ -60,6 +61,12 @@ const opportunitySections: FormSection[] = [
         type: 'date',
         label: 'Deadline',
         required: true,
+      },
+      {
+        id: 'website_url',
+        type: 'text',
+        label: 'Website URL',
+        placeholder: 'Enter the official website URL for this opportunity',
       },
     ],
   },
@@ -126,28 +133,60 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(false);
 
-  const handleSubmit = (formData: Record<string, any>) => {
+  const handleSubmit = async (formData: Record<string, any>) => {
     setLoading(true);
     
-    // Process form data
-    console.log('Submitted opportunity:', formData);
+    try {
+      // Process form data
+      console.log('Submitted opportunity:', formData);
 
-    // Convert requirements text to array
-    if (formData.requirements) {
-      formData.requirements = formData.requirements
-        .split('\n')
-        .map((item: string) => item.trim())
-        .filter((item: string) => item);
-    }
+      // Convert requirements text to array
+      if (formData.requirements) {
+        formData.requirements = formData.requirements
+          .split('\n')
+          .map((item: string) => item.trim())
+          .filter((item: string) => item);
+      }
 
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+      // Prepare data for Supabase
+      const opportunityData = {
+        title: formData.title,
+        organization: formData.organization,
+        category: formData.category,
+        type: formData.type,
+        deadline: new Date(formData.deadline).toISOString(),
+        description: formData.description,
+        location: formData.location,
+        salary: formData.salary,
+        requirements: formData.requirements,
+        website_url: formData.website_url,
+        is_active: formData.isActive,
+        featured: formData.featured
+      };
+
+      // Insert into Supabase
+      const { data, error } = await supabase
+        .from('opportunities')
+        .insert(opportunityData);
+
+      if (error) {
+        throw error;
+      }
+
       toast({
         title: "Opportunity Added",
         description: "The opportunity has been successfully created",
       });
-    }, 1000);
+    } catch (error) {
+      console.error('Error adding opportunity:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add opportunity. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
