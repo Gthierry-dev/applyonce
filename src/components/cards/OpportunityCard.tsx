@@ -1,11 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Clock, Tag, ArrowRight, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import OpportunityDrawer, { OpportunityDetails } from './OpportunityDrawer';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface OpportunityCardProps extends OpportunityDetails {
   className?: string;
@@ -24,6 +26,9 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
   className,
   ...rest
 }) => {
+  const { toast } = useToast();
+  const [applying, setApplying] = useState(false);
+
   // Format the deadline
   const formatDeadline = (dateString: string) => {
     const date = new Date(dateString);
@@ -32,6 +37,33 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
       day: 'numeric',
       year: 'numeric',
     }).format(date);
+  };
+
+  // Handle application
+  const handleApply = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setApplying(true);
+    
+    try {
+      // In a real implementation, this would call the Supabase API to create an application
+      // For now, just showing a success toast
+      
+      setTimeout(() => {
+        toast({
+          title: "Application Submitted",
+          description: `You've applied to ${title}`,
+        });
+        setApplying(false);
+      }, 800);
+    } catch (error) {
+      console.error('Error applying to opportunity:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to submit application. Please try again.",
+      });
+      setApplying(false);
+    }
   };
 
   // Combined opportunity object to pass to drawer
@@ -131,8 +163,14 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
         <OpportunityDrawer 
           opportunity={opportunity}
           trigger={
-            <Button variant="default" size="sm" className="h-8 px-3 text-xs">
-              Apply Now
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="h-8 px-3 text-xs"
+              onClick={handleApply}
+              disabled={applying}
+            >
+              {applying ? "Applying..." : "Apply Now"}
               <ArrowRight className="ml-1 h-3 w-3" />
             </Button>
           }

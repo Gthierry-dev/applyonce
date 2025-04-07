@@ -1,20 +1,43 @@
-
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Grid3X3, List } from 'lucide-react';
-import { supabase, Category } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import CategoryCard from '@/components/categories/CategoryCard';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import CategoryFormDrawer from '@/components/admin/CategoryFormDrawer';
+import { Search, Edit, Trash, ExternalLink } from 'lucide-react';
+import OpportunityFormDrawer from '@/components/admin/OpportunityFormDrawer';
+import { supabase, Opportunity } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
+
+// Update the Category type to match what we're using elsewhere
+interface AdminCategory {
+  id: string;
+  title: string;
+  description: string;
+  count: number;
+  icon_name: string;
+  color: string;
+  created_at: string;
+  updated_at: string;
+}
 
 const AdminCategories = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
+  // Update the state type
+  const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editData, setEditData] = useState<AdminCategory | null>(null);
+  const [formDrawerOpen, setFormDrawerOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -27,7 +50,7 @@ const AdminCategories = () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('title');
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setCategories(data || []);
@@ -43,9 +66,64 @@ const AdminCategories = () => {
     }
   };
 
-  const filteredCategories = categories.filter(cat => 
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteId) return;
+
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', deleteId);
+
+      if (error) throw error;
+
+      // Update the local state by removing the deleted category
+      setCategories(categories.filter(cat => cat.id !== deleteId));
+      
+      toast({
+        title: 'Success',
+        description: 'Category deleted successfully',
+      });
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete category',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteId(null);
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  const handleEditClick = (category: AdminCategory) => {
+    setEditData(category);
+    setFormDrawerOpen(true);
+  };
+
+  const handleCategoryAdded = (newCategory: AdminCategory) => {
+    // Add the new category to the local state
+    setCategories([newCategory, ...categories]);
+  };
+
+  const handleCategoryUpdated = (updatedCategory: AdminCategory) => {
+    // Update the local state by replacing the updated category
+    setCategories(categories.map(cat => 
+      cat.id === updatedCategory.id ? updatedCategory : cat
+    ));
+  };
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredCategories = categories.filter(cat =>
     cat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (cat.description && cat.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    cat.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -53,16 +131,7 @@ const AdminCategories = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Manage Categories</h1>
-          <CategoryFormDrawer 
-            trigger={<Button>Add Category</Button>}
-            onCategoryAdded={(newCategory) => {
-              setCategories([...categories, newCategory]);
-              toast({
-                title: "Category Added",
-                description: `${newCategory.title} has been added successfully`,
-              });
-            }}
-          />
+          <Button onClick={() => setFormDrawerOpen(true)}>Add Category</Button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -75,6 +144,7 @@ const AdminCategories = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <Button variant="outline">Filter</Button>
         </div>
 
         {loading ? (
@@ -82,83 +152,81 @@ const AdminCategories = () => {
             <p>Loading categories...</p>
           </div>
         ) : (
-          <Tabs defaultValue="grid" className="w-full">
-            <TabsList className="grid w-[200px] grid-cols-2">
-              <TabsTrigger value="grid" className="flex items-center gap-2">
-                <Grid3X3 className="h-4 w-4" />
-                <span>Grid</span>
-              </TabsTrigger>
-              <TabsTrigger value="table" className="flex items-center gap-2">
-                <List className="h-4 w-4" />
-                <span>Table</span>
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="grid" className="mt-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Opportunity Count</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {filteredCategories.length === 0 ? (
-                  <p className="col-span-full text-center py-8 text-muted-foreground">
-                    No categories found
-                  </p>
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8">
+                      No categories found
+                    </TableCell>
+                  </TableRow>
                 ) : (
                   filteredCategories.map((category) => (
-                    <CategoryCard
-                      key={category.id}
-                      title={category.title}
-                      description={category.description || ''}
-                      count={category.count || 0}
-                      color={category.color}
-                      iconName={category.icon_name}
-                      onClick={() => {}}
-                    />
+                    <TableRow key={category.id}>
+                      <TableCell>
+                        <div className="font-medium">{category.title}</div>
+                      </TableCell>
+                      <TableCell>{category.description}</TableCell>
+                      <TableCell>{category.count}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditClick(category)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => handleDeleteClick(category.id)}
+                          >
+                            <Trash className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
                   ))
                 )}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="table" className="mt-6">
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Title</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Icon</TableHead>
-                      <TableHead>Color</TableHead>
-                      <TableHead>Count</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredCategories.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8">
-                          No categories found
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredCategories.map((category) => (
-                        <TableRow key={category.id}>
-                          <TableCell className="font-medium">{category.title}</TableCell>
-                          <TableCell>{category.description || 'N/A'}</TableCell>
-                          <TableCell>{category.icon_name}</TableCell>
-                          <TableCell>{category.color}</TableCell>
-                          <TableCell>{category.count || 0}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button variant="ghost" size="sm">Edit</Button>
-                              <Button variant="ghost" size="sm" className="text-destructive">Delete</Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </TabsContent>
-          </Tabs>
+              </TableBody>
+            </Table>
+          </div>
         )}
+
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Category</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this category? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteConfirm}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <OpportunityFormDrawer 
+          isOpen={formDrawerOpen}
+          onClose={() => setFormDrawerOpen(false)}
+          isEditing={!!editData}
+          initialData={editData}
+          onCategoryAdded={handleCategoryAdded}
+          onCategoryUpdated={handleCategoryUpdated}
+        />
       </div>
     </AdminLayout>
   );

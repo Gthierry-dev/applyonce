@@ -80,6 +80,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
     type: "Full-time",
     salary: "$50,000 - $70,000",
     logo,
+    website_url: "#",
   };
 
   return (
@@ -138,9 +139,11 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({
                 </Link>
               </Button>
             ) : (
-              <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
-                Apply
-                <ExternalLink className="ml-1 h-3 w-3" />
+              <Button variant="outline" size="sm" className="h-8 px-3 text-xs" asChild>
+                <a href={opportunityDetails.website_url} target="_blank" rel="noopener noreferrer">
+                  Website
+                  <ExternalLink className="ml-1 h-3 w-3" />
+                </a>
               </Button>
             )}
           </CardFooter>

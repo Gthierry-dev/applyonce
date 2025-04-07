@@ -238,10 +238,10 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
               onSubmit={handleSubmit}
               loading={loading}
               submitButtonText={loading ? (
-                <div className="flex items-center">
+                <span className="flex items-center">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Adding Opportunity...
-                </div>
+                </span>
               ) : (
                 "Add Opportunity"
               )}

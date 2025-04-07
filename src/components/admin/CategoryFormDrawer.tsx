@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -247,16 +248,14 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
             sections={categorySections}
             onSubmit={handleSubmit}
             loading={loading}
-            submitButtonText={
-              loading ? (
-                <div className="flex items-center">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isEditing ? 'Updating...' : 'Adding...'}
-                </div>
-              ) : (
-                isEditing ? 'Update Category' : 'Add Category'
-              )
-            }
+            submitButtonText={loading ? (
+              <span className="flex items-center">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {isEditing ? 'Updating...' : 'Adding...'}
+              </span>
+            ) : (
+              isEditing ? 'Update Category' : 'Add Category'
+            )}
             initialValues={formValues}
           />
         </div>
