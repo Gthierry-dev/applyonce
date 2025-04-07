@@ -165,7 +165,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
       };
 
       // Insert into Supabase
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('opportunities')
         .insert(opportunityData);
 
