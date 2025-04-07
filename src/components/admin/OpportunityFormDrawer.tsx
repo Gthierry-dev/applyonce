@@ -13,9 +13,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import DynamicForm, { FormSection } from '@/components/forms/DynamicForm';
-import { Plus } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { supabase, Category } from '@/integrations/supabase/client';
-import useCategories from '@/hooks/useCategories';
+import { useCategories } from '@/hooks/useCategories';
 
 interface OpportunityFormDrawerProps {
   trigger?: React.ReactNode;
@@ -196,11 +196,11 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
         title: "Opportunity Added",
         description: "The opportunity has been successfully created",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding opportunity:', error);
       toast({
         title: "Error",
-        description: "Failed to add opportunity. Please try again.",
+        description: `Failed to add opportunity: ${error.message || "Unknown error"}`,
         variant: "destructive"
       });
     } finally {
@@ -237,7 +237,14 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
               sections={formSections}
               onSubmit={handleSubmit}
               loading={loading}
-              submitButtonText="Add Opportunity"
+              submitButtonText={loading ? (
+                <div className="flex items-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Adding Opportunity...
+                </div>
+              ) : (
+                "Add Opportunity"
+              )}
             />
           )}
         </div>

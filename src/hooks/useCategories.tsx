@@ -20,4 +20,5 @@ export const useCategories = () => {
   });
 };
 
+// Export as default for backward compatibility
 export default useCategories;

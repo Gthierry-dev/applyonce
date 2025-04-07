@@ -44,6 +44,7 @@ export type Database = {
       }
       opportunities: {
         Row: {
+          categories: string[] | null
           category: string
           created_at: string
           deadline: string
@@ -61,6 +62,7 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
+          categories?: string[] | null
           category: string
           created_at?: string
           deadline: string
@@ -78,6 +80,7 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
+          categories?: string[] | null
           category?: string
           created_at?: string
           deadline?: string

@@ -53,7 +53,16 @@ const AdminCategories = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Manage Categories</h1>
-          <CategoryFormDrawer trigger={<Button>Add Category</Button>} />
+          <CategoryFormDrawer 
+            trigger={<Button>Add Category</Button>}
+            onCategoryAdded={(newCategory) => {
+              setCategories([...categories, newCategory]);
+              toast({
+                title: "Category Added",
+                description: `${newCategory.title} has been added successfully`,
+              });
+            }}
+          />
         </div>
 
         <div className="flex items-center gap-2">
@@ -99,7 +108,7 @@ const AdminCategories = () => {
                       description={category.description || ''}
                       count={category.count || 0}
                       color={category.color}
-                      icon={category.icon_name}
+                      iconName={category.icon_name}
                       onClick={() => {}}
                     />
                   ))

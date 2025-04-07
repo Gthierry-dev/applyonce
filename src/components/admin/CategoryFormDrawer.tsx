@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -241,10 +240,14 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
             onSubmit={handleSubmit}
             loading={loading}
             submitButtonText={
-              <>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEditing ? 'Update Category' : 'Add Category'}
-              </>
+              loading ? (
+                <div className="flex items-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {isEditing ? 'Updating...' : 'Adding...'}
+                </div>
+              ) : (
+                isEditing ? 'Update Category' : 'Add Category'
+              )
             }
             initialValues={formValues}
           />
@@ -259,5 +262,73 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
     </Sheet>
   );
 };
+
+// This is the form configuration for category creation
+const categorySections: FormSection[] = [
+  {
+    id: 'basic',
+    title: 'Category Information',
+    description: 'Create a new opportunity category',
+    fields: [
+      {
+        id: 'title',
+        type: 'text',
+        label: 'Title',
+        placeholder: 'Enter category title',
+        required: true,
+      },
+      {
+        id: 'description',
+        type: 'textarea',
+        label: 'Description',
+        placeholder: 'Short description of this category',
+        required: true,
+      },
+      {
+        id: 'icon_name',
+        type: 'select',
+        label: 'Icon',
+        required: true,
+        options: [
+          { label: 'Graduation Cap', value: 'GraduationCap' },
+          { label: 'Briefcase', value: 'Briefcase' },
+          { label: 'Award', value: 'Award' },
+          { label: 'Globe', value: 'Globe' },
+          { label: 'Banknote', value: 'banknote' },
+          { label: 'Trophy', value: 'trophy' },
+          { label: 'Building', value: 'Building' },
+          { label: 'Lightbulb', value: 'Lightbulb' },
+          { label: 'Users', value: 'Users' },
+          { label: 'HeartHandshake', value: 'HeartHandshake' },
+          { label: 'PenTool', value: 'PenTool' },
+        ],
+      },
+      {
+        id: 'color',
+        type: 'select',
+        label: 'Color',
+        required: true,
+        options: [
+          { label: 'Blue', value: 'bg-blue-100' },
+          { label: 'Green', value: 'bg-green-100' },
+          { label: 'Purple', value: 'bg-purple-100' },
+          { label: 'Yellow', value: 'bg-yellow-100' },
+          { label: 'Red', value: 'bg-red-100' },
+          { label: 'Indigo', value: 'bg-indigo-100' },
+          { label: 'Orange', value: 'bg-orange-100' },
+          { label: 'Pink', value: 'bg-pink-100' },
+          { label: 'Teal', value: 'bg-teal-100' },
+        ],
+      },
+      {
+        id: 'count',
+        type: 'number',
+        label: 'Opportunity Count',
+        placeholder: 'Number of opportunities',
+        required: false,
+      },
+    ],
+  },
+];
 
 export default CategoryFormDrawer;

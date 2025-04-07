@@ -15,9 +15,10 @@ interface CategoryCardProps {
   count: number;
   iconName: string;
   color: string;
-  enabled: boolean;
-  onToggle: (enabled: boolean) => void;
-  configured: boolean;
+  enabled?: boolean;
+  onToggle?: (enabled: boolean) => void;
+  configured?: boolean;
+  onClick?: () => void;
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ 
@@ -26,9 +27,10 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   count, 
   iconName, 
   color,
-  enabled,
-  onToggle,
-  configured
+  enabled = false,
+  onToggle = () => {},
+  configured = false,
+  onClick = () => {}
 }) => {
   const handleToggleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -40,14 +42,14 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
     <Card className="overflow-hidden hover:shadow-md transition-all duration-300 relative">
       <CategoryFormDrawer 
         categoryName={title}
-        categoryIcon={<IconComponent className="h-5 w-5" />}
+        categoryIcon={IconComponent ? <IconComponent className="h-5 w-5" /> : null}
         trigger={
           <div>
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
                   <div className={`p-2 rounded-md ${color}`}>
-                    <IconComponent className="h-5 w-5 text-blue-600" />
+                    {IconComponent && <IconComponent className="h-5 w-5 text-blue-600" />}
                   </div>
                   <div className="space-y-1">
                     <h3 className="font-semibold text-lg flex items-center">
