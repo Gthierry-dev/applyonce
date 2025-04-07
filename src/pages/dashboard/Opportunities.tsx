@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import OpportunityCard from '@/components/cards/OpportunityCard';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, Opportunity } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 const Opportunities = () => {
-  const [opportunities, setOpportunities] = useState([]);
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -69,8 +69,10 @@ const Opportunities = () => {
                 title={opportunity.title}
                 organization={opportunity.organization}
                 category={opportunity.category}
+                categories={opportunity.categories as string[] | undefined}
                 deadline={new Date(opportunity.deadline).toISOString()}
                 description={opportunity.description}
+                website_url={opportunity.website_url}
               />
             ))}
           </div>

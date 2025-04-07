@@ -10,3 +10,8 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+// Define reusable types for use throughout the application
+export type Category = Database['public']['Tables']['categories']['Row'];
+export type Opportunity = Database['public']['Tables']['opportunities']['Row'];
+export type Profile = Database['public']['Tables']['profiles']['Row'];

@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Search, Edit, Trash, ExternalLink } from 'lucide-react';
 import OpportunityFormDrawer from '@/components/admin/OpportunityFormDrawer';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase, Opportunity } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -20,11 +21,11 @@ import {
 } from "@/components/ui/dialog";
 
 const AdminOpportunities = () => {
-  const [opportunities, setOpportunities] = useState([]);
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
-  const [deleteId, setDeleteId] = useState(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -82,7 +83,7 @@ const AdminOpportunities = () => {
     }
   };
 
-  const handleDeleteClick = (id) => {
+  const handleDeleteClick = (id: string) => {
     setDeleteId(id);
     setDeleteDialogOpen(true);
   };
@@ -124,7 +125,7 @@ const AdminOpportunities = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Opportunity</TableHead>
-                  <TableHead>Category</TableHead>
+                  <TableHead>Categories</TableHead>
                   <TableHead>Deadline</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -144,7 +145,21 @@ const AdminOpportunities = () => {
                         <div className="font-medium">{opportunity.title}</div>
                         <div className="text-sm text-muted-foreground">{opportunity.organization}</div>
                       </TableCell>
-                      <TableCell>{opportunity.category}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {opportunity.categories && Array.isArray(opportunity.categories) ? (
+                            opportunity.categories.map((cat, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {cat}
+                              </Badge>
+                            ))
+                          ) : (
+                            <Badge variant="outline" className="text-xs">
+                              {opportunity.category}
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>{new Date(opportunity.deadline).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 rounded-full text-xs ${

@@ -32,6 +32,7 @@ export interface OpportunityDetails {
   title: string;
   organization: string;
   category: string;
+  categories?: string[];
   deadline: string;
   logo?: string;
   description: string;
@@ -39,6 +40,7 @@ export interface OpportunityDetails {
   location?: string;
   type?: string;
   salary?: string;
+  website_url?: string;
 }
 
 interface OpportunityDrawerProps {

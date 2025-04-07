@@ -43,6 +43,7 @@ const AdminLogin = () => {
         // For simplicity, we're just storing a flag in localStorage
         // In a real app, you'd use a proper auth system with tokens
         localStorage.setItem('isAdminLoggedIn', 'true');
+        localStorage.setItem('adminEmail', email);
         
         navigate('/admin/dashboard');
       } else {

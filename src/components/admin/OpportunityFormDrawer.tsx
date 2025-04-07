@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,114 +14,8 @@ import {
 } from "@/components/ui/sheet";
 import DynamicForm, { FormSection } from '@/components/forms/DynamicForm';
 import { Plus } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-
-// Form configuration for opportunity creation
-const opportunitySections: FormSection[] = [
-  {
-    id: 'basic',
-    title: 'Basic Information',
-    description: 'Enter the basic details of the opportunity',
-    fields: [
-      {
-        id: 'title',
-        type: 'text',
-        label: 'Title',
-        placeholder: 'Enter opportunity title',
-        required: true,
-      },
-      {
-        id: 'organization',
-        type: 'text',
-        label: 'Organization',
-        placeholder: 'Enter organization name',
-        required: true,
-      },
-      {
-        id: 'category',
-        type: 'select',
-        label: 'Category',
-        required: true,
-        options: [
-          { label: 'Scholarship', value: 'scholarship' },
-          { label: 'Fellowship', value: 'fellowship' },
-          { label: 'Internship', value: 'internship' },
-          { label: 'Grant', value: 'grant' },
-          { label: 'Award', value: 'award' },
-        ],
-      },
-      {
-        id: 'type',
-        type: 'text',
-        label: 'Type',
-        placeholder: 'E.g., Summer, Full-time, Remote',
-      },
-      {
-        id: 'deadline',
-        type: 'date',
-        label: 'Deadline',
-        required: true,
-      },
-      {
-        id: 'website_url',
-        type: 'text',
-        label: 'Website URL',
-        placeholder: 'Enter the official website URL for this opportunity',
-      },
-    ],
-  },
-  {
-    id: 'details',
-    title: 'Opportunity Details',
-    description: 'Provide more detailed information about the opportunity',
-    fields: [
-      {
-        id: 'description',
-        type: 'textarea',
-        label: 'Description',
-        placeholder: 'Enter a detailed description of the opportunity',
-        required: true,
-      },
-      {
-        id: 'location',
-        type: 'text',
-        label: 'Location',
-        placeholder: 'E.g., Remote, New York, NY',
-      },
-      {
-        id: 'salary',
-        type: 'text',
-        label: 'Compensation',
-        placeholder: 'E.g., $50,000/year, $20/hour, Fully funded',
-      },
-    ],
-  },
-  {
-    id: 'requirements',
-    title: 'Requirements & Eligibility',
-    description: 'Specify who can apply for this opportunity',
-    fields: [
-      {
-        id: 'requirements',
-        type: 'textarea',
-        label: 'Requirements',
-        placeholder: 'Enter requirements, each on a new line',
-      },
-      {
-        id: 'isActive',
-        type: 'switch',
-        label: 'Active Status',
-        placeholder: 'Make this opportunity visible to users',
-      },
-      {
-        id: 'featured',
-        type: 'switch',
-        label: 'Featured',
-        placeholder: 'Show this opportunity as featured',
-      },
-    ],
-  },
-];
+import { supabase, Category } from '@/integrations/supabase/client';
+import useCategories from '@/hooks/useCategories';
 
 interface OpportunityFormDrawerProps {
   trigger?: React.ReactNode;
@@ -131,7 +25,121 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
   trigger
 }) => {
   const { toast } = useToast();
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const [formSections, setFormSections] = useState<FormSection[]>([]);
+  
+  useEffect(() => {
+    if (categories) {
+      const categoriesOptions = categories.map(category => ({
+        label: category.title,
+        value: category.title
+      }));
+      
+      // Update the form sections with the categories
+      setFormSections([
+        {
+          id: 'basic',
+          title: 'Basic Information',
+          description: 'Enter the basic details of the opportunity',
+          fields: [
+            {
+              id: 'title',
+              type: 'text',
+              label: 'Title',
+              placeholder: 'Enter opportunity title',
+              required: true,
+            },
+            {
+              id: 'organization',
+              type: 'text',
+              label: 'Organization',
+              placeholder: 'Enter organization name',
+              required: true,
+            },
+            {
+              id: 'categories',
+              type: 'multiselect',
+              label: 'Categories',
+              required: true,
+              options: categoriesOptions,
+              description: 'Select all relevant categories for this opportunity',
+            },
+            {
+              id: 'type',
+              type: 'text',
+              label: 'Type',
+              placeholder: 'E.g., Summer, Full-time, Remote',
+            },
+            {
+              id: 'deadline',
+              type: 'date',
+              label: 'Deadline',
+              required: true,
+            },
+            {
+              id: 'website_url',
+              type: 'text',
+              label: 'Website URL',
+              placeholder: 'Enter the official website URL for this opportunity',
+              required: true,
+            },
+          ],
+        },
+        {
+          id: 'details',
+          title: 'Opportunity Details',
+          description: 'Provide more detailed information about the opportunity',
+          fields: [
+            {
+              id: 'description',
+              type: 'textarea',
+              label: 'Description',
+              placeholder: 'Enter a detailed description of the opportunity',
+              required: true,
+            },
+            {
+              id: 'location',
+              type: 'text',
+              label: 'Location',
+              placeholder: 'E.g., Remote, New York, NY',
+            },
+            {
+              id: 'salary',
+              type: 'text',
+              label: 'Compensation',
+              placeholder: 'E.g., $50,000/year, $20/hour, Fully funded',
+            },
+          ],
+        },
+        {
+          id: 'requirements',
+          title: 'Requirements & Eligibility',
+          description: 'Specify who can apply for this opportunity',
+          fields: [
+            {
+              id: 'requirements',
+              type: 'textarea',
+              label: 'Requirements',
+              placeholder: 'Enter requirements, each on a new line',
+            },
+            {
+              id: 'isActive',
+              type: 'switch',
+              label: 'Active Status',
+              placeholder: 'Make this opportunity visible to users',
+            },
+            {
+              id: 'featured',
+              type: 'switch',
+              label: 'Featured',
+              placeholder: 'Show this opportunity as featured',
+            },
+          ],
+        },
+      ]);
+    }
+  }, [categories]);
 
   const handleSubmit = async (formData: Record<string, any>) => {
     setLoading(true);
@@ -148,11 +156,22 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
           .filter((item: string) => item);
       }
 
+      // Get primary category (first one)
+      const primaryCategory = formData.categories && formData.categories.length > 0 
+        ? formData.categories[0] 
+        : "";
+
+      // Store all selected categories in an array
+      const categoriesArray = Array.isArray(formData.categories) 
+        ? formData.categories 
+        : [formData.categories].filter(Boolean);
+
       // Prepare data for Supabase
       const opportunityData = {
         title: formData.title,
         organization: formData.organization,
-        category: formData.category,
+        category: primaryCategory, // Keep primary category in the original field
+        categories: categoriesArray, // Store all categories in a new field
         type: formData.type,
         deadline: new Date(formData.deadline).toISOString(),
         description: formData.description,
@@ -208,13 +227,19 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
         </SheetHeader>
         
         <div className="py-6">
-          <DynamicForm
-            title="New Opportunity"
-            sections={opportunitySections}
-            onSubmit={handleSubmit}
-            loading={loading}
-            submitButtonText="Add Opportunity"
-          />
+          {categoriesLoading ? (
+            <div className="flex justify-center py-8">
+              <p>Loading form...</p>
+            </div>
+          ) : (
+            <DynamicForm
+              title="New Opportunity"
+              sections={formSections}
+              onSubmit={handleSubmit}
+              loading={loading}
+              submitButtonText="Add Opportunity"
+            />
+          )}
         </div>
         
         <SheetFooter className="pt-2">

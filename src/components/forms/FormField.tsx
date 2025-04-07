@@ -13,6 +13,8 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { X } from 'lucide-react';
 
 export type FieldType = 
   | 'text' 
@@ -21,6 +23,7 @@ export type FieldType =
   | 'password' 
   | 'number' 
   | 'select' 
+  | 'multiselect'
   | 'checkbox' 
   | 'switch'
   | 'date'
@@ -66,6 +69,27 @@ const FormField: React.FC<FormFieldProps> = ({
 
   const handleSelectChange = (value: string) => {
     onChange(value);
+  };
+
+  const handleMultiSelectChange = (selectedValue: string) => {
+    // Initialize value as array if it's not
+    const currentValues = Array.isArray(value) ? [...value] : [];
+    
+    // Check if value is already selected
+    if (currentValues.includes(selectedValue)) {
+      // Remove value if already selected
+      onChange(currentValues.filter(v => v !== selectedValue));
+    } else {
+      // Add value if not selected
+      onChange([...currentValues, selectedValue]);
+    }
+  };
+
+  const handleRemoveItem = (itemToRemove: string) => {
+    const updatedValues = Array.isArray(value) 
+      ? value.filter(item => item !== itemToRemove)
+      : [];
+    onChange(updatedValues);
   };
 
   const handleCheckboxChange = (checked: boolean) => {
@@ -139,6 +163,44 @@ const FormField: React.FC<FormFieldProps> = ({
               ))}
             </SelectContent>
           </Select>
+        );
+      case 'multiselect':
+        return (
+          <div className="space-y-2">
+            <Select
+              disabled={disabled}
+              onValueChange={handleMultiSelectChange}
+            >
+              <SelectTrigger className={cn(error && 'border-red-500')}>
+                <SelectValue placeholder={placeholder || "Select options..."} />
+              </SelectTrigger>
+              <SelectContent>
+                {options.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {/* Selected items display */}
+            {Array.isArray(value) && value.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {value.map((item: string) => {
+                  const option = options.find(opt => opt.value === item);
+                  return (
+                    <Badge key={item} variant="secondary" className="flex items-center gap-1">
+                      {option?.label || item}
+                      <X 
+                        className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                        onClick={() => handleRemoveItem(item)}
+                      />
+                    </Badge>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         );
       case 'checkbox':
         return (

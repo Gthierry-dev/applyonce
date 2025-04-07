@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Clock, Tag, ArrowRight } from 'lucide-react';
+import { Clock, Tag, ArrowRight, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,9 +16,11 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
   title,
   organization,
   category,
+  categories,
   deadline,
   logo,
   description,
+  website_url,
   className,
   ...rest
 }) => {
@@ -38,11 +40,20 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
     title,
     organization,
     category,
+    categories,
     deadline,
     logo,
     description,
+    website_url,
     ...rest
   };
+
+  // Handle multiple categories or fallback to single category
+  const displayCategories = categories && categories.length > 0 
+    ? categories 
+    : category 
+      ? [category] 
+      : [];
 
   return (
     <Card className={cn("overflow-hidden transition-all duration-300 hover:shadow-md", className)}>
@@ -65,13 +76,21 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
               <p className="text-sm text-muted-foreground">{organization}</p>
             </div>
           </div>
-          <Badge variant="outline" className="text-xs">
-            <Tag className="mr-1 h-3 w-3" />
-            {category}
-          </Badge>
         </div>
       </CardHeader>
       <CardContent className="p-4">
+        {/* Categories */}
+        {displayCategories && displayCategories.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {displayCategories.map((cat, index) => (
+              <Badge key={index} variant="outline" className="text-xs">
+                <Tag className="mr-1 h-3 w-3" />
+                {cat}
+              </Badge>
+            ))}
+          </div>
+        )}
+        
         <p className="text-sm text-foreground/80 line-clamp-2">{description}</p>
         <div className="mt-3 flex items-center text-xs text-muted-foreground">
           <Clock className="mr-1 h-3 w-3" />
@@ -79,14 +98,36 @@ const OpportunityCard: React.FC<OpportunityCardProps> = ({
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between items-center">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8 px-2 text-xs"
-          onClick={(e) => e.stopPropagation()}
-        >
-          Save
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 px-2 text-xs"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Save
+          </Button>
+          
+          {website_url && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 px-2 text-xs"
+              asChild
+            >
+              <a 
+                href={website_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ExternalLink className="h-3 w-3 mr-1" />
+                Website
+              </a>
+            </Button>
+          )}
+        </div>
+        
         <OpportunityDrawer 
           opportunity={opportunity}
           trigger={
