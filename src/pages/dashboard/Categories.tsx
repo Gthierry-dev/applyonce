@@ -6,7 +6,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { Loader2 } from 'lucide-react';
 
 const Categories = () => {
-  const { data: categories, isLoading, error, enabledCategories, configuredCategories, handleToggle } = useCategories();
+  const { data: categories, isLoading, enabledCategories, configuredCategories, handleToggle } = useCategories();
 
   return (
     <DashboardLayout>
