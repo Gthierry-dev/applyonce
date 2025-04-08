@@ -1,18 +1,21 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard,
+  Home,
   FileText,
+  Bell,
   Settings,
   ChevronRight,
   Folder,
+  Users,
+  Search,
+  LayoutDashboard,
   LogOut,
   ChevronLeft,
   Menu,
   ClipboardList,
-  Search,
-  BarChart,
-  Users
+  BarChart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -40,10 +43,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   ];
 
   const userLinks = [
+    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { name: 'Opportunities', icon: <Search size={20} />, path: '/opportunities' },
     { name: 'Applications', icon: <FileText size={20} />, path: '/applications' },
     { name: 'Application Status', icon: <ClipboardList size={20} />, path: '/application-status' },
-    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { name: 'Categories', icon: <Folder size={20} />, path: '/categories' },
     { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
   ];
