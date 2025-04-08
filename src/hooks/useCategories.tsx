@@ -13,7 +13,7 @@ export const useCategories = () => {
   const { toast } = useToast();
   
   // Fetch categories from Supabase
-  const { data, isLoading, error } = useQuery({
+  const { data: categories, isLoading, error } = useQuery({
     queryKey: ['categories'],
     queryFn: async (): Promise<Category[]> => {
       const { data, error } = await supabase
@@ -32,8 +32,8 @@ export const useCategories = () => {
   // Initialize default states based on category data
   const createInitialState = (): Record<string, boolean> => {
     const initialState: Record<string, boolean> = {};
-    if (data) {
-      data.forEach((category, index) => {
+    if (categories) {
+      categories.forEach((category, index) => {
         // Set first two categories as initially enabled as an example
         initialState[category.title] = index < 2;
       });
@@ -69,7 +69,7 @@ export const useCategories = () => {
   };
 
   return {
-    data,
+    data: categories,
     isLoading, 
     error,
     enabledCategories,

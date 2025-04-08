@@ -15,3 +15,17 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 export type Category = Database['public']['Tables']['categories']['Row'];
 export type Opportunity = Database['public']['Tables']['opportunities']['Row'];
 export type Profile = Database['public']['Tables']['profiles']['Row'];
+
+// Define Application type based on the database schema we created
+export type Application = {
+  id: string;
+  user_id: string;
+  opportunity_id: string;
+  status: string;
+  submitted_date: string;
+  last_updated: string;
+  notes?: string;
+};
+
+// Add Role type
+export type UserRole = 'user' | 'admin';

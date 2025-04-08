@@ -141,6 +141,19 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
     }
   }, [categories]);
 
+  // Fix for the element vs string type error
+  const getSubmitButtonText = () => {
+    if (loading) {
+      return (
+        <span className="flex items-center">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Adding Opportunity...
+        </span>
+      );
+    }
+    return "Add Opportunity";
+  };
+
   const handleSubmit = async (formData: Record<string, any>) => {
     setLoading(true);
     
@@ -238,14 +251,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
               sections={formSections}
               onSubmit={handleSubmit}
               loading={loading}
-              submitButtonText={loading ? (
-                <span className="flex items-center">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Adding Opportunity...
-                </span>
-              ) : (
-                "Add Opportunity"
-              )}
+              submitButtonText={getSubmitButtonText()}
             />
           )}
         </div>
