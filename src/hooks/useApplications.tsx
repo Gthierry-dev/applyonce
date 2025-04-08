@@ -1,152 +1,111 @@
 
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
 
 export interface Application {
   id: string;
-  user_id: string;
   opportunity_id: string;
-  status: 'pending' | 'reviewing' | 'accepted' | 'rejected';
+  title: string;
+  organization: string;
+  category: string;
   submitted_date: string;
-  notes?: string;
-  // Joined fields from opportunities
-  title?: string;
-  organization?: string;
-  category?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'draft';
   logo?: string;
+  user_id?: string;
+  notes?: string;
+  last_updated?: string;
 }
 
+// This hook will be used for real database interactions when we implement auth
+// For now it uses mock data
 export const useApplications = () => {
-  const { user } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  // Fetch user's applications
+
   const applicationsQuery = useQuery({
-    queryKey: ['applications', user?.id],
+    queryKey: ['applications'],
     queryFn: async (): Promise<Application[]> => {
-      if (!user) return [];
+      // In a real implementation with auth, we would do:
+      // const user = supabase.auth.getUser();
+      // if (!user) throw new Error("User not authenticated");
       
-      const { data, error } = await supabase
-        .from('applications')
-        .select(`
-          *,
-          opportunities(title, organization, category)
-        `)
-        .eq('user_id', user.id)
-        .order('submitted_date', { ascending: false });
-        
-      if (error) {
-        throw new Error(error.message);
-      }
-      
-      // Format the data to flatten the structure
-      return data.map(app => ({
-        ...app,
-        title: app.opportunities?.title,
-        organization: app.opportunities?.organization,
-        category: app.opportunities?.category,
-        logo: null // Placeholder for future logo implementation
-      })) || [];
-    },
-    enabled: !!user
+      // Mock implementation for now
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const dummyApplications = [
+            {
+              id: "app1",
+              opportunity_id: "opp1",
+              title: "Software Engineering Internship",
+              organization: "TechCorp",
+              category: "Internship",
+              submitted_date: "2023-10-15",
+              status: "pending" as const,
+              logo: "https://images.unsplash.com/photo-1534137667199-675a46e143f3?q=80&w=80&auto=format&fit=crop",
+              last_updated: "2023-10-15",
+              notes: "Your application is being reviewed by the hiring team."
+            },
+            {
+              id: "app2",
+              opportunity_id: "opp2",
+              title: "Research Grant Application",
+              organization: "Science Foundation",
+              category: "Grant",
+              submitted_date: "2023-09-20",
+              status: "approved" as const,
+              last_updated: "2023-09-28",
+              notes: "Congratulations! Your grant application has been approved."
+            },
+            {
+              id: "app3",
+              opportunity_id: "opp3",
+              title: "Graduate Scholarship",
+              organization: "University of Technology",
+              category: "Scholarship",
+              submitted_date: "2023-11-05",
+              status: "rejected" as const,
+              logo: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=80&auto=format&fit=crop",
+              last_updated: "2023-11-15",
+              notes: "We regret to inform you that your application has not been selected."
+            },
+            {
+              id: "app4",
+              opportunity_id: "opp4",
+              title: "Product Design Fellowship",
+              organization: "Design Institute",
+              category: "Fellowship",
+              submitted_date: "2023-12-01",
+              status: "draft" as const,
+              last_updated: "2023-12-01"
+            },
+          ];
+          resolve(dummyApplications);
+        }, 800);
+      });
+    }
   });
 
-  // Submit a new application
-  const submitApplicationMutation = useMutation({
-    mutationFn: async (opportunityId: string) => {
-      if (!user) throw new Error("User must be logged in to apply");
+  const submitApplication = async (opportunityId: string, notes?: string) => {
+    try {
+      // In a real implementation with auth, we would fetch the opportunity details
+      // and create an application linked to the user and opportunity
       
-      const applicationData = {
-        user_id: user.id,
-        opportunity_id: opportunityId,
-        status: 'pending',
-        submitted_date: new Date().toISOString(),
-      };
-      
-      const { data, error } = await supabase
-        .from('applications')
-        .insert(applicationData)
-        .select()
-        .single();
-        
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
       toast({
         title: "Application Submitted",
-        description: "Your application has been successfully submitted.",
+        description: "Your application has been submitted successfully",
       });
       
-      // Refresh applications list
-      queryClient.invalidateQueries({ queryKey: ['applications', user?.id] });
-    },
-    onError: (error: any) => {
+      // Return true for success (in real implementation, we'd return the created application)
+      return true;
+    } catch (error: any) {
+      console.error('Error submitting application:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: `Failed to submit application: ${error.message}`,
+        description: "Failed to submit application. Please try again.",
       });
-    }
-  });
-
-  // Withdraw an application
-  const withdrawApplicationMutation = useMutation({
-    mutationFn: async (applicationId: string) => {
-      if (!user) throw new Error("User must be logged in to withdraw an application");
-      
-      const { error } = await supabase
-        .from('applications')
-        .delete()
-        .eq('id', applicationId)
-        .eq('user_id', user.id); // Safety check to ensure users can only delete their own applications
-        
-      if (error) throw error;
-      return applicationId;
-    },
-    onSuccess: (applicationId) => {
-      toast({
-        title: "Application Withdrawn",
-        description: "Your application has been withdrawn.",
-      });
-      
-      // Refresh applications list
-      queryClient.invalidateQueries({ queryKey: ['applications', user?.id] });
-    },
-    onError: (error: any) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Failed to withdraw application: ${error.message}`,
-      });
-    }
-  });
-
-  // Check if a user has already applied to an opportunity
-  const checkApplicationStatus = async (opportunityId: string): Promise<string | null> => {
-    if (!user) return null;
-    
-    try {
-      const { data, error } = await supabase
-        .from('applications')
-        .select('status')
-        .eq('opportunity_id', opportunityId)
-        .eq('user_id', user.id)
-        .single();
-        
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "row not found" error
-        console.error("Error checking application status:", error);
-        return null;
-      }
-      
-      return data?.status || null;
-    } catch (error) {
-      console.error("Error in checkApplicationStatus:", error);
-      return null;
+      return false;
     }
   };
 
@@ -154,11 +113,7 @@ export const useApplications = () => {
     applications: applicationsQuery.data || [],
     isLoading: applicationsQuery.isLoading,
     error: applicationsQuery.error,
-    submitApplication: submitApplicationMutation.mutate,
-    withdrawApplication: withdrawApplicationMutation.mutate,
-    checkApplicationStatus,
-    isSubmitting: submitApplicationMutation.isPending,
-    isWithdrawing: withdrawApplicationMutation.isPending
+    submitApplication,
   };
 };
 

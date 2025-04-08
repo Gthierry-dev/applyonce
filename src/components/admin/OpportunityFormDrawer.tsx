@@ -33,7 +33,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
   isEditing = false,
 }) => {
   const { toast } = useToast();
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const categoriesQuery = useCategories();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [formValues, setFormValues] = useState<Record<string, any>>({});
@@ -41,8 +41,8 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
 
   // Set up form sections with categories from the database
   useEffect(() => {
-    if (categories && categories.length > 0) {
-      const categoryOptions = categories.map(cat => ({
+    if (categoriesQuery.data && categoriesQuery.data.length > 0) {
+      const categoryOptions = categoriesQuery.data.map(cat => ({
         label: cat.title,
         value: cat.title
       }));
@@ -145,7 +145,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
             },
             {
               id: 'requirements',
-              type: 'tags',
+              type: 'tagsInput',
               label: 'Requirements',
               placeholder: 'Add requirements',
               required: false,
@@ -154,7 +154,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
         },
       ]);
     }
-  }, [categories]);
+  }, [categoriesQuery.data]);
 
   // Set initial form values when editing
   useEffect(() => {
@@ -279,7 +279,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
         </SheetHeader>
         
         <div className="py-4">
-          {categoriesLoading ? (
+          {categoriesQuery.isLoading ? (
             <div className="flex justify-center py-8">
               <p>Loading categories...</p>
             </div>
