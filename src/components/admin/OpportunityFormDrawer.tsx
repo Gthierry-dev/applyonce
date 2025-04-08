@@ -15,6 +15,7 @@ import {
 import DynamicForm, { FormSection } from '@/components/forms/DynamicForm';
 import { Plus, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useCategories } from '@/hooks/useCategories';
 
 // Form configuration for category creation
 const categorySections: FormSection[] = [
@@ -118,6 +119,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [formValues, setFormValues] = useState<Record<string, any>>({});
+  const { data: categories } = useCategories();
 
   // Control the drawer open state
   useEffect(() => {
@@ -261,7 +263,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
             sections={categorySections}
             onSubmit={handleSubmit}
             loading={loading}
-            submitButtonText={getSubmitButtonContent() as string}
+            submitButtonText={getSubmitButtonContent()}
             initialValues={formValues}
           />
         </div>
