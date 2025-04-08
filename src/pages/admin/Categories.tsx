@@ -1,13 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Edit, Trash, ExternalLink } from 'lucide-react';
-import OpportunityFormDrawer from '@/components/admin/OpportunityFormDrawer';
-import { supabase, Opportunity } from '@/integrations/supabase/client';
+import { Search, Edit, Trash } from 'lucide-react';
+import CategoryFormDrawer from '@/components/admin/CategoryFormDrawer';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
 
 // Update the Category type to match what we're using elsewhere
@@ -219,11 +218,11 @@ const AdminCategories = () => {
           </DialogContent>
         </Dialog>
 
-        <OpportunityFormDrawer 
+        <CategoryFormDrawer 
           isOpen={formDrawerOpen}
           onClose={() => setFormDrawerOpen(false)}
           isEditing={!!editData}
-          initialData={editData}
+          initialData={editData || undefined}
           onCategoryAdded={handleCategoryAdded}
           onCategoryUpdated={handleCategoryUpdated}
         />

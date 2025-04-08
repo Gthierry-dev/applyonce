@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,267 +14,263 @@ import {
 } from "@/components/ui/sheet";
 import DynamicForm, { FormSection } from '@/components/forms/DynamicForm';
 import { Plus, Loader2 } from 'lucide-react';
-import { supabase, Category } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useCategories } from '@/hooks/useCategories';
+
+// Form configuration for category creation
+const categorySections: FormSection[] = [
+  {
+    id: 'basic',
+    title: 'Category Information',
+    description: 'Create a new opportunity category',
+    fields: [
+      {
+        id: 'title',
+        type: 'text',
+        label: 'Title',
+        placeholder: 'Enter category title',
+        required: true,
+      },
+      {
+        id: 'description',
+        type: 'textarea',
+        label: 'Description',
+        placeholder: 'Short description of this category',
+        required: true,
+      },
+      {
+        id: 'icon_name',
+        type: 'select',
+        label: 'Icon',
+        required: true,
+        options: [
+          { label: 'Graduation Cap', value: 'GraduationCap' },
+          { label: 'Briefcase', value: 'Briefcase' },
+          { label: 'Award', value: 'Award' },
+          { label: 'Globe', value: 'Globe' },
+          { label: 'Banknote', value: 'banknote' },
+          { label: 'Trophy', value: 'trophy' },
+          { label: 'Building', value: 'Building' },
+          { label: 'Lightbulb', value: 'Lightbulb' },
+          { label: 'Users', value: 'Users' },
+          { label: 'HeartHandshake', value: 'HeartHandshake' },
+          { label: 'PenTool', value: 'PenTool' },
+        ],
+      },
+      {
+        id: 'color',
+        type: 'select',
+        label: 'Color',
+        required: true,
+        options: [
+          { label: 'Blue', value: 'bg-blue-100' },
+          { label: 'Green', value: 'bg-green-100' },
+          { label: 'Purple', value: 'bg-purple-100' },
+          { label: 'Yellow', value: 'bg-yellow-100' },
+          { label: 'Red', value: 'bg-red-100' },
+          { label: 'Indigo', value: 'bg-indigo-100' },
+          { label: 'Orange', value: 'bg-orange-100' },
+          { label: 'Pink', value: 'bg-pink-100' },
+          { label: 'Teal', value: 'bg-teal-100' },
+        ],
+      },
+      {
+        id: 'count',
+        type: 'number',
+        label: 'Opportunity Count',
+        placeholder: 'Number of opportunities',
+        required: false,
+      },
+    ],
+  },
+];
+
+interface Category {
+  id: string;
+  title: string;
+  description: string | null;
+  count: number | null;
+  icon_name: string;
+  color: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
 interface OpportunityFormDrawerProps {
   trigger?: React.ReactNode;
+  isOpen?: boolean;
+  onClose?: () => void;
+  isEditing?: boolean;
+  initialData?: Category;
+  onCategoryAdded?: (category: Category) => void;
+  onCategoryUpdated?: (category: Category) => void;
 }
 
 const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({ 
-  trigger
+  trigger,
+  isOpen,
+  onClose,
+  isEditing = false,
+  initialData,
+  onCategoryAdded,
+  onCategoryUpdated
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [formSections, setFormSections] = useState<FormSection[]>([]);
-  
-  // Fetch categories directly here
-  const { data: categories, isLoading: categoriesLoading } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async (): Promise<Category[]> => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('title');
-        
-      if (error) {
-        throw new Error(error.message);
-      }
-      
-      return data || [];
-    }
-  });
-  
-  useEffect(() => {
-    if (categories) {
-      const categoriesOptions = categories.map(category => ({
-        label: category.title,
-        value: category.title
-      }));
-      
-      // Update the form sections with the categories
-      setFormSections([
-        {
-          id: 'basic',
-          title: 'Basic Information',
-          description: 'Enter the basic details of the opportunity',
-          fields: [
-            {
-              id: 'title',
-              type: 'text',
-              label: 'Title',
-              placeholder: 'Enter opportunity title',
-              required: true,
-            },
-            {
-              id: 'organization',
-              type: 'text',
-              label: 'Organization',
-              placeholder: 'Enter organization name',
-              required: true,
-            },
-            {
-              id: 'categories',
-              type: 'multiselect',
-              label: 'Categories',
-              required: true,
-              options: categoriesOptions,
-              description: 'Select all relevant categories for this opportunity',
-            },
-            {
-              id: 'type',
-              type: 'text',
-              label: 'Type',
-              placeholder: 'E.g., Summer, Full-time, Remote',
-            },
-            {
-              id: 'deadline',
-              type: 'date',
-              label: 'Deadline',
-              required: true,
-            },
-            {
-              id: 'website_url',
-              type: 'text',
-              label: 'Website URL',
-              placeholder: 'Enter the official website URL for this opportunity',
-              required: true,
-            },
-          ],
-        },
-        {
-          id: 'details',
-          title: 'Opportunity Details',
-          description: 'Provide more detailed information about the opportunity',
-          fields: [
-            {
-              id: 'description',
-              type: 'textarea',
-              label: 'Description',
-              placeholder: 'Enter a detailed description of the opportunity',
-              required: true,
-            },
-            {
-              id: 'location',
-              type: 'text',
-              label: 'Location',
-              placeholder: 'E.g., Remote, New York, NY',
-            },
-            {
-              id: 'salary',
-              type: 'text',
-              label: 'Compensation',
-              placeholder: 'E.g., $50,000/year, $20/hour, Fully funded',
-            },
-          ],
-        },
-        {
-          id: 'requirements',
-          title: 'Requirements & Eligibility',
-          description: 'Specify who can apply for this opportunity',
-          fields: [
-            {
-              id: 'requirements',
-              type: 'textarea',
-              label: 'Requirements',
-              placeholder: 'Enter requirements, each on a new line',
-            },
-            {
-              id: 'isActive',
-              type: 'switch',
-              label: 'Active Status',
-              placeholder: 'Make this opportunity visible to users',
-            },
-            {
-              id: 'featured',
-              type: 'switch',
-              label: 'Featured',
-              placeholder: 'Show this opportunity as featured',
-            },
-          ],
-        },
-      ]);
-    }
-  }, [categories]);
+  const [open, setOpen] = useState(false);
+  const [formValues, setFormValues] = useState<Record<string, any>>({});
+  const { data: categories } = useCategories();
 
-  // For the submit button content
-  const getSubmitButtonContent = (): ReactNode => {
-    if (loading) {
-      return (
-        <span className="flex items-center">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Adding Opportunity...
-        </span>
-      );
+  // Control the drawer open state
+  useEffect(() => {
+    if (isOpen !== undefined) {
+      setOpen(isOpen);
     }
-    return "Add Opportunity";
+  }, [isOpen]);
+
+  // Set initial form values when editing
+  useEffect(() => {
+    if (isEditing && initialData) {
+      setFormValues({
+        title: initialData.title,
+        description: initialData.description || '',
+        icon_name: initialData.icon_name,
+        color: initialData.color,
+        count: initialData.count || 0,
+      });
+    }
+  }, [isEditing, initialData]);
+
+  // Handle drawer close
+  const handleClose = () => {
+    setOpen(false);
+    if (onClose) {
+      onClose();
+    }
   };
 
   const handleSubmit = async (formData: Record<string, any>) => {
     setLoading(true);
     
     try {
-      // Process form data
-      console.log('Submitted opportunity:', formData);
-
-      // Convert requirements text to array
-      if (formData.requirements) {
-        formData.requirements = formData.requirements
-          .split('\n')
-          .map((item: string) => item.trim())
-          .filter((item: string) => item);
-      }
-
-      // Get primary category (first one)
-      const primaryCategory = formData.categories && formData.categories.length > 0 
-        ? formData.categories[0] 
-        : "";
-
-      // Store all selected categories in an array
-      const categoriesArray = Array.isArray(formData.categories) 
-        ? formData.categories 
-        : [formData.categories].filter(Boolean);
-
-      // Prepare data for Supabase
-      const opportunityData = {
+      const categoryData = {
         title: formData.title,
-        organization: formData.organization,
-        category: primaryCategory, // Keep primary category in the original field
-        categories: categoriesArray, // Store all categories in a new field
-        type: formData.type,
-        deadline: new Date(formData.deadline).toISOString(),
         description: formData.description,
-        location: formData.location,
-        salary: formData.salary,
-        requirements: formData.requirements,
-        website_url: formData.website_url,
-        is_active: formData.isActive,
-        featured: formData.featured
+        icon_name: formData.icon_name,
+        color: formData.color,
+        count: formData.count || 0,
+        updated_at: new Date().toISOString()
       };
-
-      // Insert into Supabase
-      const { error } = await supabase
-        .from('opportunities')
-        .insert(opportunityData);
-
-      if (error) {
-        throw error;
+      
+      let result;
+      
+      if (isEditing && initialData) {
+        // Update existing category
+        const { data, error } = await supabase
+          .from('categories')
+          .update(categoryData)
+          .eq('id', initialData.id)
+          .select('*')
+          .single();
+        
+        if (error) {
+          throw error;
+        }
+        
+        result = data;
+        
+        toast({
+          title: "Category Updated",
+          description: "The category has been successfully updated",
+        });
+        
+        // Call the callback with the updated category
+        if (onCategoryUpdated && result) {
+          onCategoryUpdated(result);
+        }
+      } else {
+        // Create new category
+        const { data, error } = await supabase
+          .from('categories')
+          .insert(categoryData)
+          .select('*')
+          .single();
+        
+        if (error) {
+          throw error;
+        }
+        
+        result = data;
+        
+        toast({
+          title: "Category Added",
+          description: "The category has been successfully created",
+        });
+        
+        // Call the callback with the new category
+        if (onCategoryAdded && result) {
+          onCategoryAdded(result);
+        }
       }
-
-      toast({
-        title: "Opportunity Added",
-        description: "The opportunity has been successfully created",
-      });
+      
+      handleClose();
     } catch (error: any) {
-      console.error('Error adding opportunity:', error);
+      console.error('Error saving category:', error);
       toast({
+        variant: "destructive",
         title: "Error",
-        description: `Failed to add opportunity: ${error.message || "Unknown error"}`,
-        variant: "destructive"
+        description: `Failed to ${isEditing ? 'update' : 'create'} category: ${error.message || 'Unknown error'}`,
       });
     } finally {
       setLoading(false);
     }
   };
 
+  // For the submit button content
+  const getSubmitButtonContent = () => {
+    if (loading) {
+      return (
+        <span className="flex items-center">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          {isEditing ? 'Updating...' : 'Adding...'}
+        </span>
+      );
+    }
+    return isEditing ? 'Update Category' : 'Add Category';
+  };
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {trigger || (
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            Add Opportunity
+            Add Category
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Add New Opportunity</SheetTitle>
+          <SheetTitle>{isEditing ? 'Edit Category' : 'Add New Category'}</SheetTitle>
           <SheetDescription>
-            Fill in the details to create a new opportunity
+            {isEditing ? 'Update category details' : 'Create a new category for opportunities'}
           </SheetDescription>
         </SheetHeader>
         
         <div className="py-6">
-          {categoriesLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-              <span className="ml-2">Loading form...</span>
-            </div>
-          ) : (
-            <DynamicForm
-              title="New Opportunity"
-              sections={formSections}
-              onSubmit={handleSubmit}
-              loading={loading}
-              submitButtonText={getSubmitButtonContent()}
-            />
-          )}
+          <DynamicForm
+            title={isEditing ? 'Edit Category' : 'New Category'}
+            sections={categorySections}
+            onSubmit={handleSubmit}
+            loading={loading}
+            submitButtonText={getSubmitButtonContent()}
+            initialValues={formValues}
+          />
         </div>
         
         <SheetFooter className="pt-2">
           <SheetClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" onClick={handleClose} disabled={loading}>Cancel</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>
