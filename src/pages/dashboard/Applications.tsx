@@ -5,7 +5,7 @@ import ApplicationCard from '@/components/cards/ApplicationCard';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useApplications } from '@/hooks/useApplications';
+import { useApplications, ApplicationStatus } from '@/hooks/useApplications';
 
 const Applications = () => {
   const { applications, isLoading } = useApplications();
@@ -42,7 +42,7 @@ const Applications = () => {
                 organization={application.organization}
                 category={application.category}
                 submittedDate={application.submitted_date}
-                status={application.status}
+                status={application.status as ApplicationStatus}
                 logo={application.logo}
               />
             ))}

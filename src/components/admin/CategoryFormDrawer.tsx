@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -224,8 +224,8 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
     }
   };
 
-  // Fix for the element vs string type error
-  const getSubmitButtonText = () => {
+  // For the submit button content
+  const getSubmitButtonContent = (): ReactNode => {
     if (loading) {
       return (
         <span className="flex items-center">
@@ -261,7 +261,7 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
             sections={categorySections}
             onSubmit={handleSubmit}
             loading={loading}
-            submitButtonText={getSubmitButtonText()}
+            submitButtonText={getSubmitButtonContent()}
             initialValues={formValues}
           />
         </div>

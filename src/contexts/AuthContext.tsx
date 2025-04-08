@@ -5,7 +5,7 @@ import { supabase, Profile, UserRole } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
 
-interface ProfileWithRole extends Profile {
+interface ProfileWithRole extends Omit<Profile, 'role'> {
   role?: UserRole;
 }
 
@@ -66,19 +66,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const fetchUserProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*, role')
-      .eq('id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    if (error) {
-      console.error('Error fetching user profile:', error);
-      return;
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return;
+      }
+
+      const profileData = data as ProfileWithRole;
+      setProfile(profileData);
+      setIsAdmin(profileData?.role === 'admin');
+    } catch (error) {
+      console.error('Unexpected error fetching profile:', error);
     }
-
-    setProfile(data as ProfileWithRole);
-    setIsAdmin(data?.role === 'admin');
   };
 
   const signIn = async (email: string, password: string) => {

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/sheet";
 import DynamicForm, { FormSection } from '@/components/forms/DynamicForm';
 import { Plus, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useCategories } from '@/hooks/useCategories';
+import { supabase, Category } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 interface OpportunityFormDrawerProps {
   trigger?: React.ReactNode;
@@ -26,8 +26,24 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
   const [formSections, setFormSections] = useState<FormSection[]>([]);
+  
+  // Fetch categories directly here
+  const { data: categories, isLoading: categoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async (): Promise<Category[]> => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('title');
+        
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      return data || [];
+    }
+  });
   
   useEffect(() => {
     if (categories) {
@@ -141,8 +157,8 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
     }
   }, [categories]);
 
-  // Fix for the element vs string type error
-  const getSubmitButtonText = () => {
+  // For the submit button content
+  const getSubmitButtonContent = (): ReactNode => {
     if (loading) {
       return (
         <span className="flex items-center">
@@ -251,7 +267,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
               sections={formSections}
               onSubmit={handleSubmit}
               loading={loading}
-              submitButtonText={getSubmitButtonText()}
+              submitButtonText={getSubmitButtonContent()}
             />
           )}
         </div>
