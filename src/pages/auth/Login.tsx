@@ -1,16 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -18,42 +18,33 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signIn, user, isAdmin } = useAuth();
+
+  useEffect(() => {
+    // Redirect if already logged in
+    if (user) {
+      navigate(isAdmin ? '/admin/dashboard' : '/dashboard');
+    }
+  }, [user, isAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      // Simulating authentication
-      // In a real app, this would be replaced with an actual auth call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Demo login - we just move forward in this demo
-      toast({
-        title: "Login successful",
-        description: "Welcome back to ApplyOnce!",
-      });
-      
-      navigate('/dashboard');
+      await signIn(email, password);
+      // No need to navigate here, the useEffect will handle it
     } catch (error) {
-      toast({
-        title: "Login failed",
-        description: "Please check your credentials and try again.",
-        variant: "destructive",
-      });
+      console.error('Login error:', error);
+      // Error is already handled in signIn function
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSocialLogin = (provider: 'google' | 'linkedin') => {
-    toast({
-      title: `${provider.charAt(0).toUpperCase() + provider.slice(1)} login`,
-      description: `This would connect to ${provider} in a real implementation.`,
-    });
-    // In a real app, this would trigger the OAuth flow
-    navigate('/dashboard');
+    // Redirect to coming soon page
+    navigate('/social-auth-coming-soon');
   };
 
   return (
@@ -142,22 +133,21 @@ const Login = () => {
                 </label>
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Log in'}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Logging in...
+                  </>
+                ) : 'Log in'}
               </Button>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col">
-            <p className="text-center text-sm mt-4"> 
-              Continue as <Link to="/dashboard" className="text-primary hover:underline">Guest</Link> or 
-              <Link to="/admin/login" className="text-primary hover:underline ml-1">Admin</Link>
-            </p>
-            
             <p className="text-center text-sm mt-4">
               Don't have an account?{' '}
               <Link to="/signup" className="text-primary hover:underline">
                 Sign up
               </Link>
-              
             </p>
           </CardFooter>
         </Card>

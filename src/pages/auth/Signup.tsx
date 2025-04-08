@@ -1,16 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import SocialLoginButton from '@/components/auth/SocialLoginButton';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -20,60 +20,44 @@ const Signup = () => {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signUp, user } = useAuth();
+
+  useEffect(() => {
+    // Redirect if already logged in
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
-      toast({
-        title: "Passwords don't match",
-        description: "Please check your passwords and try again.",
-        variant: "destructive",
-      });
+      // Toasts are handled in the Auth context
       return;
     }
 
     if (!agreeTerms) {
-      toast({
-        title: "Terms agreement required",
-        description: "Please agree to the terms and conditions to continue.",
-        variant: "destructive",
-      });
+      // Toasts are handled in the Auth context
       return;
     }
     
     setIsLoading(true);
     
     try {
-      // Simulating registration
-      // In a real app, this would be replaced with an actual auth call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Account created",
-        description: "Welcome to ApplyOnce! You can now log in.",
-      });
-      
+      await signUp(email, password, name);
       navigate('/login');
     } catch (error) {
-      toast({
-        title: "Signup failed",
-        description: "There was an error creating your account. Please try again.",
-        variant: "destructive",
-      });
+      console.error('Signup error:', error);
+      // Error is already handled in signUp function
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSocialSignup = (provider: 'google' | 'linkedin') => {
-    toast({
-      title: `${provider.charAt(0).toUpperCase() + provider.slice(1)} signup`,
-      description: `This would connect to ${provider} in a real implementation.`,
-    });
-    // In a real app, this would trigger the OAuth flow
-    navigate('/dashboard');
+    // Redirect to coming soon page
+    navigate('/social-auth-coming-soon');
   };
 
   return (
@@ -184,7 +168,12 @@ const Signup = () => {
                 </label>
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating account...' : 'Create account'}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : 'Create account'}
               </Button>
             </form>
           </CardContent>

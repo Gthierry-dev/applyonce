@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import DynamicForm, { FormSection } from '@/components/forms/DynamicForm';
 import { Plus, Loader2 } from 'lucide-react';
-import { supabase, Category } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { useCategories } from '@/hooks/useCategories';
 
 interface OpportunityFormDrawerProps {
@@ -229,7 +229,8 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
         <div className="py-6">
           {categoriesLoading ? (
             <div className="flex justify-center py-8">
-              <p>Loading form...</p>
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <span className="ml-2">Loading form...</span>
             </div>
           ) : (
             <DynamicForm
