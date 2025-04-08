@@ -1,12 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Edit, Trash, ExternalLink } from 'lucide-react';
-import OpportunityFormDrawer from '@/components/admin/OpportunityFormDrawer';
-import { supabase, Opportunity } from '@/integrations/supabase/client';
+import { Search, Edit, Trash, Plus } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import CategoryFormDrawer from '@/components/admin/CategoryFormDrawer';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -15,30 +16,28 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
 
-// Update the Category type to match what we're using elsewhere
 interface AdminCategory {
   id: string;
   title: string;
-  description: string;
-  count: number;
+  description: string | null;
+  count: number | null;
   icon_name: string;
   color: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const AdminCategories = () => {
-  // Update the state type
   const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editData, setEditData] = useState<AdminCategory | null>(null);
-  const [formDrawerOpen, setFormDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<AdminCategory | null>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -50,7 +49,7 @@ const AdminCategories = () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('title');
 
       if (error) throw error;
       setCategories(data || []);
@@ -66,25 +65,61 @@ const AdminCategories = () => {
     }
   };
 
+  const handleCategoryAdded = (newCategory: AdminCategory) => {
+    setCategories([...categories, newCategory]);
+  };
+
+  const handleCategoryUpdated = (updatedCategory: AdminCategory) => {
+    setCategories(categories.map(cat => 
+      cat.id === updatedCategory.id ? updatedCategory : cat
+    ));
+    setEditDrawerOpen(false);
+    setCategoryToEdit(null);
+  };
+
+  const handleEdit = (category: AdminCategory) => {
+    setCategoryToEdit(category);
+    setEditDrawerOpen(true);
+  };
+
   const handleDeleteClick = (id: string) => {
-    setDeleteId(id);
+    setCategoryToDelete(id);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!deleteId) return;
+    if (!categoryToDelete) return;
 
     try {
+      // Check if category is in use by any opportunities
+      const { data: opportunities, error: checkError } = await supabase
+        .from('opportunities')
+        .select('id')
+        .eq('category', categories.find(c => c.id === categoryToDelete)?.title || '')
+        .limit(1);
+
+      if (checkError) throw checkError;
+
+      if (opportunities && opportunities.length > 0) {
+        toast({
+          title: 'Cannot Delete',
+          description: 'This category is used by existing opportunities. Remove those first.',
+          variant: 'destructive',
+        });
+        setDeleteDialogOpen(false);
+        setCategoryToDelete(null);
+        return;
+      }
+
+      // Safe to delete
       const { error } = await supabase
         .from('categories')
         .delete()
-        .eq('id', deleteId);
+        .eq('id', categoryToDelete);
 
       if (error) throw error;
 
-      // Update the local state by removing the deleted category
-      setCategories(categories.filter(cat => cat.id !== deleteId));
-      
+      setCategories(categories.filter(cat => cat.id !== categoryToDelete));
       toast({
         title: 'Success',
         description: 'Category deleted successfully',
@@ -97,33 +132,14 @@ const AdminCategories = () => {
         variant: 'destructive',
       });
     } finally {
-      setDeleteId(null);
       setDeleteDialogOpen(false);
+      setCategoryToDelete(null);
     }
   };
 
-  const handleEditClick = (category: AdminCategory) => {
-    setEditData(category);
-    setFormDrawerOpen(true);
-  };
-
-  const handleCategoryAdded = (newCategory: AdminCategory) => {
-    // Add the new category to the local state
-    setCategories([newCategory, ...categories]);
-  };
-
-  const handleCategoryUpdated = (updatedCategory: AdminCategory) => {
-    // Update the local state by replacing the updated category
-    setCategories(categories.map(cat => 
-      cat.id === updatedCategory.id ? updatedCategory : cat
-    ));
-  };
-
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const filteredCategories = categories.filter(cat =>
-    cat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    cat.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCategories = categories.filter(category => 
+    category.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (category.description && category.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -131,7 +147,15 @@ const AdminCategories = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Manage Categories</h1>
-          <Button onClick={() => setFormDrawerOpen(true)}>Add Category</Button>
+          <CategoryFormDrawer 
+            onCategoryAdded={handleCategoryAdded}
+            trigger={
+              <Button className="flex items-center gap-2">
+                <Plus className="h-4 w-4" /> 
+                Add Category
+              </Button>
+            }
+          />
         </div>
 
         <div className="flex items-center gap-2">
@@ -144,7 +168,6 @@ const AdminCategories = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button variant="outline">Filter</Button>
         </div>
 
         {loading ? (
@@ -157,15 +180,16 @@ const AdminCategories = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Category</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Opportunity Count</TableHead>
+                  <TableHead>Icon</TableHead>
+                  <TableHead>Color</TableHead>
+                  <TableHead>Opportunities</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredCategories.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
+                    <TableCell colSpan={5} className="text-center py-8">
                       No categories found
                     </TableCell>
                   </TableRow>
@@ -174,12 +198,25 @@ const AdminCategories = () => {
                     <TableRow key={category.id}>
                       <TableCell>
                         <div className="font-medium">{category.title}</div>
+                        <div className="text-sm text-muted-foreground line-clamp-1">
+                          {category.description}
+                        </div>
                       </TableCell>
-                      <TableCell>{category.description}</TableCell>
-                      <TableCell>{category.count}</TableCell>
+                      <TableCell>{category.icon_name}</TableCell>
+                      <TableCell>
+                        <div className={`w-8 h-8 rounded ${category.color}`}></div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge>{category.count || 0}</Badge>
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditClick(category)}>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => handleEdit(category)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button 
@@ -199,35 +236,41 @@ const AdminCategories = () => {
             </Table>
           </div>
         )}
+      </div>
 
-        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete Category</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete this category? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={handleDeleteConfirm}>
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <OpportunityFormDrawer 
-          isOpen={formDrawerOpen}
-          onClose={() => setFormDrawerOpen(false)}
-          isEditing={!!editData}
-          initialData={editData}
-          onCategoryAdded={handleCategoryAdded}
+      {/* Edit Category Drawer */}
+      {categoryToEdit && (
+        <CategoryFormDrawer
+          isOpen={editDrawerOpen}
+          onClose={() => {
+            setEditDrawerOpen(false);
+            setCategoryToEdit(null);
+          }}
+          isEditing={true}
+          initialData={categoryToEdit}
           onCategoryUpdated={handleCategoryUpdated}
         />
-      </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Category</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this category? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };

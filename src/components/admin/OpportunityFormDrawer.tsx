@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,34 +14,44 @@ import {
 } from "@/components/ui/sheet";
 import DynamicForm, { FormSection } from '@/components/forms/DynamicForm';
 import { Plus, Loader2 } from 'lucide-react';
-import { supabase, Category } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
 import { useCategories } from '@/hooks/useCategories';
 
 interface OpportunityFormDrawerProps {
   trigger?: React.ReactNode;
+  onOpportunityAdded?: (opportunity: any) => void;
+  onOpportunityUpdated?: (opportunity: any) => void;
+  initialData?: any;
+  isEditing?: boolean;
 }
 
-const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({ 
-  trigger
+const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
+  trigger,
+  onOpportunityAdded,
+  onOpportunityUpdated,
+  initialData = null,
+  isEditing = false,
 }) => {
   const { toast } = useToast();
+  const categoriesQuery = useCategories();
   const [loading, setLoading] = useState(false);
-  const { data: categories, isLoading: categoriesLoading } = useCategories();
-  const [formSections, setFormSections] = useState<FormSection[]>([]);
-  
+  const [open, setOpen] = useState(false);
+  const [formValues, setFormValues] = useState<Record<string, any>>({});
+  const [opportunitySections, setOpportunitySections] = useState<FormSection[]>([]);
+
+  // Set up form sections with categories from the database
   useEffect(() => {
-    if (categories) {
-      const categoriesOptions = categories.map(category => ({
-        label: category.title,
-        value: category.title
+    if (categoriesQuery.data && categoriesQuery.data.length > 0) {
+      const categoryOptions = categoriesQuery.data.map(cat => ({
+        label: cat.title,
+        value: cat.title
       }));
-      
-      // Update the form sections with the categories
-      setFormSections([
+
+      setOpportunitySections([
         {
           id: 'basic',
-          title: 'Basic Information',
-          description: 'Enter the basic details of the opportunity',
+          title: 'Opportunity Information',
+          description: 'Create a new opportunity',
           fields: [
             {
               id: 'title',
@@ -54,154 +64,196 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
               id: 'organization',
               type: 'text',
               label: 'Organization',
-              placeholder: 'Enter organization name',
+              placeholder: 'Organization offering this opportunity',
               required: true,
+            },
+            {
+              id: 'description',
+              type: 'textarea',
+              label: 'Description',
+              placeholder: 'Detailed description of the opportunity',
+              required: true,
+            },
+            {
+              id: 'category',
+              type: 'select',
+              label: 'Primary Category',
+              required: true,
+              options: categoryOptions,
             },
             {
               id: 'categories',
               type: 'multiselect',
-              label: 'Categories',
-              required: true,
-              options: categoriesOptions,
-              description: 'Select all relevant categories for this opportunity',
-            },
-            {
-              id: 'type',
-              type: 'text',
-              label: 'Type',
-              placeholder: 'E.g., Summer, Full-time, Remote',
+              label: 'Additional Categories',
+              required: false,
+              options: categoryOptions,
             },
             {
               id: 'deadline',
               type: 'date',
-              label: 'Deadline',
+              label: 'Application Deadline',
               required: true,
             },
             {
               id: 'website_url',
               type: 'text',
               label: 'Website URL',
-              placeholder: 'Enter the official website URL for this opportunity',
-              required: true,
-            },
-          ],
-        },
-        {
-          id: 'details',
-          title: 'Opportunity Details',
-          description: 'Provide more detailed information about the opportunity',
-          fields: [
-            {
-              id: 'description',
-              type: 'textarea',
-              label: 'Description',
-              placeholder: 'Enter a detailed description of the opportunity',
-              required: true,
+              placeholder: 'https://example.com',
+              required: false,
             },
             {
               id: 'location',
               type: 'text',
               label: 'Location',
-              placeholder: 'E.g., Remote, New York, NY',
+              placeholder: 'Location or Remote',
+              required: false,
+            },
+            {
+              id: 'type',
+              type: 'select',
+              label: 'Type',
+              required: false,
+              options: [
+                { label: 'Full-time', value: 'Full-time' },
+                { label: 'Part-time', value: 'Part-time' },
+                { label: 'Contract', value: 'Contract' },
+                { label: 'Internship', value: 'Internship' },
+                { label: 'Scholarship', value: 'Scholarship' },
+                { label: 'Grant', value: 'Grant' },
+              ],
             },
             {
               id: 'salary',
               type: 'text',
-              label: 'Compensation',
-              placeholder: 'E.g., $50,000/year, $20/hour, Fully funded',
-            },
-          ],
-        },
-        {
-          id: 'requirements',
-          title: 'Requirements & Eligibility',
-          description: 'Specify who can apply for this opportunity',
-          fields: [
-            {
-              id: 'requirements',
-              type: 'textarea',
-              label: 'Requirements',
-              placeholder: 'Enter requirements, each on a new line',
+              label: 'Salary/Stipend',
+              placeholder: 'e.g. $50,000-$70,000 or $15/hour',
+              required: false,
             },
             {
-              id: 'isActive',
+              id: 'is_active',
               type: 'switch',
-              label: 'Active Status',
-              placeholder: 'Make this opportunity visible to users',
+              label: 'Active',
+              description: 'Is this opportunity active and visible to users?',
+              required: false,
             },
             {
               id: 'featured',
               type: 'switch',
               label: 'Featured',
-              placeholder: 'Show this opportunity as featured',
+              description: 'Show this opportunity at the top of the list',
+              required: false,
             },
+            {
+              id: 'requirements',
+              type: 'tagsInput',
+              label: 'Requirements',
+              placeholder: 'Add requirements',
+              required: false,
+            }
           ],
         },
       ]);
     }
-  }, [categories]);
+  }, [categoriesQuery.data]);
+
+  // Set initial form values when editing
+  useEffect(() => {
+    if (isEditing && initialData) {
+      const formattedDeadline = initialData.deadline ? new Date(initialData.deadline).toISOString().split('T')[0] : '';
+      
+      setFormValues({
+        title: initialData.title || '',
+        organization: initialData.organization || '',
+        description: initialData.description || '',
+        category: initialData.category || '',
+        categories: initialData.categories || [],
+        deadline: formattedDeadline,
+        website_url: initialData.website_url || '',
+        location: initialData.location || '',
+        type: initialData.type || '',
+        salary: initialData.salary || '',
+        is_active: initialData.is_active !== undefined ? initialData.is_active : true,
+        featured: initialData.featured || false,
+        requirements: initialData.requirements || [],
+      });
+    }
+  }, [isEditing, initialData]);
 
   const handleSubmit = async (formData: Record<string, any>) => {
     setLoading(true);
     
     try {
-      // Process form data
-      console.log('Submitted opportunity:', formData);
-
-      // Convert requirements text to array
-      if (formData.requirements) {
-        formData.requirements = formData.requirements
-          .split('\n')
-          .map((item: string) => item.trim())
-          .filter((item: string) => item);
-      }
-
-      // Get primary category (first one)
-      const primaryCategory = formData.categories && formData.categories.length > 0 
-        ? formData.categories[0] 
-        : "";
-
-      // Store all selected categories in an array
-      const categoriesArray = Array.isArray(formData.categories) 
-        ? formData.categories 
-        : [formData.categories].filter(Boolean);
-
-      // Prepare data for Supabase
+      // Format deadline to include time
+      const deadlineDate = new Date(formData.deadline);
+      deadlineDate.setHours(23, 59, 59);
+      
       const opportunityData = {
         title: formData.title,
         organization: formData.organization,
-        category: primaryCategory, // Keep primary category in the original field
-        categories: categoriesArray, // Store all categories in a new field
-        type: formData.type,
-        deadline: new Date(formData.deadline).toISOString(),
         description: formData.description,
-        location: formData.location,
-        salary: formData.salary,
-        requirements: formData.requirements,
-        website_url: formData.website_url,
-        is_active: formData.isActive,
-        featured: formData.featured
+        category: formData.category,
+        categories: formData.categories || [],
+        deadline: deadlineDate.toISOString(),
+        website_url: formData.website_url || null,
+        location: formData.location || null,
+        type: formData.type || null,
+        salary: formData.salary || null,
+        is_active: formData.is_active !== undefined ? formData.is_active : true,
+        featured: formData.featured || false,
+        requirements: formData.requirements || [],
+        updated_at: new Date().toISOString(),
       };
-
-      // Insert into Supabase
-      const { error } = await supabase
-        .from('opportunities')
-        .insert(opportunityData);
-
-      if (error) {
-        throw error;
+      
+      let result;
+      
+      if (isEditing && initialData) {
+        // Update existing opportunity
+        const { data, error } = await supabase
+          .from('opportunities')
+          .update(opportunityData)
+          .eq('id', initialData.id)
+          .select('*')
+          .single();
+        
+        if (error) throw error;
+        result = data;
+        
+        toast({
+          title: "Opportunity Updated",
+          description: "The opportunity has been successfully updated",
+        });
+        
+        if (onOpportunityUpdated) {
+          onOpportunityUpdated(result);
+        }
+      } else {
+        // Create new opportunity
+        const { data, error } = await supabase
+          .from('opportunities')
+          .insert(opportunityData)
+          .select('*')
+          .single();
+        
+        if (error) throw error;
+        result = data;
+        
+        toast({
+          title: "Opportunity Added",
+          description: "The opportunity has been successfully created",
+        });
+        
+        if (onOpportunityAdded) {
+          onOpportunityAdded(result);
+        }
       }
-
-      toast({
-        title: "Opportunity Added",
-        description: "The opportunity has been successfully created",
-      });
+      
+      setOpen(false);
     } catch (error: any) {
-      console.error('Error adding opportunity:', error);
+      console.error('Error saving opportunity:', error);
       toast({
+        variant: "destructive",
         title: "Error",
-        description: `Failed to add opportunity: ${error.message || "Unknown error"}`,
-        variant: "destructive"
+        description: `Failed to ${isEditing ? 'update' : 'create'} opportunity: ${error.message || 'Unknown error'}`,
       });
     } finally {
       setLoading(false);
@@ -209,49 +261,51 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
   };
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {trigger || (
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            Add Opportunity
+            New Opportunity
           </Button>
         )}
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Add New Opportunity</SheetTitle>
+          <SheetTitle>{isEditing ? 'Edit Opportunity' : 'Create Opportunity'}</SheetTitle>
           <SheetDescription>
-            Fill in the details to create a new opportunity
+            {isEditing ? 'Update opportunity details' : 'Add a new opportunity to the platform'}
           </SheetDescription>
         </SheetHeader>
         
-        <div className="py-6">
-          {categoriesLoading ? (
+        <div className="py-4">
+          {categoriesQuery.isLoading ? (
             <div className="flex justify-center py-8">
-              <p>Loading form...</p>
+              <p>Loading categories...</p>
             </div>
-          ) : (
+          ) : opportunitySections.length > 0 ? (
             <DynamicForm
-              title="New Opportunity"
-              sections={formSections}
+              title=""
+              sections={opportunitySections}
               onSubmit={handleSubmit}
               loading={loading}
-              submitButtonText={loading ? (
-                <span className="flex items-center">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Adding Opportunity...
-                </span>
-              ) : (
-                "Add Opportunity"
-              )}
+              submitButtonText={
+                loading ? 
+                  "Processing..." : 
+                  (isEditing ? 'Update Opportunity' : 'Create Opportunity')
+              }
+              initialValues={formValues}
             />
+          ) : (
+            <div className="text-center py-4">
+              <p>No categories found. Please create some categories first.</p>
+            </div>
           )}
         </div>
         
         <SheetFooter className="pt-2">
           <SheetClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" disabled={loading}>Cancel</Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

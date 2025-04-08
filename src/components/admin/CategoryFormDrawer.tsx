@@ -248,14 +248,11 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
             sections={categorySections}
             onSubmit={handleSubmit}
             loading={loading}
-            submitButtonText={loading ? (
-              <span className="flex items-center">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {isEditing ? 'Updating...' : 'Adding...'}
-              </span>
-            ) : (
-              isEditing ? 'Update Category' : 'Add Category'
-            )}
+            submitButtonText={
+              loading ? 
+                "Processing..." : 
+                (isEditing ? 'Update Category' : 'Add Category')
+            }
             initialValues={formValues}
           />
         </div>

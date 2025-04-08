@@ -1,67 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-
-interface Application {
-  id: string;
-  title: string;
-  organization: string;
-  submitted_date: string;
-  status: 'pending' | 'approved' | 'rejected' | 'draft';
-  last_updated: string;
-  notes?: string;
-}
+import { useApplications } from '@/hooks/useApplications';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ApplicationStatus = () => {
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchApplicationStatus();
-  }, []);
-
-  const fetchApplicationStatus = async () => {
-    // In a real implementation, fetch from a 'applications' table
-    // Mock data for now
-    setTimeout(() => {
-      const mockApplications = [
-        {
-          id: "app1",
-          title: "Software Engineering Internship",
-          organization: "TechCorp",
-          submitted_date: "2023-10-15",
-          status: "pending" as const,
-          last_updated: "2023-10-15",
-          notes: "Your application is being reviewed by the hiring team."
-        },
-        {
-          id: "app2",
-          title: "Research Grant Application",
-          organization: "Science Foundation",
-          submitted_date: "2023-09-20",
-          status: "approved" as const,
-          last_updated: "2023-09-28",
-          notes: "Congratulations! Your grant application has been approved."
-        },
-        {
-          id: "app3",
-          title: "Graduate Scholarship",
-          organization: "University of Technology",
-          submitted_date: "2023-11-05",
-          status: "rejected" as const,
-          last_updated: "2023-11-15",
-          notes: "We regret to inform you that your application has not been selected."
-        }
-      ];
-      setApplications(mockApplications);
-      setLoading(false);
-    }, 800);
-  };
+  const { applications, isLoading } = useApplications();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -121,10 +69,20 @@ const ApplicationStatus = () => {
           </p>
         </div>
         
-        {loading ? (
-          <div className="flex justify-center py-8">
-            <p>Loading application status...</p>
-          </div>
+        {isLoading ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Application Status Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            </CardContent>
+          </Card>
         ) : applications.length > 0 ? (
           <Card>
             <CardHeader>
@@ -150,7 +108,7 @@ const ApplicationStatus = () => {
                         </div>
                       </TableCell>
                       <TableCell>{formatDate(app.submitted_date)}</TableCell>
-                      <TableCell>{formatDate(app.last_updated)}</TableCell>
+                      <TableCell>{formatDate(app.last_updated || app.submitted_date)}</TableCell>
                       <TableCell>
                         {getStatusBadge(app.status)}
                         <p className="text-xs mt-1 text-muted-foreground max-w-[250px]">
