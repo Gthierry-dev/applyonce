@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Loader2 } from 'lucide-react';
 import DynamicForm from '@/components/forms/DynamicForm';
 import { categorySections } from './CategoryFormConfig';
@@ -37,7 +37,7 @@ const CategoryFormContent: React.FC<CategoryFormContentProps> = ({
         sections={categorySections}
         onSubmit={onSubmit}
         loading={loading}
-        submitButtonText={getSubmitButtonContent()}
+        submitButtonText={getSubmitButtonContent() as string}
         initialValues={initialValues}
       />
     </div>
