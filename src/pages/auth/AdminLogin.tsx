@@ -6,18 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LockKeyhole, AlertCircle } from 'lucide-react';
+import { LockKeyhole, AlertCircle, UserPlus } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Login state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // Signup state
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signupFullName, setSignupFullName] = useState('');
+  const [signupError, setSignupError] = useState<string | null>(null);
+  const [signupLoading, setSignupLoading] = useState(false);
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +89,64 @@ const AdminLogin = () => {
     }
   };
 
+  const handleAdminSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSignupError(null);
+    setSignupLoading(true);
+
+    try {
+      // Create the user account
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: signupEmail,
+        password: signupPassword,
+        options: {
+          data: {
+            full_name: signupFullName,
+            role: 'admin'
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      if (!data || !data.user) {
+        throw new Error('Failed to create admin account');
+      }
+
+      // Manually update the role in profiles table to ensure admin status
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ role: 'admin' })
+        .eq('id', data.user.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: 'Admin Account Created',
+        description: 'The new admin account has been created successfully.',
+      });
+      
+      // Clear the form
+      setSignupEmail('');
+      setSignupPassword('');
+      setSignupFullName('');
+      
+      // Switch to login tab
+      document.getElementById('login-tab')?.click();
+      
+    } catch (err) {
+      console.error('Admin signup error:', err);
+      setSignupError(err instanceof Error ? err.message : 'An error occurred during signup');
+      toast({
+        variant: "destructive",
+        title: "Signup Failed",
+        description: err instanceof Error ? err.message : 'Failed to create admin account',
+      });
+    } finally {
+      setSignupLoading(false);
+    }
+  };
+
   return (
     <Layout noFooter className="flex items-center justify-center px-4 h-screen bg-muted/40">
       <Card className="w-full max-w-md">
@@ -88,49 +156,117 @@ const AdminLogin = () => {
               <LockKeyhole className="h-6 w-6 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl text-center font-bold">Admin Login</CardTitle>
+          <CardTitle className="text-2xl text-center font-bold">Admin Portal</CardTitle>
           <CardDescription className="text-center">
-            Enter your credentials to access the admin dashboard
+            Manage your application
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleAdminLogin}>
-          <CardContent className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="admin@example.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Logging In...' : 'Login to Admin'}
-            </Button>
-          </CardFooter>
-        </form>
+        
+        <Tabs defaultValue="login" className="w-full">
+          <TabsList className="grid grid-cols-2 w-full">
+            <TabsTrigger id="login-tab" value="login">Login</TabsTrigger>
+            <TabsTrigger value="signup">Create Admin</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="login">
+            <form onSubmit={handleAdminLogin}>
+              <CardContent className="space-y-4 pt-4">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="admin@example.com" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoComplete="email"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Logging In...' : 'Login to Admin'}
+                </Button>
+              </CardFooter>
+            </form>
+          </TabsContent>
+          
+          <TabsContent value="signup">
+            <form onSubmit={handleAdminSignup}>
+              <CardContent className="space-y-4 pt-4">
+                {signupError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{signupError}</AlertDescription>
+                  </Alert>
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input 
+                    id="fullName" 
+                    type="text" 
+                    placeholder="Jane Doe" 
+                    value={signupFullName}
+                    onChange={(e) => setSignupFullName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signupEmail">Email</Label>
+                  <Input 
+                    id="signupEmail" 
+                    type="email" 
+                    placeholder="admin@example.com" 
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signupPassword">Password</Label>
+                  <Input 
+                    id="signupPassword" 
+                    type="password"
+                    placeholder="••••••••"
+                    value={signupPassword}
+                    onChange={(e) => setSignupPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button type="submit" className="w-full" disabled={signupLoading}>
+                  {signupLoading ? (
+                    'Creating Account...'
+                  ) : (
+                    <>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Create Admin Account
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </form>
+          </TabsContent>
+        </Tabs>
       </Card>
     </Layout>
   );

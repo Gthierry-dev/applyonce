@@ -5,7 +5,7 @@ import { supabase, Profile, UserRole } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/use-toast';
 
-interface ProfileWithRole extends Profile {
+interface ProfileWithRole extends Omit<Profile, 'role'> {
   role?: UserRole;
 }
 
