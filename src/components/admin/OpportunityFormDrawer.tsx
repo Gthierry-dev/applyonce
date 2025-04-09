@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,10 +22,9 @@ import { Switch } from "@/components/ui/switch"
 import { useToast } from '@/hooks/use-toast';
 import { Category } from '@/integrations/supabase/client';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { DatePicker } from "@/components/ui/date-picker"
-import { CalendarIcon } from "@radix-ui/react-icons"
 import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
@@ -155,7 +155,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
                 <SelectContent>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
-                      {category.name}
+                      {category.title}
                     </SelectItem>
                   ))}
                 </SelectContent>

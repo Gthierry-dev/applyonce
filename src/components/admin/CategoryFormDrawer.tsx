@@ -1,18 +1,11 @@
+
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Plus } from "lucide-react"
+import { Plus, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -23,13 +16,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { toast } from "@/hooks/use-toast"
@@ -44,18 +30,17 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useEffect, useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
-import { Loader2 } from "lucide-react"
 
 const categorySchema = z.object({
-  name: z.string().min(2, {
+  title: z.string().min(2, {
     message: "Category name must be at least 2 characters.",
   }),
   description: z.string().optional(),
   is_active: z.boolean().default(true),
+  icon_name: z.string().default("folder"),
+  color: z.string().default("#4F46E5"),
 })
 
 interface CategoryFormDrawerProps {
@@ -75,18 +60,22 @@ export function CategoryFormDrawer({
   const form = useForm<z.infer<typeof categorySchema>>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
-      name: category?.name || "",
+      title: category?.title || "",
       description: category?.description || "",
       is_active: category?.is_active || true,
+      icon_name: category?.icon_name || "folder",
+      color: category?.color || "#4F46E5",
     },
   })
 
   useEffect(() => {
     if (category) {
       form.reset({
-        name: category.name || "",
+        title: category.title || "",
         description: category.description || "",
         is_active: category.is_active || true,
+        icon_name: category.icon_name || "folder",
+        color: category.color || "#4F46E5",
       })
     }
   }, [category, form])
@@ -114,7 +103,7 @@ export function CategoryFormDrawer({
 
         toast({
           title: "Category updated successfully",
-          description: `Category "${values.name}" has been updated.`,
+          description: `Category "${values.title}" has been updated.`,
         })
       } else {
         // Create new category
@@ -135,7 +124,7 @@ export function CategoryFormDrawer({
 
         toast({
           title: "Category created successfully",
-          description: `Category "${values.name}" has been created.`,
+          description: `Category "${values.title}" has been created.`,
         })
       }
       form.reset()
@@ -172,7 +161,7 @@ export function CategoryFormDrawer({
             <div className="grid gap-4 py-4">
               <FormField
                 control={form.control}
-                name="name"
+                name="title"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category name</FormLabel>

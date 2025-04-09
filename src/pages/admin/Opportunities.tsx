@@ -4,9 +4,9 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Edit, Trash, ExternalLink } from 'lucide-react';
+import { Search, Edit, Trash, ExternalLink, Plus } from 'lucide-react';
 import OpportunityFormDrawer from '@/components/admin/OpportunityFormDrawer';
-import { supabase, Opportunity } from '@/integrations/supabase/client';
+import { supabase, Opportunity, Category } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -21,15 +21,38 @@ import {
 
 const AdminOpportunities = () => {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingOpportunity, setEditingOpportunity] = useState<Opportunity | undefined>(undefined);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   useEffect(() => {
     fetchOpportunities();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*');
+
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load categories',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const fetchOpportunities = async () => {
     try {
@@ -87,10 +110,77 @@ const AdminOpportunities = () => {
     setDeleteDialogOpen(true);
   };
 
+  const handleEditClick = (opportunity: Opportunity) => {
+    setEditingOpportunity(opportunity);
+    setDrawerOpen(true);
+  };
+
+  const handleAddNew = () => {
+    setEditingOpportunity(undefined);
+    setDrawerOpen(true);
+  };
+
+  const handleSubmit = async (values: any) => {
+    setSubmitLoading(true);
+    try {
+      if (editingOpportunity) {
+        // Update existing opportunity
+        const { error } = await supabase
+          .from('opportunities')
+          .update(values)
+          .eq('id', editingOpportunity.id);
+
+        if (error) throw error;
+
+        toast({
+          title: 'Success',
+          description: 'Opportunity updated successfully',
+        });
+
+        // Update the local state
+        setOpportunities(
+          opportunities.map(opp => 
+            opp.id === editingOpportunity.id ? { ...opp, ...values } : opp
+          )
+        );
+      } else {
+        // Create new opportunity
+        const { data, error } = await supabase
+          .from('opportunities')
+          .insert([values])
+          .select();
+
+        if (error) throw error;
+
+        toast({
+          title: 'Success',
+          description: 'Opportunity created successfully',
+        });
+
+        // Add to local state if we got data back
+        if (data) {
+          setOpportunities([data[0], ...opportunities]);
+        } else {
+          // If no data, refetch to be safe
+          fetchOpportunities();
+        }
+      }
+    } catch (error) {
+      console.error('Error saving opportunity:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save opportunity',
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
   const filteredOpportunities = opportunities.filter(opp => 
-    opp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    opp.organization.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    opp.category.toLowerCase().includes(searchQuery.toLowerCase())
+    opp.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    opp.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (typeof opp.category === 'string' && opp.category.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -98,7 +188,10 @@ const AdminOpportunities = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Manage Opportunities</h1>
-          <OpportunityFormDrawer />
+          <Button onClick={handleAddNew}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Opportunity
+          </Button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -142,7 +235,7 @@ const AdminOpportunities = () => {
                     <TableRow key={opportunity.id}>
                       <TableCell>
                         <div className="font-medium">{opportunity.title}</div>
-                        <div className="text-sm text-muted-foreground">{opportunity.organization}</div>
+                        <div className="text-sm text-muted-foreground">{opportunity.company}</div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
@@ -176,7 +269,12 @@ const AdminOpportunities = () => {
                               </a>
                             </Button>
                           )}
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8"
+                            onClick={() => handleEditClick(opportunity)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button 
@@ -215,6 +313,16 @@ const AdminOpportunities = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Opportunity Form Drawer */}
+        <OpportunityFormDrawer
+          open={drawerOpen}
+          setOpen={setDrawerOpen}
+          categories={categories}
+          onSubmit={handleSubmit}
+          loading={submitLoading}
+          initialValues={editingOpportunity}
+        />
       </div>
     </AdminLayout>
   );
