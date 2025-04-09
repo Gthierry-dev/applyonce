@@ -37,8 +37,8 @@ const formSchema = z.object({
   category_id: z.string().uuid({
     message: 'Please select a category.',
   }),
-  company: z.string().min(2, {
-    message: 'Company name must be at least 2 characters.',
+  organization: z.string().min(2, {
+    message: 'Organization name must be at least 2 characters.',
   }),
   location: z.string().min(2, {
     message: 'Location must be at least 2 characters.',
@@ -77,7 +77,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
       title: initialValues?.title || '',
       description: initialValues?.description || '',
       category_id: initialValues?.category_id || '',
-      company: initialValues?.company || '',
+      organization: initialValues?.organization || '',
       location: initialValues?.location || '',
       salary: initialValues?.salary || '',
       application_url: initialValues?.application_url || '',
@@ -165,10 +165,10 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
               )}
             </div>
             <div>
-              <Label htmlFor="company">Company</Label>
-              <Input id="company" type="text" placeholder="Company Name" {...form.register('company')} />
-              {form.formState.errors.company && (
-                <p className="text-sm text-red-500">{form.formState.errors.company.message}</p>
+              <Label htmlFor="organization">Organization</Label>
+              <Input id="organization" type="text" placeholder="Organization Name" {...form.register('organization')} />
+              {form.formState.errors.organization && (
+                <p className="text-sm text-red-500">{form.formState.errors.organization.message}</p>
               )}
             </div>
             <div>

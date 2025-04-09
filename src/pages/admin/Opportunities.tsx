@@ -179,7 +179,7 @@ const AdminOpportunities = () => {
 
   const filteredOpportunities = opportunities.filter(opp => 
     opp.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    opp.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    opp.organization?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (typeof opp.category === 'string' && opp.category.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
@@ -235,7 +235,7 @@ const AdminOpportunities = () => {
                     <TableRow key={opportunity.id}>
                       <TableCell>
                         <div className="font-medium">{opportunity.title}</div>
-                        <div className="text-sm text-muted-foreground">{opportunity.company}</div>
+                        <div className="text-sm text-muted-foreground">{opportunity.organization}</div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">

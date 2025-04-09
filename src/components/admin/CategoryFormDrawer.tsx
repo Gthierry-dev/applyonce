@@ -87,7 +87,12 @@ export function CategoryFormDrawer({
         // Update existing category
         const { data, error } = await supabase
           .from("categories")
-          .update(values)
+          .update({
+            title: values.title,
+            description: values.description,
+            icon_name: values.icon_name,
+            color: values.color
+          })
           .eq("id", category.id)
           .select()
 
@@ -109,7 +114,12 @@ export function CategoryFormDrawer({
         // Create new category
         const { data, error } = await supabase
           .from("categories")
-          .insert([values])
+          .insert({
+            title: values.title,
+            description: values.description,
+            icon_name: values.icon_name,
+            color: values.color
+          })
           .select()
 
         if (error) {
