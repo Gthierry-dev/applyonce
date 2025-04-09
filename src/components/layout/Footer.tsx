@@ -134,7 +134,7 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
               Terms
             </Link>
             <span className="text-sm text-muted-foreground">
-              Made with <Heart className="inline h-3 w-3 text-red-500" /> by Lovable
+              Ttech innovation labz
             </span>
           </div>
         </div>
