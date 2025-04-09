@@ -1,53 +1,62 @@
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from 'react';
 import { supabase, Category } from '@/integrations/supabase/client';
-
-export interface CategoryState {
-  enabled: Record<string, boolean>;
-  configured: Record<string, boolean>;
-}
+import { useToast } from '@/hooks/use-toast';
 
 export const useCategories = () => {
+  const [data, setData] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [enabledCategories, setEnabledCategories] = useState<Record<string, boolean>>({});
+  const [configuredCategories, setConfiguredCategories] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
-  
-  // Fetch categories from Supabase
-  const { data: categories, isLoading, error } = useQuery({
-    queryKey: ['categories'],
-    queryFn: async (): Promise<Category[]> => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('title');
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('categories')
+          .select('*')
+          .order('title');
+
+        if (error) {
+          throw error;
+        }
+
+        setData(data || []);
         
-      if (error) {
-        throw new Error(error.message);
+        // Initialize enabled categories
+        const initialEnabledCategories: Record<string, boolean> = {};
+        data?.forEach(category => {
+          initialEnabledCategories[category.title] = true;
+        });
+        
+        setEnabledCategories(initialEnabledCategories);
+        
+        // Simulate configured categories (this would come from user preferences in a real app)
+        const initialConfiguredCategories: Record<string, boolean> = {};
+        data?.forEach(category => {
+          initialConfiguredCategories[category.title] = Math.random() > 0.5;
+        });
+        
+        setConfiguredCategories(initialConfiguredCategories);
+      } catch (err) {
+        setError(err as Error);
+        toast({
+          variant: "destructive",
+          title: "Error fetching categories",
+          description: (err as Error).message,
+        });
+      } finally {
+        setIsLoading(false);
       }
-      
-      return data || [];
-    }
-  });
+    };
 
-  // Initialize default states based on category data
-  const createInitialState = (): Record<string, boolean> => {
-    const initialState: Record<string, boolean> = {};
-    if (categories) {
-      categories.forEach((category, index) => {
-        // Set first two categories as initially enabled as an example
-        initialState[category.title] = index < 2;
-      });
-    }
-    return initialState;
-  };
+    fetchCategories();
+  }, [toast]);
 
-  // State to track enabled categories
-  const [enabledCategories, setEnabledCategories] = useState<Record<string, boolean>>(createInitialState());
-  
-  // State to track configured categories
-  const [configuredCategories, setConfiguredCategories] = useState<Record<string, boolean>>(createInitialState());
-
-  // Handle toggle change
+  // Handle category toggle
   const handleToggle = (category: string, enabled: boolean) => {
     setEnabledCategories(prev => ({
       ...prev,
@@ -56,21 +65,13 @@ export const useCategories = () => {
     
     toast({
       title: enabled ? "Category enabled" : "Category disabled",
-      description: `${category} has been ${enabled ? 'added to' : 'removed from'} your feed.`,
+      description: `${category} has been ${enabled ? 'enabled' : 'disabled'}.`
     });
-    
-    // If not configured and enabling, we should prompt user to configure
-    if (enabled && !configuredCategories[category]) {
-      toast({
-        title: "Configuration needed",
-        description: `Click on the ${category} card to configure your profile for this category.`,
-      });
-    }
   };
 
   return {
-    data: categories,
-    isLoading, 
+    data,
+    isLoading,
     error,
     enabledCategories,
     configuredCategories,

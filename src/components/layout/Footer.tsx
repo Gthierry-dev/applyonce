@@ -1,124 +1,144 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Linkedin, ArrowRight, Mails } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { ChevronRight, Heart } from 'lucide-react';
+import { Container } from '@/components/ui/container';
 import { Separator } from '@/components/ui/separator';
 
-const Footer = () => {
+interface FooterProps {
+  className?: string;
+}
+
+const Footer: React.FC<FooterProps> = ({ className }) => {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="bg-muted/30 border-t">
-      <div className="container px-4 py-12 mx-auto">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-4">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="rounded-md bg-primary p-1.5">
-                <span className="text-primary-foreground font-bold text-sm">A1</span>
-              </div>
-              <span className="font-display font-semibold text-lg">ApplyOnce</span>
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              Streamlining the application process for opportunities across
-              educational, professional, and personal development sectors.
-            </p>
-            <div className="flex space-x-3">
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Facebook size={20} />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Twitter size={20} />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Instagram size={20} />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Linkedin size={20} />
-              </a>
+    <footer className={cn("border-t bg-background", className)}>
+      <Container>
+        <div className="py-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="space-y-4">
+              <Link to="/" className="flex items-center gap-2">
+                <div className="rounded-md bg-primary p-1.5">
+                  <span className="text-primary-foreground font-bold text-sm">AO</span>
+                </div>
+                <span className="font-display font-semibold text-lg">ApplyOnce</span>
+              </Link>
+              <p className="text-sm text-muted-foreground">
+                Streamline your application process. Apply once, unlock many opportunities.
+              </p>
             </div>
-          </div>
-
-          <div>
-            <h3 className="font-medium text-foreground mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/opportunities" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Find Opportunities
+            
+            <div>
+              <h4 className="font-medium text-sm mb-4">Resources</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link 
+                    to="/resources" 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Resource Library
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to="/support" 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Support Center
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to="/pricing" 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Pricing & Plans
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-sm mb-4">Company</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link 
+                    to="/about" 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    About Us
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to="/community" 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Community
+                  </Link>
+                </li>
+                <li>
+                  <Link 
+                    to="/blog" 
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Blog
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-sm mb-4">Get Started</h4>
+              <div className="space-y-3">
+                <Link 
+                  to="/signup" 
+                  className="inline-flex items-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/80 h-9 px-4 py-2"
+                >
+                  Sign Up
+                  <ChevronRight className="ml-1 h-4 w-4" />
                 </Link>
-              </li>
-              <li>
-                <Link to="/resources" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Resources
-                </Link>
-              </li>
-              <li>
-                <Link to="/community" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Community
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <p className="text-xs text-muted-foreground">
+                  Free plan includes up to 5 applications per month.
+                </p>
+                <Link
+                  to="/admin/login"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors mt-8"
+                >
                   Admin Login
                 </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-medium text-foreground mb-4">Legal</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Terms of Service
-                </Link>
-              </li>
-              <li>
-                <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="/cookies" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Cookie Policy
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-medium text-foreground mb-4">Subscribe</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Stay updated with the latest opportunities and news.
-            </p>
-            <div className="flex">
-              <Input
-                type="email"
-                placeholder="Your email"
-                className="rounded-r-none"
-              />
-              <Button type="submit" className="rounded-l-none">
-                <ArrowRight size={16} />
-              </Button>
+              </div>
             </div>
           </div>
         </div>
-
-        <Separator className="my-8" />
-
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <p className="text-xs text-muted-foreground">
+        
+        <Separator />
+        
+        <div className="py-6 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-sm text-muted-foreground">
             &copy; {currentYear} ApplyOnce. All rights reserved.
           </p>
-          <div className="flex items-center mt-4 md:mt-0">
-            <a href="mailto:support@applyonce.com" className="flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors">
-              <Mails size={14} className="mr-1" />
-              support@applyonce.com
-            </a>
+          <div className="flex items-center space-x-4 mt-4 md:mt-0">
+            <Link 
+              to="/privacy" 
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Privacy
+            </Link>
+            <Link 
+              to="/terms" 
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Terms
+            </Link>
+            <span className="text-sm text-muted-foreground">
+              Made with <Heart className="inline h-3 w-3 text-red-500" /> by Lovable
+            </span>
           </div>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 };

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Edit, Trash, ExternalLink } from 'lucide-react';
-import OpportunityFormDrawer from '@/components/admin/OpportunityFormDrawer';
-import { supabase, Opportunity } from '@/integrations/supabase/client';
+import { Search, Edit, Trash, Plus } from 'lucide-react';
+import { supabase, Category } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -15,55 +15,42 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
-
-// Update the Category type to match what we're using elsewhere
-interface AdminCategory {
-  id: string;
-  title: string;
-  description: string;
-  count: number;
-  icon_name: string;
-  color: string;
-  created_at: string;
-  updated_at: string;
-}
+import CategoryDrawer from '@/components/admin/CategoryDrawer';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const AdminCategories = () => {
-  // Update the state type
-  const [categories, setCategories] = useState<AdminCategory[]>([]);
-  const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editData, setEditData] = useState<AdminCategory | null>(null);
-  const [formDrawerOpen, setFormDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | undefined>(undefined);
+  
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      setLoading(true);
+  // Fetch categories using React Query
+  const { data: categories, isLoading } = useQuery({
+    queryKey: ['admin-categories'],
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCategories(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load categories',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
+      return data || [];
     }
+  });
+
+  const handleEditClick = (category: Category) => {
+    setEditingCategory(category);
+    setCategoryDrawerOpen(true);
+  };
+
+  const handleAddClick = () => {
+    setEditingCategory(undefined);
+    setCategoryDrawerOpen(true);
   };
 
   const handleDeleteClick = (id: string) => {
@@ -81,19 +68,19 @@ const AdminCategories = () => {
         .eq('id', deleteId);
 
       if (error) throw error;
-
-      // Update the local state by removing the deleted category
-      setCategories(categories.filter(cat => cat.id !== deleteId));
+      
+      // Invalidate the categories query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
       
       toast({
         title: 'Success',
         description: 'Category deleted successfully',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting category:', error);
       toast({
         title: 'Error',
-        description: 'Failed to delete category',
+        description: 'Failed to delete category: ' + error.message,
         variant: 'destructive',
       });
     } finally {
@@ -102,28 +89,14 @@ const AdminCategories = () => {
     }
   };
 
-  const handleEditClick = (category: AdminCategory) => {
-    setEditData(category);
-    setFormDrawerOpen(true);
+  const handleCategorySave = (category: Category) => {
+    // Invalidate the categories query to refresh the data
+    queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
   };
 
-  const handleCategoryAdded = (newCategory: AdminCategory) => {
-    // Add the new category to the local state
-    setCategories([newCategory, ...categories]);
-  };
-
-  const handleCategoryUpdated = (updatedCategory: AdminCategory) => {
-    // Update the local state by replacing the updated category
-    setCategories(categories.map(cat => 
-      cat.id === updatedCategory.id ? updatedCategory : cat
-    ));
-  };
-
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const filteredCategories = categories.filter(cat =>
+  const filteredCategories = categories?.filter(cat =>
     cat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    cat.description.toLowerCase().includes(searchQuery.toLowerCase())
+    (cat.description && cat.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -131,7 +104,10 @@ const AdminCategories = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Manage Categories</h1>
-          <Button onClick={() => setFormDrawerOpen(true)}>Add Category</Button>
+          <Button onClick={handleAddClick}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Category
+          </Button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -144,10 +120,9 @@ const AdminCategories = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button variant="outline">Filter</Button>
         </div>
 
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center py-8">
             <p>Loading categories...</p>
           </div>
@@ -163,7 +138,7 @@ const AdminCategories = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCategories.length === 0 ? (
+                {!filteredCategories || filteredCategories.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-8">
                       No categories found
@@ -176,7 +151,9 @@ const AdminCategories = () => {
                         <div className="font-medium">{category.title}</div>
                       </TableCell>
                       <TableCell>{category.description}</TableCell>
-                      <TableCell>{category.count}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{category.count || 0}</Badge>
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditClick(category)}>
@@ -200,6 +177,7 @@ const AdminCategories = () => {
           </div>
         )}
 
+        {/* Delete Confirmation Dialog */}
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -219,13 +197,14 @@ const AdminCategories = () => {
           </DialogContent>
         </Dialog>
 
-        <OpportunityFormDrawer 
-          isOpen={formDrawerOpen}
-          onClose={() => setFormDrawerOpen(false)}
-          isEditing={!!editData}
-          initialData={editData}
-          onCategoryAdded={handleCategoryAdded}
-          onCategoryUpdated={handleCategoryUpdated}
+        {/* Category Form Drawer */}
+        <CategoryDrawer
+          trigger={<span />} // We're controlling open state externally
+          isOpen={categoryDrawerOpen}
+          onOpenChange={setCategoryDrawerOpen}
+          isEditing={!!editingCategory}
+          initialData={editingCategory}
+          onSave={handleCategorySave}
         />
       </div>
     </AdminLayout>
