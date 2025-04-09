@@ -15,6 +15,12 @@ const AdminRoute = () => {
     );
   }
 
+  // For admin login page, we need to make an exception and allow access
+  if (location.pathname === '/admin/login') {
+    return <Outlet />;
+  }
+
+  // For other admin routes, check authentication and admin status
   if (!user) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
