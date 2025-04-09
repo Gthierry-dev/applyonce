@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,12 +18,16 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn, user, isAdmin } = useAuth();
+  
+  // Extract redirect path from location state or use default
+  const from = location.state?.from?.pathname || (isAdmin ? '/admin/dashboard' : '/dashboard');
 
   useEffect(() => {
     // Redirect if already logged in
     if (user) {
-      navigate(isAdmin ? '/admin/dashboard' : '/dashboard');
+      navigate(isAdmin ? '/admin/dashboard' : '/dashboard', { replace: true });
     }
   }, [user, isAdmin, navigate]);
 
@@ -162,6 +166,12 @@ const Login = () => {
             Privacy Policy
           </Link>
           .
+        </div>
+        
+        <div className="text-center text-xs text-muted-foreground mt-4">
+          <Link to="/admin/login" className="text-primary hover:underline">
+            Admin Login
+          </Link>
         </div>
       </div>
     </Layout>

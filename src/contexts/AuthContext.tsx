@@ -58,8 +58,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Fetch user profile if session exists
       if (session?.user) {
         fetchUserProfile(session.user.id);
+      } else {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -75,14 +76,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Error fetching user profile:', error);
+        setIsLoading(false);
         return;
       }
 
       const profileData = data as ProfileWithRole;
       setProfile(profileData);
       setIsAdmin(profileData?.role === 'admin');
+      setIsLoading(false);
     } catch (error) {
       console.error('Unexpected error fetching profile:', error);
+      setIsLoading(false);
     }
   };
 
@@ -140,15 +144,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      setIsLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      navigate('/');
+      
+      // Clear all auth state
+      setSession(null);
+      setUser(null);
+      setProfile(null);
+      setIsAdmin(false);
+      
+      // Navigate to home page after logout
+      navigate('/', { replace: true });
+      
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Sign out failed",
         description: error.message || "An error occurred during sign out",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
