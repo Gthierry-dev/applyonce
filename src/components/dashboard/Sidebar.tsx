@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
   FileText,
@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SidebarProps {
   className?: string;
@@ -32,6 +33,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
 
   const adminLinks = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
@@ -60,6 +63,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
 
   const handleMobileToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
   };
 
   // Close mobile menu when changing routes
@@ -148,13 +155,13 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
             </div>
 
             <div className="mt-auto">
-              <Link
-                to="/"
-                className="flex items-center px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+              <Button
+                onClick={handleLogout}
+                className="flex items-center w-full px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
               >
                 <LogOut size={20} className="mr-3" />
-                <span>Back to Home</span>
-              </Link>
+                <span>Logout</span>
+              </Button>
             </div>
           </nav>
         </div>
@@ -261,24 +268,24 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link
-                  to="/"
+                <Button
+                  onClick={handleLogout}
                   className="flex items-center justify-center py-2 rounded-md text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
                 >
                   <LogOut size={20} />
-                </Link>
+                </Button>
               </TooltipTrigger>
-              <TooltipContent side="right">Back to Home</TooltipContent>
+              <TooltipContent side="right">Logout</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         ) : (
-          <Link
-            to="/"
-            className="flex items-center px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+          <Button
+            onClick={handleLogout}
+            className="flex items-center w-full px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
           >
             <LogOut size={20} className="mr-3" />
-            <span>Back to Home</span>
-          </Link>
+            <span>Logout</span>
+          </Button>
         )}
       </div>
     </aside>
