@@ -81,14 +81,14 @@ const Signup = () => {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-2">
               <SocialLoginButton 
                 provider="google" 
-                onClick={() => handleSocialSignup('google')} 
+                onClick={() => handleSocialLogin('google')} 
               />
               <SocialLoginButton 
                 provider="linkedin" 
-                onClick={() => handleSocialSignup('linkedin')} 
+                onClick={() => handleSocialLogin('linkedin')} 
               />
             </div>
             

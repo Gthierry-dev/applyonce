@@ -29,12 +29,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 interface User {
   id: string;
   full_name: string;
-  email: string;
   role: string;
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
-  applications_count?: number;
 }
 
 const AdminUsers = () => {
@@ -44,60 +42,49 @@ const AdminUsers = () => {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Fetch users with their application counts
+  // Fetch users
   const { data: users = [], isLoading, error } = useQuery<User[]>({
     queryKey: ['users'],
     queryFn: async () => {
-      // First, get all users from the profiles table
+      console.log('Fetching users from Supabase...');
+      
+      // Get all users from the profiles table
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (profilesError) throw profilesError;
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
       
-      // Then, get application counts for each user
-      const usersWithCounts = await Promise.all(
-        profiles.map(async (profile) => {
-          const { count, error: countError } = await supabase
-            .from('applications')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', profile.id);
-          
-          if (countError) throw countError;
-          
-          return {
-            ...profile,
-            applications_count: count || 0
-          };
-        })
-      );
-      
-      return usersWithCounts;
+      console.log('Profiles fetched:', profiles);
+      return profiles || [];
     }
   });
   
   // Filter users based on search query
   const filteredUsers = users.filter(user => 
-    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    user.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      const { error } = await supabase
+      // Delete the profile
+      const { error: profileError } = await supabase
         .from('profiles')
         .delete()
         .eq('id', userId);
       
-      if (error) throw error;
+      if (profileError) throw profileError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
         title: 'Success',
-        description: 'User deleted successfully',
+        description: 'User profile deleted successfully',
       });
     },
     onError: (error) => {
@@ -151,7 +138,7 @@ const AdminUsers = () => {
             </div>
           ) : error ? (
             <div className="p-4 text-center text-red-500">
-              Error loading users. Please try again.
+              Error loading users: {error instanceof Error ? error.message : 'Unknown error'}
             </div>
           ) : filteredUsers.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
@@ -162,10 +149,8 @@ const AdminUsers = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Applications</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -173,7 +158,6 @@ const AdminUsers = () => {
                 {filteredUsers.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell className="font-medium">{user.full_name || 'N/A'}</TableCell>
-                    <TableCell>{user.email}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
@@ -186,7 +170,6 @@ const AdminUsers = () => {
                         Active
                       </span>
                     </TableCell>
-                    <TableCell>{user.applications_count || 0}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
