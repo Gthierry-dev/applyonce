@@ -18,6 +18,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -145,14 +146,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
       
-      // Clear all auth state
+      // First clear local state
       setSession(null);
       setUser(null);
       setProfile(null);
       setIsAdmin(false);
+      
+      // Then sign out from Supabase
+      // This will ensure that even if there's an error with Supabase,
+      // the user is logged out on the client side
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
       
       // Navigate to home page after logout
       navigate('/', { replace: true });
@@ -167,8 +172,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Sign out failed",
         description: error.message || "An error occurred during sign out",
       });
+      console.error('Sign out error:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/#/reset-password',
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Password reset email sent",
+        description: "Check your inbox for instructions to reset your password.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Password reset failed",
+        description: error.message || "An error occurred sending the reset email",
+      });
+      throw error;
     }
   };
 
@@ -182,7 +210,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         signIn,
         signUp,
-        signOut
+        signOut,
+        resetPassword
       }}
     >
       {children}

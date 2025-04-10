@@ -1,22 +1,23 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LockKeyhole, AlertCircle, UserPlus } from 'lucide-react';
+import { LockKeyhole, AlertCircle, UserPlus, ArrowLeft, Mail } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
+import { Separator } from '@/components/ui/separator';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, resetPassword } = useAuth();
   
   // Redirect if already authenticated and is admin
   useEffect(() => {
@@ -30,6 +31,10 @@ const AdminLogin = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // Forgot password state
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
   
   // Signup state
   const [signupEmail, setSignupEmail] = useState('');
@@ -98,6 +103,23 @@ const AdminLogin = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    
+    try {
+      await resetPassword(forgotEmail);
+      setForgotEmail('');
+      
+      // Switch back to login tab after sending reset email
+      document.getElementById('login-tab')?.click();
+    } catch (error) {
+      console.error('Password reset error:', error);
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   const handleAdminSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setSignupError(null);
@@ -158,6 +180,11 @@ const AdminLogin = () => {
 
   return (
     <Layout noFooter className="flex items-center justify-center px-4 h-screen bg-muted/40">
+      <Link to="/" className="absolute top-4 left-4 flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to home
+      </Link>
+      
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
@@ -172,8 +199,9 @@ const AdminLogin = () => {
         </CardHeader>
         
         <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid grid-cols-2 w-full">
+          <TabsList className="grid grid-cols-3 w-full">
             <TabsTrigger id="login-tab" value="login">Login</TabsTrigger>
+            <TabsTrigger value="forgot">Forgot Password</TabsTrigger>
             <TabsTrigger value="signup">Create Admin</TabsTrigger>
           </TabsList>
           
@@ -210,9 +238,53 @@ const AdminLogin = () => {
                   />
                 </div>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex flex-col gap-2">
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Logging In...' : 'Login to Admin'}
+                </Button>
+                <div className="w-full text-center text-sm text-muted-foreground">
+                  <Link to="/" className="text-primary hover:underline">
+                    Return to home page
+                  </Link>
+                </div>
+              </CardFooter>
+            </form>
+          </TabsContent>
+          
+          <TabsContent value="forgot">
+            <form onSubmit={handleForgotPassword}>
+              <CardContent className="space-y-4 pt-4">
+                <div className="flex justify-center mb-4">
+                  <div className="rounded-full bg-muted p-3">
+                    <Mail className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                </div>
+                <p className="text-center text-sm text-muted-foreground mb-4">
+                  Enter your email and we'll send you instructions to reset your password
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="forgotEmail">Email</Label>
+                  <Input 
+                    id="forgotEmail" 
+                    type="email" 
+                    placeholder="admin@example.com" 
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </CardContent>
+              <CardFooter className="flex flex-col gap-2">
+                <Button type="submit" className="w-full" disabled={forgotLoading}>
+                  {forgotLoading ? 'Sending...' : 'Reset Password'}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="w-full" 
+                  onClick={() => document.getElementById('login-tab')?.click()}
+                >
+                  Back to Login
                 </Button>
               </CardFooter>
             </form>
@@ -276,6 +348,15 @@ const AdminLogin = () => {
             </form>
           </TabsContent>
         </Tabs>
+        
+        <div className="p-4">
+          <Separator className="my-2" />
+          <div className="text-center text-xs text-muted-foreground mt-2">
+            <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
+            {' '}&bull;{' '}
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+          </div>
+        </div>
       </Card>
     </Layout>
   );

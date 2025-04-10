@@ -13,6 +13,9 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import AdminLogin from "./pages/auth/AdminLogin";
+import ResetPassword from "./pages/auth/ResetPassword";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 // Dashboard routes
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -50,6 +53,9 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/social-auth-coming-soon" element={<SocialAuthComingSoon />} />
             
             {/* Protected Dashboard Routes */}
