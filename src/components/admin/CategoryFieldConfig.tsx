@@ -70,7 +70,7 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setFields(data as CustomField[] || []);
+      setFields(data as unknown as CustomField[] || []);
     } catch (error) {
       console.error('Error fetching category fields:', error);
       toast({
@@ -110,7 +110,7 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
 
       const { data, error } = await supabase
         .from('category_fields')
-        .insert([fieldToInsert])
+        .insert([fieldToInsert as any])
         .select();
 
       if (error) throw error;
@@ -120,7 +120,7 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
         description: 'Field added successfully',
       });
 
-      setFields([...fields, data[0] as CustomField]);
+      setFields([...fields, data[0] as unknown as CustomField]);
       
       // Reset new field form
       setNewField({

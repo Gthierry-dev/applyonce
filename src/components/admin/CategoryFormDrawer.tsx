@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Plus, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -274,3 +273,6 @@ export function CategoryFormDrawer({
     </Drawer>
   )
 }
+
+// Export as default for backward compatibility
+export default CategoryFormDrawer;
