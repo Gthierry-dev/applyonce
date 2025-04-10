@@ -1,5 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +12,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { Plus, Trash, GripVertical } from 'lucide-react';
 import { 
   Card,
   CardContent,
@@ -23,326 +25,242 @@ import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { CategoryField, FieldType } from '@/types/category';
 
-export type FieldType = 'text' | 'textarea' | 'file' | 'url' | 'date' | 'select' | 'checkbox' | 'number';
+const fieldTypes: { value: FieldType; label: string }[] = [
+  { value: 'text', label: 'Text' },
+  { value: 'textarea', label: 'Text Area' },
+  { value: 'number', label: 'Number' },
+  { value: 'select', label: 'Select' },
+  { value: 'checkbox', label: 'Checkbox' },
+  { value: 'date', label: 'Date' },
+  { value: 'file', label: 'File Upload' },
+  { value: 'url', label: 'URL' },
+];
 
-export interface CustomField {
-  id?: string;
-  name: string;
-  label: string;
-  type: FieldType;
-  required: boolean;
-  category_id: string;
-  options?: string[];
-  placeholder?: string;
-}
+const fieldSchema = z.object({
+  label: z.string().min(1, 'Label is required'),
+  type: z.enum(['text', 'textarea', 'number', 'select', 'checkbox', 'date', 'file', 'url'] as const),
+  required: z.boolean().default(false),
+  placeholder: z.string().optional(),
+  options: z.array(z.string()).optional(),
+});
+
+type FieldFormData = z.infer<typeof fieldSchema>;
 
 interface CategoryFieldConfigProps {
   categoryId: string;
-  categoryName?: string;
 }
 
-const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, categoryName }) => {
-  const [fields, setFields] = useState<CustomField[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [newField, setNewField] = useState<CustomField>({
-    name: '',
-    label: '',
-    type: 'text',
-    required: false,
-    category_id: categoryId,
+export function CategoryFieldConfig({ categoryId }: CategoryFieldConfigProps) {
+  const queryClient = useQueryClient();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<FieldFormData>({
+    resolver: zodResolver(fieldSchema),
   });
-  const { toast } = useToast();
 
-  useEffect(() => {
-    if (categoryId) {
-      fetchCategoryFields();
-    }
-  }, [categoryId]);
+  const { data: fields = [], isLoading } = useQuery<CategoryField[]>({
+    queryKey: ['categoryFields', categoryId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('category_fields')
+        .select('*')
+        .eq('category_id', categoryId)
+        .order('order');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
-  const fetchCategoryFields = async () => {
-    try {
-      setLoading(true);
-      // Use a type cast to avoid TypeScript errors
-      const response = await fetch(`${supabase.supabaseUrl}/rest/v1/category_fields?category_id=eq.${categoryId}&order=created_at.asc`, {
-        headers: {
-          'apikey': supabase.supabaseKey,
-          'Content-Type': 'application/json',
-        },
-      });
+  const addFieldMutation = useMutation({
+    mutationFn: async (newField: Omit<CategoryField, 'id' | 'created_at' | 'updated_at'>) => {
+      const { data, error } = await supabase
+        .from('category_fields')
+        .insert([newField])
+        .select()
+        .single();
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch category fields');
-      }
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categoryFields', categoryId] });
+      toast.success('Field added successfully');
+      reset();
+    },
+    onError: (error) => {
+      toast.error('Failed to add field: ' + error.message);
+    },
+  });
+
+  const deleteFieldMutation = useMutation({
+    mutationFn: async (fieldId: string) => {
+      const { error } = await supabase
+        .from('category_fields')
+        .delete()
+        .eq('id', fieldId);
       
-      const data = await response.json();
-      setFields(data as CustomField[]);
-    } catch (error) {
-      console.error('Error fetching category fields:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load category fields',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categoryFields', categoryId] });
+      toast.success('Field deleted successfully');
+    },
+    onError: (error) => {
+      toast.error('Failed to delete field: ' + error.message);
+    },
+  });
+
+  const reorderFieldsMutation = useMutation({
+    mutationFn: async (updates: { id: string; order: number }[]) => {
+      const { error } = await supabase
+        .from('category_fields')
+        .upsert(updates);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categoryFields', categoryId] });
+    },
+    onError: (error) => {
+      toast.error('Failed to reorder fields: ' + error.message);
+    },
+  });
+
+  const onSubmit = (data: FieldFormData) => {
+    const newField = {
+      category_id: categoryId,
+      label: data.label,
+      type: data.type,
+      required: data.required,
+      placeholder: data.placeholder,
+      options: data.options,
+      order: fields.length,
+    };
+    addFieldMutation.mutate(newField);
   };
 
-  const handleAddField = async () => {
-    try {
-      if (!newField.name || !newField.label) {
-        toast({
-          title: 'Validation Error',
-          description: 'Name and label are required',
-          variant: 'destructive',
-        });
-        return;
-      }
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
 
-      // Convert field name to safe format
-      const safeName = newField.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-      
-      setLoading(true);
-      const fieldToInsert = {
-        name: safeName,
-        label: newField.label,
-        type: newField.type,
-        required: newField.required,
-        category_id: categoryId,
-        options: newField.type === 'select' ? (newField.options || []) : null,
-        placeholder: newField.placeholder
-      };
+    const items = Array.from(fields);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
 
-      // Use fetch API directly to insert data
-      const response = await fetch(`${supabase.supabaseUrl}/rest/v1/category_fields`, {
-        method: 'POST',
-        headers: {
-          'apikey': supabase.supabaseKey,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=representation',
-        },
-        body: JSON.stringify(fieldToInsert),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to add field');
-      }
-      
-      const data = await response.json();
+    const updates = items.map((item, index) => ({
+      id: item.id,
+      order: index,
+    }));
 
-      toast({
-        title: 'Success',
-        description: 'Field added successfully',
-      });
-
-      if (data && data.length > 0) {
-        setFields([...fields, data[0] as CustomField]);
-      }
-      
-      // Reset new field form
-      setNewField({
-        name: '',
-        label: '',
-        type: 'text',
-        required: false,
-        category_id: categoryId,
-      });
-    } catch (error) {
-      console.error('Error adding field:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to add field',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
+    reorderFieldsMutation.mutate(updates);
   };
 
-  const handleRemoveField = async (fieldId: string) => {
-    try {
-      setLoading(true);
-      // Use fetch API directly to delete data
-      const response = await fetch(`${supabase.supabaseUrl}/rest/v1/category_fields?id=eq.${fieldId}`, {
-        method: 'DELETE',
-        headers: {
-          'apikey': supabase.supabaseKey,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to remove field');
-      }
-
-      toast({
-        title: 'Success',
-        description: 'Field removed successfully',
-      });
-
-      setFields(fields.filter(field => field.id !== fieldId));
-    } catch (error) {
-      console.error('Error removing field:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to remove field',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
-        <CardTitle>Custom Fields for {categoryName || 'Category'}</CardTitle>
-        <CardDescription>
-          Configure custom input fields that applicants must fill when applying for 
-          opportunities in this category.
-        </CardDescription>
+        <CardTitle>Custom Fields</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          {/* Existing fields */}
-          {fields.length > 0 ? (
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium">Existing Fields</h3>
-              <div className="grid gap-4">
-                {fields.map((field) => (
-                  <div key={field.id} className="flex items-center justify-between p-3 border rounded-md">
-                    <div>
-                      <p className="font-medium">{field.label}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {field.type} • {field.required ? 'Required' : 'Optional'}
-                      </p>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => field.id && handleRemoveField(field.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-4 text-muted-foreground">
-              No custom fields configured yet
-            </div>
-          )}
-
-          {/* Add new field form */}
-          <div className="space-y-4 pt-4 border-t">
-            <h3 className="text-sm font-medium">Add New Field</h3>
-            <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fieldName">Field Name</Label>
-                  <Input
-                    id="fieldName"
-                    value={newField.name}
-                    onChange={(e) => setNewField({...newField, name: e.target.value})}
-                    placeholder="e.g. cv_upload"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="fieldLabel">Display Label</Label>
-                  <Input
-                    id="fieldLabel"
-                    value={newField.label}
-                    onChange={(e) => setNewField({...newField, label: e.target.value})}
-                    placeholder="e.g. CV Upload"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fieldType">Field Type</Label>
-                  <Select 
-                    value={newField.type} 
-                    onValueChange={(value) => setNewField({
-                      ...newField, 
-                      type: value as FieldType,
-                      options: value === 'select' ? ['option1'] : undefined
-                    })}
-                  >
-                    <SelectTrigger id="fieldType">
-                      <SelectValue placeholder="Select field type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="text">Text</SelectItem>
-                      <SelectItem value="textarea">Text Area</SelectItem>
-                      <SelectItem value="number">Number</SelectItem>
-                      <SelectItem value="file">File Upload</SelectItem>
-                      <SelectItem value="url">URL</SelectItem>
-                      <SelectItem value="date">Date</SelectItem>
-                      <SelectItem value="select">Dropdown</SelectItem>
-                      <SelectItem value="checkbox">Checkbox</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="fieldRequired">Required Field</Label>
-                  <div className="flex items-center h-10 space-x-2">
-                    <Switch
-                      id="fieldRequired"
-                      checked={newField.required}
-                      onCheckedChange={(checked) => setNewField({...newField, required: checked})}
-                    />
-                    <Label htmlFor="fieldRequired" className="cursor-pointer">
-                      {newField.required ? 'Required' : 'Optional'}
-                    </Label>
-                  </div>
-                </div>
-              </div>
-
-              {newField.type === 'select' && (
-                <div className="space-y-2">
-                  <Label>Dropdown Options (one per line)</Label>
-                  <Textarea
-                    className="min-h-20"
-                    value={(newField.options || []).join('\n')}
-                    onChange={(e) => setNewField({
-                      ...newField, 
-                      options: e.target.value.split('\n').filter(Boolean).map(item => 
-                        item.trim() || `option_${Date.now()}`
-                      )
-                    })}
-                    placeholder="Option 1&#10;Option 2&#10;Option 3"
-                  />
-                </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="label">Field Label</Label>
+              <Input
+                id="label"
+                {...register('label')}
+                placeholder="Enter field label"
+              />
+              {errors.label && (
+                <p className="text-sm text-red-500">{errors.label.message}</p>
               )}
-
-              <div className="space-y-2">
-                <Label htmlFor="fieldPlaceholder">Placeholder (optional)</Label>
-                <Input
-                  id="fieldPlaceholder"
-                  value={newField.placeholder || ''}
-                  onChange={(e) => setNewField({...newField, placeholder: e.target.value})}
-                  placeholder="e.g. Enter your GitHub URL"
-                />
-              </div>
+            </div>
+            <div>
+              <Label htmlFor="type">Field Type</Label>
+              <Select
+                onValueChange={(value) => register('type').onChange({ target: { value } })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select field type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fieldTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.type && (
+                <p className="text-sm text-red-500">{errors.type.message}</p>
+              )}
             </div>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="required"
+              {...register('required')}
+            />
+            <Label htmlFor="required">Required field</Label>
+          </div>
+
+          <Button type="submit">Add Field</Button>
+        </form>
+
+        <div className="mt-6">
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="fields">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="space-y-2"
+                >
+                  {fields.map((field, index) => (
+                    <Draggable
+                      key={field.id}
+                      draggableId={field.id}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                        >
+                          <div>
+                            <h4 className="font-medium">{field.label}</h4>
+                            <p className="text-sm text-gray-500">{field.type}</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteFieldMutation.mutate(field.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </div>
       </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={handleAddField} 
-          disabled={loading}
-          className="w-full"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Field
-        </Button>
-      </CardFooter>
     </Card>
   );
-};
-
-export default CategoryFieldConfig;
+}

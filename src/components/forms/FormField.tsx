@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -15,19 +14,7 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
-
-export type FieldType = 
-  | 'text' 
-  | 'textarea' 
-  | 'email' 
-  | 'password' 
-  | 'number' 
-  | 'select' 
-  | 'multiselect'
-  | 'checkbox' 
-  | 'switch'
-  | 'date'
-  | 'file';
+import { FieldType } from '@/components/admin/CategoryFieldConfig';
 
 export interface Option {
   label: string;
@@ -35,8 +22,8 @@ export interface Option {
 }
 
 export interface FormFieldProps {
-  type: FieldType;
   id: string;
+  type: FieldType;
   label: string;
   placeholder?: string;
   description?: string;
@@ -50,8 +37,8 @@ export interface FormFieldProps {
 }
 
 const FormField: React.FC<FormFieldProps> = ({
-  type,
   id,
+  type,
   label,
   placeholder,
   description,
@@ -109,29 +96,17 @@ const FormField: React.FC<FormFieldProps> = ({
   const renderField = () => {
     switch (type) {
       case 'text':
-      case 'email':
-      case 'password':
-      case 'number':
-        return (
-          <Input
-            type={type}
-            id={id}
-            placeholder={placeholder}
-            disabled={disabled}
-            value={value || ''}
-            onChange={handleInputChange}
-            className={cn(error && 'border-red-500')}
-          />
-        );
+      case 'url':
       case 'date':
         return (
           <Input
-            type="date"
             id={id}
-            disabled={disabled}
+            type={type}
+            placeholder={placeholder}
             value={value || ''}
-            onChange={handleInputChange}
-            className={cn(error && 'border-red-500')}
+            onChange={(e) => onChange(e.target.value)}
+            required={required}
+            className={error ? 'border-red-500' : ''}
           />
         );
       case 'textarea':
@@ -139,25 +114,37 @@ const FormField: React.FC<FormFieldProps> = ({
           <Textarea
             id={id}
             placeholder={placeholder}
-            disabled={disabled}
             value={value || ''}
-            onChange={handleInputChange}
-            className={cn(error && 'border-red-500')}
+            onChange={(e) => onChange(e.target.value)}
+            required={required}
+            className={error ? 'border-red-500' : ''}
+          />
+        );
+      case 'number':
+        return (
+          <Input
+            id={id}
+            type="number"
+            placeholder={placeholder}
+            value={value || ''}
+            onChange={(e) => onChange(Number(e.target.value))}
+            required={required}
+            className={error ? 'border-red-500' : ''}
           />
         );
       case 'select':
         return (
           <Select
-            disabled={disabled}
-            value={value || ''}
+            value={value}
             onValueChange={handleSelectChange}
+            required={required}
           >
-            <SelectTrigger className={cn(error && 'border-red-500')}>
-              <SelectValue placeholder={placeholder} />
+            <SelectTrigger className={error ? 'border-red-500' : ''}>
+              <SelectValue placeholder={placeholder || 'Select an option'} />
             </SelectTrigger>
             <SelectContent>
-              {options.map((option) => (
-                <SelectItem key={option.value} value={option.value || '_empty_'}>
+              {options?.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
               ))}
@@ -204,20 +191,13 @@ const FormField: React.FC<FormFieldProps> = ({
         );
       case 'checkbox':
         return (
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id={id}
-              checked={value || false}
-              onCheckedChange={handleCheckboxChange}
-              disabled={disabled}
-            />
-            <label
-              htmlFor={id}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              {placeholder}
-            </label>
-          </div>
+          <Checkbox
+            id={id}
+            checked={value || false}
+            onCheckedChange={handleCheckboxChange}
+            required={required}
+            className={error ? 'border-red-500' : ''}
+          />
         );
       case 'switch':
         return (
@@ -239,11 +219,11 @@ const FormField: React.FC<FormFieldProps> = ({
       case 'file':
         return (
           <Input
-            type="file"
             id={id}
-            disabled={disabled}
+            type="file"
             onChange={handleFileChange}
-            className={cn(error && 'border-red-500')}
+            required={required}
+            className={error ? 'border-red-500' : ''}
           />
         );
       default:

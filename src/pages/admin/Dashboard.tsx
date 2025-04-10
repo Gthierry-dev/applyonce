@@ -1,10 +1,20 @@
-
 import React from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Users, FileText, Folder } from 'lucide-react';
+import { BarChart, Users, FileText, Folder, Loader2 } from 'lucide-react';
+import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 
 const AdminDashboard = () => {
+  const { data: stats, isLoading } = useAdminDashboard();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -20,7 +30,7 @@ const AdminDashboard = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1,245</div>
+              <div className="text-2xl font-bold">{stats?.totalUsers}</div>
               <p className="text-xs text-muted-foreground">+21 from last week</p>
             </CardContent>
           </Card>
@@ -31,7 +41,7 @@ const AdminDashboard = () => {
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">684</div>
+              <div className="text-2xl font-bold">{stats?.totalApplications}</div>
               <p className="text-xs text-muted-foreground">+43 from last week</p>
             </CardContent>
           </Card>
@@ -42,7 +52,7 @@ const AdminDashboard = () => {
               <Folder className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
+              <div className="text-2xl font-bold">{stats?.totalCategories}</div>
               <p className="text-xs text-muted-foreground">+2 from last month</p>
             </CardContent>
           </Card>
@@ -53,7 +63,7 @@ const AdminDashboard = () => {
               <BarChart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">62</div>
+              <div className="text-2xl font-bold">{stats?.totalOpportunities}</div>
               <p className="text-xs text-muted-foreground">+7 from last month</p>
             </CardContent>
           </Card>
@@ -66,27 +76,17 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <div>
-                    <p className="text-sm font-medium">New opportunity added: Summer Internship Program</p>
-                    <p className="text-xs text-muted-foreground">2 hours ago</p>
+                {stats?.recentActivities.map((activity, index) => (
+                  <div key={index} className="flex items-center gap-4">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <div>
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(activity.timestamp).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                  <div>
-                    <p className="text-sm font-medium">Category updated: Research Grants</p>
-                    <p className="text-xs text-muted-foreground">5 hours ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                  <div>
-                    <p className="text-sm font-medium">New user registered: John Doe</p>
-                    <p className="text-xs text-muted-foreground">1 day ago</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -97,22 +97,14 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">Summer Research Fellowship</p>
-                  <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-1 rounded">156 applies</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">Graduate Scholarship Program</p>
-                  <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-1 rounded">124 applies</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">Tech Innovation Grant</p>
-                  <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-1 rounded">98 applies</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">International Exchange Program</p>
-                  <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-1 rounded">87 applies</span>
-                </div>
+                {stats?.popularOpportunities.map((opportunity, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <p className="text-sm font-medium">{opportunity.title}</p>
+                    <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-1 rounded">
+                      {opportunity.applicationCount} applications
+                    </span>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
