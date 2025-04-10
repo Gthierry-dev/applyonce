@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Search, PenLine, Trash, FilePlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase, Category } from '@/integrations/supabase/client';
-import CategoryFormDrawer from '@/components/admin/CategoryFormDrawer';
+import { CategoryFormDrawer } from '@/components/admin/CategoryFormDrawer';
 import CategoryFieldConfig from '@/components/admin/CategoryFieldConfig';
 
 const AdminCategories = () => {

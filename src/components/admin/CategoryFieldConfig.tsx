@@ -62,6 +62,7 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
   const fetchCategoryFields = async () => {
     try {
       setLoading(true);
+      // Note: Make sure the category_fields table exists in your database
       const { data, error } = await supabase
         .from('category_fields')
         .select('*')
@@ -69,7 +70,7 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setFields(data || []);
+      setFields(data as CustomField[] || []);
     } catch (error) {
       console.error('Error fetching category fields:', error);
       toast({
@@ -97,14 +98,19 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
       const safeName = newField.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
       
       setLoading(true);
+      const fieldToInsert = {
+        name: safeName,
+        label: newField.label,
+        type: newField.type,
+        required: newField.required,
+        category_id: categoryId,
+        options: newField.type === 'select' ? (newField.options || []) : null,
+        placeholder: newField.placeholder
+      };
+
       const { data, error } = await supabase
         .from('category_fields')
-        .insert([{
-          ...newField,
-          name: safeName,
-          category_id: categoryId,
-          options: newField.type === 'select' ? (newField.options || []) : null
-        }])
+        .insert([fieldToInsert])
         .select();
 
       if (error) throw error;
@@ -114,7 +120,7 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
         description: 'Field added successfully',
       });
 
-      setFields([...fields, data[0]]);
+      setFields([...fields, data[0] as CustomField]);
       
       // Reset new field form
       setNewField({

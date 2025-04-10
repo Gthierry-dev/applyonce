@@ -47,43 +47,60 @@ interface CategoryFormDrawerProps {
   children?: React.ReactNode
   className?: string
   category?: any
+  open?: boolean
+  setOpen?: (open: boolean) => void
+  selectedCategory?: any
+  onCreateSuccess?: (category: any) => void
+  onUpdateSuccess?: (category: any) => void
 }
 
 export function CategoryFormDrawer({
   children,
   className,
   category,
+  open,
+  setOpen,
+  selectedCategory,
+  onCreateSuccess,
+  onUpdateSuccess
 }: CategoryFormDrawerProps) {
-  const [open, setOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Use the provided open/setOpen if available, otherwise use local state
+  const drawerOpen = open !== undefined ? open : isOpen;
+  const setDrawerOpen = setOpen || setIsOpen;
+  
+  // Use either provided category or selectedCategory
+  const categoryData = category || selectedCategory;
 
   const form = useForm<z.infer<typeof categorySchema>>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
-      title: category?.title || "",
-      description: category?.description || "",
-      is_active: category?.is_active || true,
-      icon_name: category?.icon_name || "folder",
-      color: category?.color || "#4F46E5",
+      title: categoryData?.title || "",
+      description: categoryData?.description || "",
+      is_active: categoryData?.is_active || true,
+      icon_name: categoryData?.icon_name || "folder",
+      color: categoryData?.color || "#4F46E5",
     },
   })
 
   useEffect(() => {
-    if (category) {
+    if (categoryData) {
       form.reset({
-        title: category.title || "",
-        description: category.description || "",
-        is_active: category.is_active || true,
-        icon_name: category.icon_name || "folder",
-        color: category.color || "#4F46E5",
+        title: categoryData.title || "",
+        description: categoryData.description || "",
+        is_active: categoryData.is_active || true,
+        icon_name: categoryData.icon_name || "folder",
+        color: categoryData.color || "#4F46E5",
       })
     }
-  }, [category, form])
+  }, [categoryData, form])
 
   async function onSubmit(values: z.infer<typeof categorySchema>) {
     setIsLoading(true)
     try {
-      if (category) {
+      if (categoryData) {
         // Update existing category
         const { data, error } = await supabase
           .from("categories")
@@ -93,7 +110,7 @@ export function CategoryFormDrawer({
             icon_name: values.icon_name,
             color: values.color
           })
-          .eq("id", category.id)
+          .eq("id", categoryData.id)
           .select()
 
         if (error) {
@@ -110,6 +127,10 @@ export function CategoryFormDrawer({
           title: "Category updated successfully",
           description: `Category "${values.title}" has been updated.`,
         })
+        
+        if (onUpdateSuccess && data && data.length > 0) {
+          onUpdateSuccess(data[0]);
+        }
       } else {
         // Create new category
         const { data, error } = await supabase
@@ -136,9 +157,13 @@ export function CategoryFormDrawer({
           title: "Category created successfully",
           description: `Category "${values.title}" has been created.`,
         })
+        
+        if (onCreateSuccess && data && data.length > 0) {
+          onCreateSuccess(data[0]);
+        }
       }
       form.reset()
-      setOpen(false)
+      setDrawerOpen(false)
     } catch (error) {
       console.error("Category action error:", error)
       toast({
@@ -152,15 +177,15 @@ export function CategoryFormDrawer({
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className={cn("sm:max-w-lg", className)}>
         <DrawerHeader>
           <DrawerTitle>
-            {category ? "Edit Category" : "Create New Category"}
+            {categoryData ? "Edit Category" : "Create New Category"}
           </DrawerTitle>
           <DrawerDescription>
-            {category
+            {categoryData
               ? "Make changes to your category here."
               : "Add a new category to the list."}
           </DrawerDescription>
@@ -240,7 +265,7 @@ export function CategoryFormDrawer({
                 {isLoading && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {category ? "Update Category" : "Create Category"}
+                {categoryData ? "Update Category" : "Create Category"}
               </Button>
             </DrawerFooter>
           </form>
