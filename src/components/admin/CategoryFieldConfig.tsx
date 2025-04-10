@@ -58,7 +58,7 @@ interface CategoryFieldConfigProps {
   categoryId: string;
 }
 
-export function CategoryFieldConfig({ categoryId }: CategoryFieldConfigProps) {
+const CategoryFieldConfig = ({ categoryId }: CategoryFieldConfigProps) => {
   const queryClient = useQueryClient();
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FieldFormData>({
     resolver: zodResolver(fieldSchema),
@@ -146,12 +146,23 @@ export function CategoryFieldConfig({ categoryId }: CategoryFieldConfigProps) {
     addFieldMutation.mutate(newField);
   };
 
-  const onDragEnd = (result: any) => {
-    if (!result.destination) return;
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, dropIndex: number) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    
+    if (dragIndex === dropIndex) return;
 
     const items = Array.from(fields);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    const [draggedItem] = items.splice(dragIndex, 1);
+    items.splice(dropIndex, 0, draggedItem);
 
     const updates = items.map((item, index) => ({
       id: item.id,
@@ -217,50 +228,36 @@ export function CategoryFieldConfig({ categoryId }: CategoryFieldConfigProps) {
           <Button type="submit">Add Field</Button>
         </form>
 
-        <div className="mt-6">
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="fields">
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="space-y-2"
-                >
-                  {fields.map((field, index) => (
-                    <Draggable
-                      key={field.id}
-                      draggableId={field.id}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                        >
-                          <div>
-                            <h4 className="font-medium">{field.label}</h4>
-                            <p className="text-sm text-gray-500">{field.type}</p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => deleteFieldMutation.mutate(field.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
+        <div className="mt-6 space-y-2">
+          {fields.map((field, index) => (
+            <div
+              key={field.id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, index)}
+              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-move"
+            >
+              <div className="flex items-center space-x-2">
+                <GripVertical className="h-5 w-5 text-gray-400" />
+                <div>
+                  <h4 className="font-medium">{field.label}</h4>
+                  <p className="text-sm text-gray-500">{field.type}</p>
                 </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => deleteFieldMutation.mutate(field.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>
   );
-}
+};
+
+export default CategoryFieldConfig;

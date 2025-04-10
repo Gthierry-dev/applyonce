@@ -1,19 +1,11 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import OpportunityCard from '@/components/cards/OpportunityCard';
 import { Button } from '@/components/ui/button';
-import { supabase, Opportunity, Category } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Search, SlidersHorizontal } from 'lucide-react';
+import { useOpportunities } from '@/hooks/useOpportunities';
+import { useCategories } from '@/hooks/useCategories';
 import { 
   Sheet, 
   SheetContent, 
@@ -26,208 +18,124 @@ import {
 } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const Opportunities = () => {
-  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
-  const { toast } = useToast();
+  const [showRemoteOnly, setShowRemoteOnly] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  useEffect(() => {
-    fetchOpportunities();
-    fetchCategories();
-  }, []);
+  const { opportunities, isLoading, applyToOpportunity } = useOpportunities({
+    searchQuery,
+    categoryId: selectedCategory,
+  });
 
-  const fetchCategories = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('title', { ascending: true });
+  const { categories } = useCategories();
 
-      if (error) throw error;
-      setCategories(data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
+  const filteredOpportunities = opportunities.filter(opportunity => {
+    if (showRemoteOnly && !opportunity.is_remote) {
+      return false;
     }
+    return true;
+  });
+
+  const handleApply = async (opportunityId: string) => {
+    await applyToOpportunity.mutateAsync(opportunityId);
   };
-
-  const fetchOpportunities = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('opportunities')
-        .select('*')
-        .eq('is_active', true)
-        .order('featured', { ascending: false })
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setOpportunities(data || []);
-    } catch (error) {
-      console.error('Error fetching opportunities:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load opportunities',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFilter = async () => {
-    try {
-      setLoading(true);
-      
-      let query = supabase
-        .from('opportunities')
-        .select('*')
-        .eq('is_active', true);
-      
-      if (selectedCategory) {
-        query = query.eq('category', selectedCategory);
-      }
-      
-      if (showFeaturedOnly) {
-        query = query.eq('featured', true);
-      }
-      
-      const { data, error } = await query
-        .order('featured', { ascending: false })
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setOpportunities(data || []);
-    } catch (error) {
-      console.error('Error filtering opportunities:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to filter opportunities',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const resetFilters = () => {
-    setSelectedCategory('');
-    setShowFeaturedOnly(false);
-    fetchOpportunities();
-  };
-
-  const filteredOpportunities = opportunities.filter(opp => 
-    opp.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    opp.organization?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (typeof opp.category === 'string' && opp.category.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Opportunities</h1>
-            <p className="text-muted-foreground">
-              Discover and apply for internships, jobs, scholarships, and more
-            </p>
-          </div>
-          
-          <Sheet>
+      <div className="container mx-auto py-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Opportunities</h1>
+          <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
             <SheetTrigger asChild>
-              <Button>
+              <Button variant="outline">
                 <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Filter
+                Filters
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
                 <SheetTitle>Filter Opportunities</SheetTitle>
                 <SheetDescription>
-                  Narrow down opportunities based on your preferences
+                  Filter opportunities by category and work type.
                 </SheetDescription>
               </SheetHeader>
-              
-              <div className="py-4 space-y-4">
+              <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select 
-                    value={selectedCategory} 
+                  <Label>Category</Label>
+                  <Select
+                    value={selectedCategory}
                     onValueChange={setSelectedCategory}
                   >
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="Select category" />
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="_all">All Categories</SelectItem>
+                      <SelectItem value="">All Categories</SelectItem>
                       {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.title}>
-                          {category.title}
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="featured"
-                    checked={showFeaturedOnly}
-                    onCheckedChange={(checked) => 
-                      setShowFeaturedOnly(checked as boolean)
-                    }
+                  <Checkbox
+                    id="remote"
+                    checked={showRemoteOnly}
+                    onCheckedChange={(checked) => setShowRemoteOnly(checked as boolean)}
                   />
-                  <Label htmlFor="featured">Featured opportunities only</Label>
+                  <Label htmlFor="remote">Remote only</Label>
                 </div>
               </div>
-              
               <SheetFooter>
                 <SheetClose asChild>
-                  <Button variant="outline" onClick={resetFilters}>Reset</Button>
-                </SheetClose>
-                <SheetClose asChild>
-                  <Button onClick={handleFilter}>Apply Filters</Button>
+                  <Button variant="outline">Close</Button>
                 </SheetClose>
               </SheetFooter>
             </SheetContent>
           </Sheet>
         </div>
-        
-        <div className="relative">
+
+        <div className="relative mb-6">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search opportunities..."
-            className="pl-8 mb-6"
+            className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        
-        {loading ? (
+
+        {isLoading ? (
           <div className="flex justify-center py-8">
             <p>Loading opportunities...</p>
           </div>
         ) : filteredOpportunities.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No opportunities available at the moment.</p>
+            <p className="text-muted-foreground">No opportunities found.</p>
           </div>
         ) : (
           <div className="grid gap-6">
             {filteredOpportunities.map((opportunity) => (
-              <OpportunityCard 
+              <OpportunityCard
                 key={opportunity.id}
                 id={opportunity.id}
                 title={opportunity.title}
                 organization={opportunity.organization}
-                category={opportunity.category}
-                categories={opportunity.categories as string[] | undefined}
-                deadline={new Date(opportunity.deadline).toISOString()}
+                category={opportunity.category?.name || ''}
+                categories={[opportunity.category?.name || '']}
+                deadline={opportunity.expiry_date}
                 description={opportunity.description}
-                website_url={opportunity.website_url}
+                website_url={opportunity.application_url}
+                onApply={() => handleApply(opportunity.id)}
+                isRemote={opportunity.is_remote}
+                location={opportunity.location}
+                salary={opportunity.salary}
               />
             ))}
           </div>

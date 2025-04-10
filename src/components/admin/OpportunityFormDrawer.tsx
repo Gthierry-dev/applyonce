@@ -19,25 +19,15 @@ import { Switch } from "@/components/ui/switch"
 import { useToast } from '@/hooks/use-toast';
 import { Category } from '@/integrations/supabase/client';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Calendar as CalendarIcon, Plus, Trash } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { DatePicker } from "@/components/ui/date-picker"
 import { cn } from "@/lib/utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-
-// Define field types
-type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'select' | 'checkbox' | 'file';
-
-interface CustomField {
-  id: string;
-  label: string;
-  type: FieldType;
-  required: boolean;
-  options?: string[]; // For select fields
-  placeholder?: string;
-}
+import { Checkbox } from "@/components/ui/checkbox"
+import { CategoryField } from '@/types/category';
 
 // Extend the form schema to include custom fields
 const formSchema = z.object({
@@ -86,11 +76,11 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("basic");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(initialValues?.category_id || null);
-  const [customFields, setCustomFields] = useState<CustomField[]>([]);
+  const [customFields, setCustomFields] = useState<CategoryField[]>([]);
   const [isLoadingFields, setIsLoadingFields] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: initialValues ? undefined : zodResolver(formSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       title: initialValues?.title || '',
       description: initialValues?.description || '',
@@ -134,7 +124,7 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
         .from('category_fields')
         .select('*')
         .eq('category_id', categoryId)
-        .order('created_at', { ascending: true });
+        .order('order', { ascending: true });
 
       if (error) throw error;
       
@@ -171,102 +161,134 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
   };
 
   // Render custom field based on its type
-  const renderCustomField = (field: CustomField) => {
+  const renderCustomField = (field: CategoryField) => {
     const fieldName = `custom_fields.${field.id}`;
     
     switch (field.type) {
       case 'text':
         return (
-          <Input 
-            id={field.id} 
-            placeholder={field.placeholder || field.label} 
-            {...form.register(fieldName)} 
+          <Controller
+            name={fieldName}
+            control={form.control}
+            render={({ field: formField }) => (
+              <Input 
+                {...formField}
+                placeholder={field.placeholder || field.label}
+                required={field.required}
+              />
+            )}
           />
         );
       case 'textarea':
         return (
-          <Textarea 
-            id={field.id} 
-            placeholder={field.placeholder || field.label} 
-            {...form.register(fieldName)} 
+          <Controller
+            name={fieldName}
+            control={form.control}
+            render={({ field: formField }) => (
+              <Textarea 
+                {...formField}
+                placeholder={field.placeholder || field.label}
+                required={field.required}
+              />
+            )}
           />
         );
       case 'number':
         return (
-          <Input 
-            id={field.id} 
-            type="number" 
-            placeholder={field.placeholder || field.label} 
-            {...form.register(fieldName)} 
+          <Controller
+            name={fieldName}
+            control={form.control}
+            render={({ field: formField }) => (
+              <Input 
+                {...formField}
+                type="number"
+                placeholder={field.placeholder || field.label}
+                required={field.required}
+              />
+            )}
           />
-        );
-      case 'date':
-        return (
-          <DatePicker
-            onSelect={(date) => form.setValue(fieldName, date || new Date())}
-            defaultDate={form.getValues(fieldName)}
-          >
-            <div className="relative">
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !form.getValues(fieldName) && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {form.getValues(fieldName) ? (
-                  format(form.getValues(fieldName), "PPP")
-                ) : (
-                  <span>{field.placeholder || "Pick a date"}</span>
-                )}
-              </Button>
-            </div>
-          </DatePicker>
         );
       case 'select':
         return (
-          <Select 
-            onValueChange={(value) => form.setValue(fieldName, value)} 
-            defaultValue={form.getValues(fieldName)}
-          >
-            <SelectTrigger id={field.id}>
-              <SelectValue placeholder={field.placeholder || `Select ${field.label}`} />
-            </SelectTrigger>
-            <SelectContent>
-              {field.options?.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Controller
+            name={fieldName}
+            control={form.control}
+            render={({ field: formField }) => (
+              <Select
+                onValueChange={formField.onChange}
+                defaultValue={formField.value}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={field.placeholder || field.label} />
+                </SelectTrigger>
+                <SelectContent>
+                  {field.options?.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
         );
       case 'checkbox':
         return (
           <Controller
-            control={form.control}
             name={fieldName}
-            render={({ field }) => (
-              <Switch
-                id={field.id}
-                checked={field.value}
-                onCheckedChange={field.onChange}
+            control={form.control}
+            render={({ field: formField }) => (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id={field.id}
+                  checked={formField.value}
+                  onCheckedChange={formField.onChange}
+                />
+                <Label htmlFor={field.id}>{field.label}</Label>
+              </div>
+            )}
+          />
+        );
+      case 'date':
+        return (
+          <Controller
+            name={fieldName}
+            control={form.control}
+            render={({ field: formField }) => (
+              <DatePicker
+                date={formField.value ? new Date(formField.value) : undefined}
+                onSelect={formField.onChange}
               />
             )}
           />
         );
       case 'file':
         return (
-          <Input 
-            id={field.id} 
-            type="file" 
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                form.setValue(fieldName, file);
-              }
-            }}
+          <Controller
+            name={fieldName}
+            control={form.control}
+            render={({ field: formField }) => (
+              <Input 
+                {...formField}
+                type="file"
+                required={field.required}
+              />
+            )}
+          />
+        );
+      case 'url':
+        return (
+          <Controller
+            name={fieldName}
+            control={form.control}
+            render={({ field: formField }) => (
+              <Input 
+                {...formField}
+                type="url"
+                placeholder={field.placeholder || field.label}
+                required={field.required}
+              />
+            )}
           />
         );
       default:
@@ -276,51 +298,44 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+      <SheetContent className="w-[800px] sm:max-w-[800px]">
         <SheetHeader>
-          <SheetTitle>
-            {initialValues ? 'Edit Opportunity' : 'Create New Opportunity'}
-          </SheetTitle>
+          <SheetTitle>{initialValues ? 'Edit Opportunity' : 'Create Opportunity'}</SheetTitle>
           <SheetDescription>
-            {initialValues
-              ? 'Edit the opportunity details.'
-              : 'Add a new opportunity to the platform.'}
+            Fill in the details for the opportunity. Fields marked with * are required.
           </SheetDescription>
         </SheetHeader>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="basic">Basic Info</TabsTrigger>
-            <TabsTrigger value="custom" disabled={!selectedCategory || isLoadingFields}>
-              Custom Fields
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="basic" className="space-y-4 py-4">
-            <form onSubmit={form.handleSubmit(handleValidSubmit)} className="space-y-4">
-              <div className="grid gap-4">
-                <div>
-                  <Label htmlFor="title">Title</Label>
-                  <Input id="title" type="text" placeholder="Job Title" {...form.register('title')} />
+
+        <form onSubmit={form.handleSubmit(handleValidSubmit)} className="space-y-6 mt-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basic">Basic Information</TabsTrigger>
+              <TabsTrigger value="custom" disabled={!selectedCategory}>
+                Custom Fields
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="basic" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title *</Label>
+                  <Input
+                    id="title"
+                    {...form.register('title')}
+                    placeholder="Enter opportunity title"
+                  />
                   {form.formState.errors.title && (
                     <p className="text-sm text-red-500">{form.formState.errors.title.message}</p>
                   )}
                 </div>
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Job Description"
-                    {...form.register('description')}
-                  />
-                  {form.formState.errors.description && (
-                    <p className="text-sm text-red-500">{form.formState.errors.description.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Select onValueChange={form.setValue.bind(null, 'category_id')} defaultValue={initialValues?.category_id}>
-                    <SelectTrigger id="category">
+
+                <div className="space-y-2">
+                  <Label htmlFor="category_id">Category *</Label>
+                  <Select
+                    onValueChange={(value) => form.setValue('category_id', value)}
+                    defaultValue={form.getValues('category_id')}
+                  >
+                    <SelectTrigger>
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -335,170 +350,135 @@ const OpportunityFormDrawer: React.FC<OpportunityFormDrawerProps> = ({
                     <p className="text-sm text-red-500">{form.formState.errors.category_id.message}</p>
                   )}
                 </div>
-                <div>
-                  <Label htmlFor="organization">Organization</Label>
-                  <Input id="organization" type="text" placeholder="Organization Name" {...form.register('organization')} />
+
+                <div className="space-y-2">
+                  <Label htmlFor="organization">Organization *</Label>
+                  <Input
+                    id="organization"
+                    {...form.register('organization')}
+                    placeholder="Enter organization name"
+                  />
                   {form.formState.errors.organization && (
                     <p className="text-sm text-red-500">{form.formState.errors.organization.message}</p>
                   )}
                 </div>
-                <div>
-                  <Label htmlFor="location">Location</Label>
-                  <Input id="location" type="text" placeholder="Location" {...form.register('location')} />
+
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location *</Label>
+                  <Input
+                    id="location"
+                    {...form.register('location')}
+                    placeholder="Enter location"
+                  />
                   {form.formState.errors.location && (
                     <p className="text-sm text-red-500">{form.formState.errors.location.message}</p>
                   )}
                 </div>
-                <div>
+
+                <div className="space-y-2">
                   <Label htmlFor="salary">Salary</Label>
-                  <Input id="salary" type="text" placeholder="Salary" {...form.register('salary')} />
+                  <Input
+                    id="salary"
+                    {...form.register('salary')}
+                    placeholder="Enter salary range"
+                  />
                 </div>
-                <div>
-                  <Label htmlFor="application_url">Application URL</Label>
+
+                <div className="space-y-2">
+                  <Label htmlFor="application_url">Application URL *</Label>
                   <Input
                     id="application_url"
-                    type="url"
-                    placeholder="https://example.com/apply"
                     {...form.register('application_url')}
+                    placeholder="Enter application URL"
                   />
                   {form.formState.errors.application_url && (
                     <p className="text-sm text-red-500">{form.formState.errors.application_url.message}</p>
                   )}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Label htmlFor="is_remote">Remote</Label>
+
+                <div className="space-y-2">
+                  <Label>Posted Date *</Label>
                   <Controller
+                    name="posted_date"
                     control={form.control}
-                    name="is_remote"
                     render={({ field }) => (
-                      <Switch
-                        id="is_remote"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                      <DatePicker
+                        date={field.value}
+                        onSelect={field.onChange}
                       />
                     )}
                   />
                 </div>
-                <div>
-                  <Label>Posted Date</Label>
-                  <DatePicker
-                    onSelect={(date) => form.setValue('posted_date', date || new Date())}
-                    defaultDate={initialValues?.posted_date}
-                  >
-                    <div className="relative">
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !form.getValues('posted_date') && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {form.getValues('posted_date') ? (
-                          format(form.getValues('posted_date'), "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </div>
-                  </DatePicker>
+
+                <div className="space-y-2">
+                  <Label>Expiry Date *</Label>
+                  <Controller
+                    name="expiry_date"
+                    control={form.control}
+                    render={({ field }) => (
+                      <DatePicker
+                        date={field.value}
+                        onSelect={field.onChange}
+                      />
+                    )}
+                  />
                 </div>
-                <div>
-                  <Label>Expiry Date</Label>
-                  <DatePicker
-                    onSelect={(date) => form.setValue('expiry_date', date || new Date())}
-                    defaultDate={initialValues?.expiry_date}
-                  >
-                    <div className="relative">
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !form.getValues('expiry_date') && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {form.getValues('expiry_date') ? (
-                          format(form.getValues('expiry_date'), "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </div>
-                  </DatePicker>
-                </div>
-              </div>
-              <SheetFooter>
-                <Button variant="outline" type="button" onClick={() => setOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    'Save Opportunity'
+
+                <div className="col-span-2 space-y-2">
+                  <Label htmlFor="description">Description *</Label>
+                  <Textarea
+                    id="description"
+                    {...form.register('description')}
+                    placeholder="Enter opportunity description"
+                    className="min-h-[100px]"
+                  />
+                  {form.formState.errors.description && (
+                    <p className="text-sm text-red-500">{form.formState.errors.description.message}</p>
                   )}
-                </Button>
-              </SheetFooter>
-            </form>
-          </TabsContent>
-          
-          <TabsContent value="custom" className="space-y-4 py-4">
-            {isLoadingFields ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <span className="ml-2">Loading custom fields...</span>
+                </div>
+
+                <div className="col-span-2 flex items-center space-x-2">
+                  <Switch
+                    id="is_remote"
+                    {...form.register('is_remote')}
+                  />
+                  <Label htmlFor="is_remote">Remote Position</Label>
+                </div>
               </div>
-            ) : customFields.length === 0 ? (
-              <Card>
-                <CardContent className="py-6 text-center">
-                  <p className="text-muted-foreground">
-                    No custom fields defined for this category.
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Custom fields can be configured in the Categories section.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  These fields will be required when users apply for this opportunity.
-                </p>
-                <Separator />
-                {customFields.map((field) => (
-                  <div key={field.id} className="space-y-2">
-                    <div className="flex items-center justify-between">
+            </TabsContent>
+
+            <TabsContent value="custom" className="space-y-4">
+              {isLoadingFields ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : customFields.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4">
+                  {customFields.map((field) => (
+                    <div key={field.id} className="space-y-2">
                       <Label htmlFor={field.id}>
                         {field.label}
                         {field.required && <span className="text-red-500 ml-1">*</span>}
                       </Label>
+                      {renderCustomField(field)}
                     </div>
-                    {renderCustomField(field)}
-                  </div>
-                ))}
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button variant="outline" onClick={() => setActiveTab("basic")}>
-                    Back to Basic Info
-                  </Button>
-                  <Button type="submit" disabled={loading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      'Save Opportunity'
-                    )}
-                  </Button>
+                  ))}
                 </div>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  No custom fields defined for this category.
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+
+          <SheetFooter>
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {initialValues ? 'Update Opportunity' : 'Create Opportunity'}
+            </Button>
+          </SheetFooter>
+        </form>
       </SheetContent>
     </Sheet>
   );

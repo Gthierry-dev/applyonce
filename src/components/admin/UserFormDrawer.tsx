@@ -1,5 +1,7 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -18,43 +20,165 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Loader2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
+// Define the form schema with Zod
+const formSchema = z.object({
+  full_name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
+  email: z.string().email({ message: 'Please enter a valid email address' }),
+  role: z.enum(['user', 'admin'], { required_error: 'Please select a role' }),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+interface Profile {
+  id: string;
+  full_name: string;
+  avatar_url: string | null;
   role: string;
-  status: string;
-  applications: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface UserFormDrawerProps {
   isOpen?: boolean;
   onClose?: () => void;
   isEditing?: boolean;
-  initialData?: User;
+  initialData?: Profile & { email?: string };
+  onSuccess?: () => void;
 }
 
 const UserFormDrawer = ({ 
   isOpen = false, 
   onClose = () => {}, 
   isEditing = false,
-  initialData
+  initialData,
+  onSuccess
 }: UserFormDrawerProps) => {
-  const [open, setOpen] = React.useState(isOpen);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(isOpen);
+  
+  // Initialize form with react-hook-form and zod validation
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      full_name: initialData?.full_name || '',
+      email: initialData?.email || '',
+      role: (initialData?.role as 'user' | 'admin') || 'user',
+    },
+  });
+  
+  // Update form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        full_name: initialData.full_name,
+        email: initialData.email || '',
+        role: initialData.role as 'user' | 'admin',
+      });
+    }
+  }, [initialData, form]);
+  
+  // Update open state when isOpen prop changes
+  useEffect(() => {
+    setOpen(isOpen);
+  }, [isOpen]);
   
   const handleOpenChange = (open: boolean) => {
     setOpen(open);
     if (!open) onClose();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would handle the form submission
-    console.log('Form submitted');
-    handleOpenChange(false);
+  // Create user mutation
+  const createUserMutation = useMutation({
+    mutationFn: async (data: FormValues) => {
+      // First create the auth user
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email: data.email,
+        email_confirm: true,
+        user_metadata: { full_name: data.full_name },
+      });
+      
+      if (authError) throw authError;
+      
+      // Then create the profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: authData.user.id,
+          full_name: data.full_name,
+          role: data.role,
+        });
+      
+      if (profileError) throw profileError;
+      
+      return authData.user;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast({
+        title: 'Success',
+        description: 'User created successfully',
+      });
+      handleOpenChange(false);
+      if (onSuccess) onSuccess();
+    },
+    onError: (error) => {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: `Failed to create user: ${error.message}`,
+      });
+    }
+  });
+  
+  // Update user mutation
+  const updateUserMutation = useMutation({
+    mutationFn: async (data: FormValues) => {
+      if (!initialData) throw new Error('No user to update');
+      
+      // Update the profile
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: data.full_name,
+          role: data.role,
+        })
+        .eq('id', initialData.id);
+      
+      if (error) throw error;
+      
+      return { id: initialData.id, ...data };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast({
+        title: 'Success',
+        description: 'User updated successfully',
+      });
+      handleOpenChange(false);
+      if (onSuccess) onSuccess();
+    },
+    onError: (error) => {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: `Failed to update user: ${error.message}`,
+      });
+    }
+  });
+
+  const onSubmit = (data: FormValues) => {
+    if (isEditing && initialData) {
+      updateUserMutation.mutate(data);
+    } else {
+      createUserMutation.mutate(data);
+    }
   };
 
   return (
@@ -77,15 +201,18 @@ const UserFormDrawer = ({
             </SheetDescription>
           </SheetHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6 py-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-6">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="full_name">Full Name</Label>
                 <Input 
-                  id="name"
-                  defaultValue={initialData?.name || ''}
+                  id="full_name"
+                  {...form.register('full_name')}
                   className="mt-1"
                 />
+                {form.formState.errors.full_name && (
+                  <p className="text-sm text-red-500 mt-1">{form.formState.errors.full_name.message}</p>
+                )}
               </div>
               
               <div>
@@ -93,35 +220,32 @@ const UserFormDrawer = ({
                 <Input 
                   id="email"
                   type="email"
-                  defaultValue={initialData?.email || ''}
+                  {...form.register('email')}
                   className="mt-1"
+                  disabled={isEditing} // Email can't be changed after creation
                 />
+                {form.formState.errors.email && (
+                  <p className="text-sm text-red-500 mt-1">{form.formState.errors.email.message}</p>
+                )}
               </div>
               
               <div>
                 <Label htmlFor="role">Role</Label>
-                <Select defaultValue={initialData?.role || 'User'}>
+                <Select 
+                  onValueChange={(value) => form.setValue('role', value as 'user' | 'admin')}
+                  defaultValue={form.getValues('role')}
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="User">User</SelectItem>
-                    <SelectItem value="Admin">Admin</SelectItem>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="status">Status</Label>
-                <Select defaultValue={initialData?.status || 'Active'}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
+                {form.formState.errors.role && (
+                  <p className="text-sm text-red-500 mt-1">{form.formState.errors.role.message}</p>
+                )}
               </div>
             </div>
 
@@ -129,7 +253,15 @@ const UserFormDrawer = ({
               <SheetClose asChild>
                 <Button variant="outline" type="button">Cancel</Button>
               </SheetClose>
-              <Button type="submit">{isEditing ? 'Update' : 'Create'}</Button>
+              <Button 
+                type="submit" 
+                disabled={createUserMutation.isPending || updateUserMutation.isPending}
+              >
+                {(createUserMutation.isPending || updateUserMutation.isPending) && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {isEditing ? 'Update' : 'Create'}
+              </Button>
             </SheetFooter>
           </form>
         </SheetContent>
