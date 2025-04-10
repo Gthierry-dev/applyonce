@@ -29,7 +29,7 @@ const Settings = () => {
   // Notification settings
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [appNotifications, setAppNotifications] = useState(true);
-
+//change
   useEffect(() => {
     if (user) {
       setEmail(user.email || '');
