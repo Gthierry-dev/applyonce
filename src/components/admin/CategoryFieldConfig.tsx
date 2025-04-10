@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -237,7 +238,7 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
                     onValueChange={(value) => setNewField({
                       ...newField, 
                       type: value as FieldType,
-                      options: value === 'select' ? [''] : undefined
+                      options: value === 'select' ? ['option1'] : undefined
                     })}
                   >
                     <SelectTrigger id="fieldType">
@@ -278,7 +279,9 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
                     value={(newField.options || []).join('\n')}
                     onChange={(e) => setNewField({
                       ...newField, 
-                      options: e.target.value.split('\n').filter(Boolean)
+                      options: e.target.value.split('\n').filter(Boolean).map(item => 
+                        item.trim() || `option_${Date.now()}`
+                      )
                     })}
                     placeholder="Option 1&#10;Option 2&#10;Option 3"
                   />

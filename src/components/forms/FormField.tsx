@@ -157,7 +157,7 @@ const FormField: React.FC<FormFieldProps> = ({
             </SelectTrigger>
             <SelectContent>
               {options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
+                <SelectItem key={option.value} value={option.value || '_empty_'}>
                   {option.label}
                 </SelectItem>
               ))}
@@ -176,7 +176,7 @@ const FormField: React.FC<FormFieldProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {options.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem key={option.value} value={option.value || `_empty_${option.label}`}>
                     {option.label}
                   </SelectItem>
                 ))}
