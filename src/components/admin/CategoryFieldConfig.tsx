@@ -22,6 +22,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 
 export type FieldType = 'text' | 'textarea' | 'file' | 'url' | 'date' | 'select' | 'checkbox' | 'number';
 
@@ -62,15 +63,15 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
   const fetchCategoryFields = async () => {
     try {
       setLoading(true);
-      // Note: Make sure the category_fields table exists in your database
+      // Use the generic query method to avoid TypeScript issues with the newly created table
       const { data, error } = await supabase
         .from('category_fields')
         .select('*')
         .eq('category_id', categoryId)
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true }) as { data: CustomField[] | null, error: any };
 
       if (error) throw error;
-      setFields(data as unknown as CustomField[] || []);
+      setFields(data || []);
     } catch (error) {
       console.error('Error fetching category fields:', error);
       toast({
@@ -108,10 +109,11 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
         placeholder: newField.placeholder
       };
 
+      // Use the generic query method to avoid TypeScript issues with the newly created table
       const { data, error } = await supabase
         .from('category_fields')
-        .insert([fieldToInsert as any])
-        .select();
+        .insert([fieldToInsert])
+        .select() as { data: CustomField[] | null, error: any };
 
       if (error) throw error;
 
@@ -120,7 +122,9 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
         description: 'Field added successfully',
       });
 
-      setFields([...fields, data[0] as unknown as CustomField]);
+      if (data && data.length > 0) {
+        setFields([...fields, data[0]]);
+      }
       
       // Reset new field form
       setNewField({
@@ -145,10 +149,11 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
   const handleRemoveField = async (fieldId: string) => {
     try {
       setLoading(true);
+      // Use the generic query method to avoid TypeScript issues with the newly created table
       const { error } = await supabase
         .from('category_fields')
         .delete()
-        .eq('id', fieldId);
+        .eq('id', fieldId) as { error: any };
 
       if (error) throw error;
 
@@ -280,8 +285,8 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
               {newField.type === 'select' && (
                 <div className="space-y-2">
                   <Label>Dropdown Options (one per line)</Label>
-                  <textarea
-                    className="min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  <Textarea
+                    className="min-h-20"
                     value={(newField.options || []).join('\n')}
                     onChange={(e) => setNewField({
                       ...newField, 

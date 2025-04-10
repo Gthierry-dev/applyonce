@@ -42,6 +42,53 @@ export type Database = {
         }
         Relationships: []
       }
+      category_fields: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          label: string
+          name: string
+          options: string[] | null
+          placeholder: string | null
+          required: boolean
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          label: string
+          name: string
+          options?: string[] | null
+          placeholder?: string | null
+          required?: boolean
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          label?: string
+          name?: string
+          options?: string[] | null
+          placeholder?: string | null
+          required?: boolean
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_fields_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       opportunities: {
         Row: {
           categories: string[] | null
