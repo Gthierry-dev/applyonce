@@ -1,218 +1,181 @@
-import React, { useState, useEffect } from 'react';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter } from '@/components/ui/drawer';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { 
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import CategoryFormBuilder from './CategoryFormBuilder';
+import { Category } from '@/types/category';
 
-interface Category {
-  id: string;
-  title: string;
-  description: string;
-  icon_name: string;
-  color: string;
-  count: number;
-  created_at: string;
-  updated_at: string;
-}
+const categorySchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().optional(),
+  icon_name: z.string().optional(),
+  color: z.string().optional(),
+});
+
+type CategoryFormData = z.infer<typeof categorySchema>;
 
 interface CategoryFormDrawerProps {
-  isOpen?: boolean;
-  onClose?: () => void;
-  isEditing?: boolean;
+  isOpen: boolean;
+  onClose: () => void;
   initialData?: Category;
   onSuccess?: () => void;
 }
 
 const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
-  isOpen = false,
+  isOpen,
   onClose,
-  isEditing = false,
   initialData,
-  onSuccess
+  onSuccess,
 }) => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<{
-    title: string;
-    description: string;
-    icon_name: string;
-    color: string;
-  }>({
-    title: '',
-    description: '',
-    icon_name: 'folder',
-    color: '#3b82f6'
-  });
-
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
-        title: initialData.title || '',
-        description: initialData.description || '',
-        icon_name: initialData.icon_name || 'folder',
-        color: initialData.color || '#3b82f6'
-      });
-    } else {
-      resetForm();
-    }
-  }, [initialData, isOpen]);
-
-  const resetForm = () => {
-    setFormData({
+  const [activeTab, setActiveTab] = useState('details');
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: initialData || {
       title: '',
       description: '',
-      icon_name: 'folder',
-      color: '#3b82f6'
-    });
-  };
+      icon_name: '',
+      color: '',
+    },
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
+  const onSubmit = async (data: CategoryFormData) => {
     try {
-      if (isEditing && initialData) {
-        // Update existing category
+      if (initialData) {
         const { error } = await supabase
           .from('categories')
-          .update({
-            title: formData.title,
-            description: formData.description,
-            icon_name: formData.icon_name,
-            color: formData.color,
-            updated_at: new Date().toISOString()
-          })
+          .update(data)
           .eq('id', initialData.id);
-
+        
         if (error) throw error;
-
         toast({
           title: 'Success',
           description: 'Category updated successfully',
         });
       } else {
-        // Create new category
         const { error } = await supabase
           .from('categories')
-          .insert({
-            title: formData.title,
-            description: formData.description,
-            icon_name: formData.icon_name,
-            color: formData.color,
-            count: 0,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-
+          .insert([data]);
+        
         if (error) throw error;
-
         toast({
           title: 'Success',
           description: 'Category created successfully',
         });
       }
-
-      resetForm();
-      if (onSuccess) onSuccess();
-      if (onClose) onClose();
+      
+      reset();
+      onSuccess?.();
+      onClose();
     } catch (error) {
-      console.error('Error saving category:', error);
       toast({
-        variant: 'destructive',
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to save category',
+        description: error instanceof Error ? error.message : 'An error occurred',
+        variant: 'destructive',
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
-    <Drawer open={isOpen} onOpenChange={(open) => !open && onClose && onClose()}>
+    <Drawer open={isOpen} onOpenChange={onClose}>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>{isEditing ? 'Edit Category' : 'Add New Category'}</DrawerTitle>
+          <DrawerTitle>{initialData ? 'Edit Category' : 'Create Category'}</DrawerTitle>
           <DrawerDescription>
-            {isEditing 
-              ? 'Update category information below.' 
-              : 'Fill in the information to create a new category.'}
+            {initialData 
+              ? 'Update the category details and form configuration'
+              : 'Create a new category and configure its form fields'}
           </DrawerDescription>
         </DrawerHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 p-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Title</Label>
-            <Input
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Enter category title"
-              required
-            />
-          </div>
+        <div className="p-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="details">Category Details</TabsTrigger>
+              {initialData && (
+                <TabsTrigger value="form">Form Configuration</TabsTrigger>
+              )}
+            </TabsList>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Enter category description"
-              required
-            />
-          </div>
+            <TabsContent value="details">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    {...register('title')}
+                    placeholder="Enter category title"
+                  />
+                  {errors.title && (
+                    <p className="text-sm text-red-500">{errors.title.message}</p>
+                  )}
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="icon_name">Icon Name</Label>
-            <Input
-              id="icon_name"
-              name="icon_name"
-              value={formData.icon_name}
-              onChange={handleChange}
-              placeholder="Enter icon name (e.g., folder, file, etc.)"
-              required
-            />
-          </div>
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    {...register('description')}
+                    placeholder="Enter category description"
+                  />
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="color">Color</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="color"
-                name="color"
-                type="color"
-                value={formData.color}
-                onChange={handleChange}
-                className="w-12 h-10 p-1"
-              />
-              <Input
-                value={formData.color}
-                onChange={handleChange}
-                name="color"
-                placeholder="#3b82f6"
-                className="flex-1"
-              />
-            </div>
-          </div>
+                <div>
+                  <Label htmlFor="icon_name">Icon Name</Label>
+                  <Input
+                    id="icon_name"
+                    {...register('icon_name')}
+                    placeholder="Enter icon name (optional)"
+                  />
+                </div>
 
-          <DrawerFooter>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEditing ? 'Update Category' : 'Create Category'}
-            </Button>
-          </DrawerFooter>
-        </form>
+                <div>
+                  <Label htmlFor="color">Color</Label>
+                  <Input
+                    id="color"
+                    {...register('color')}
+                    placeholder="Enter color (optional)"
+                  />
+                </div>
+
+                <Button type="submit" className="w-full">
+                  {initialData ? 'Update Category' : 'Create Category'}
+                </Button>
+              </form>
+            </TabsContent>
+
+            {initialData && (
+              <TabsContent value="form">
+                <CategoryFormBuilder
+                  categoryId={initialData.id}
+                  categoryName={initialData.title}
+                />
+              </TabsContent>
+            )}
+          </Tabs>
+        </div>
+
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DrawerClose>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );
