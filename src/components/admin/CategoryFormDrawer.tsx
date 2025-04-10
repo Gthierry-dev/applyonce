@@ -93,7 +93,7 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
   };
 
   return (
-    <Drawer open={isOpen} onOpenChange={onClose}>
+    <Drawer open={isOpen} onOpenChange={onClose} direction="right">
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{initialData ? 'Edit Category' : 'Create Category'}</DrawerTitle>
