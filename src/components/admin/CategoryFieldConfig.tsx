@@ -63,15 +63,20 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
   const fetchCategoryFields = async () => {
     try {
       setLoading(true);
-      // Use the generic query method to avoid TypeScript issues with the newly created table
-      const { data, error } = await supabase
-        .from('category_fields')
-        .select('*')
-        .eq('category_id', categoryId)
-        .order('created_at', { ascending: true }) as { data: CustomField[] | null, error: any };
-
-      if (error) throw error;
-      setFields(data || []);
+      // Use a type cast to avoid TypeScript errors
+      const response = await fetch(`${supabase.supabaseUrl}/rest/v1/category_fields?category_id=eq.${categoryId}&order=created_at.asc`, {
+        headers: {
+          'apikey': supabase.supabaseKey,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch category fields');
+      }
+      
+      const data = await response.json();
+      setFields(data as CustomField[]);
     } catch (error) {
       console.error('Error fetching category fields:', error);
       toast({
@@ -109,13 +114,22 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
         placeholder: newField.placeholder
       };
 
-      // Use the generic query method to avoid TypeScript issues with the newly created table
-      const { data, error } = await supabase
-        .from('category_fields')
-        .insert([fieldToInsert])
-        .select() as { data: CustomField[] | null, error: any };
-
-      if (error) throw error;
+      // Use fetch API directly to insert data
+      const response = await fetch(`${supabase.supabaseUrl}/rest/v1/category_fields`, {
+        method: 'POST',
+        headers: {
+          'apikey': supabase.supabaseKey,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation',
+        },
+        body: JSON.stringify(fieldToInsert),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add field');
+      }
+      
+      const data = await response.json();
 
       toast({
         title: 'Success',
@@ -123,7 +137,7 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
       });
 
       if (data && data.length > 0) {
-        setFields([...fields, data[0]]);
+        setFields([...fields, data[0] as CustomField]);
       }
       
       // Reset new field form
@@ -149,13 +163,18 @@ const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ categoryId, c
   const handleRemoveField = async (fieldId: string) => {
     try {
       setLoading(true);
-      // Use the generic query method to avoid TypeScript issues with the newly created table
-      const { error } = await supabase
-        .from('category_fields')
-        .delete()
-        .eq('id', fieldId) as { error: any };
-
-      if (error) throw error;
+      // Use fetch API directly to delete data
+      const response = await fetch(`${supabase.supabaseUrl}/rest/v1/category_fields?id=eq.${fieldId}`, {
+        method: 'DELETE',
+        headers: {
+          'apikey': supabase.supabaseKey,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to remove field');
+      }
 
       toast({
         title: 'Success',
