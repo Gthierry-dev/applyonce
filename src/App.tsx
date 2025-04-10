@@ -69,13 +69,13 @@ const App = () => (
             </Route>
 
             {/* Admin Dashboard Routes */}
-            <Route element={<AdminRoute />}>
+{/*             <Route element={<AdminRoute />}> */}
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/opportunities" element={<AdminOpportunities />} />
               <Route path="/admin/categories" element={<AdminCategories />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
-            </Route>
+{/*             </Route> */}
             
             {/* New Navigation Routes */}
             <Route path="/community" element={<Community />} />
