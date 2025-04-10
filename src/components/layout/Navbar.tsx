@@ -92,7 +92,7 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Opportunities</NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="grid grid-cols-2 gap-3 p-4 md:w-[400px] lg:w-[500px]">
+                    <div className="grid grid-cols-4 gap-3 p-4 md:w-[400px] lg:w-[500px]">
                       {categoryData.map((category) => {
                         const IconComponent = iconMap[category.iconName];
                         return (
