@@ -176,6 +176,9 @@ const AdminLogin = () => {
               </Button>
             </CardFooter>
           </form>
+          <Link to="../admin/dashboard">
+  <button>admin</button>
+</Link>
           
           <div className="p-4 pt-0">
             <Separator className="my-4" />
