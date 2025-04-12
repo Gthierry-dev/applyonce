@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Search, Edit, Trash, MoreHorizontal, Loader2, Plus } from 'lucide-react';
-import CategoryFormDrawer from '@/components/admin/CategoryFormDrawer';
+import { CategoryDrawer } from '@/components/admin/CategoryDrawer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +25,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCategories } from '@/hooks/useCategories';
 
 interface Category {
   id: string;
@@ -40,80 +41,49 @@ interface Category {
 const AdminCategories = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [categoryToEdit, setCategoryToEdit] = useState<Category | null>(null);
-  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
-  const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Fetch categories
-  const { data: categories = [], isLoading, error } = useQuery<Category[]>({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      console.log('Fetching categories from Supabase...');
-      
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('title', { ascending: true });
-      
-      if (error) {
-        console.error('Error fetching categories:', error);
-        throw error;
-      }
-      
-      console.log('Categories fetched:', data);
-      return data || [];
-    }
-  });
-  
-  // Filter categories based on search query
-  const filteredCategories = categories.filter(category => 
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+  const { data: categories, isLoading } = useCategories();
+
+  const filteredCategories = categories?.filter(category =>
     category.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    category.description.toLowerCase().includes(searchQuery.toLowerCase())
+    category.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  
-  // Delete category mutation
-  const deleteCategoryMutation = useMutation({
-    mutationFn: async (categoryId: string) => {
+
+  const handleEditClick = (category: Category) => {
+    setSelectedCategory(category);
+    setIsEditDrawerOpen(true);
+  };
+
+  const handleDeleteClick = async (categoryId: string) => {
+    try {
       const { error } = await supabase
         .from('categories')
         .delete()
         .eq('id', categoryId);
-      
+
       if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+
       toast({
         title: 'Success',
         description: 'Category deleted successfully',
       });
-    },
-    onError: (error) => {
+
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    } catch (error) {
       toast({
-        variant: 'destructive',
         title: 'Error',
-        description: `Failed to delete category: ${error.message}`,
+        description: error instanceof Error ? error.message : 'Failed to delete category',
+        variant: 'destructive',
       });
     }
-  });
-  
-  const handleEditClick = (category: Category) => {
-    setCategoryToEdit(category);
-    setIsEditDrawerOpen(true);
   };
-  
-  const handleEditDrawerClose = () => {
-    setIsEditDrawerOpen(false);
-    setCategoryToEdit(null);
-  };
-  
-  const handleAddDrawerClose = () => {
-    setIsAddDrawerOpen(false);
-  };
-  
-  const handleDeleteCategory = (categoryId: string) => {
-    deleteCategoryMutation.mutate(categoryId);
+
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['categories'] });
   };
 
   return (
@@ -121,7 +91,7 @@ const AdminCategories = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold tracking-tight">Manage Categories</h1>
-          <Button onClick={() => setIsAddDrawerOpen(true)} className="flex items-center gap-2">
+          <Button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Add Category
           </Button>
@@ -145,11 +115,7 @@ const AdminCategories = () => {
             <div className="flex justify-center items-center p-8">
               <Loader2 className="h-8 w-8 animate-spin" />
             </div>
-          ) : error ? (
-            <div className="p-4 text-center text-red-500">
-              Error loading categories: {error instanceof Error ? error.message : 'Unknown error'}
-            </div>
-          ) : filteredCategories.length === 0 ? (
+          ) : filteredCategories?.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
               {searchQuery ? 'No categories found matching your search.' : 'No categories found.'}
             </div>
@@ -164,7 +130,7 @@ const AdminCategories = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCategories.map((category) => (
+                {filteredCategories?.map((category) => (
                   <TableRow key={category.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
@@ -213,7 +179,7 @@ const AdminCategories = () => {
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction 
                                   className="bg-destructive text-destructive-foreground"
-                                  onClick={() => handleDeleteCategory(category.id)}
+                                  onClick={() => handleDeleteClick(category.id)}
                                 >
                                   Delete
                                 </AlertDialogAction>
@@ -230,29 +196,20 @@ const AdminCategories = () => {
           )}
         </div>
 
-        {/* Edit Category Drawer */}
-        {categoryToEdit && (
-          <CategoryFormDrawer 
-            isOpen={isEditDrawerOpen}
-            onClose={handleEditDrawerClose}
-            isEditing={true}
-            initialData={categoryToEdit}
-            onSuccess={() => {
-              queryClient.invalidateQueries({ queryKey: ['categories'] });
-              handleEditDrawerClose();
-            }}
-          />
-        )}
+        <CategoryDrawer
+          isOpen={isCreateDrawerOpen}
+          onClose={() => setIsCreateDrawerOpen(false)}
+          onSuccess={handleSuccess}
+        />
 
-        {/* Add Category Drawer */}
-        <CategoryFormDrawer 
-          isOpen={isAddDrawerOpen}
-          onClose={handleAddDrawerClose}
-          isEditing={false}
-          onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ['categories'] });
-            handleAddDrawerClose();
+        <CategoryDrawer
+          isOpen={isEditDrawerOpen}
+          onClose={() => {
+            setIsEditDrawerOpen(false);
+            setSelectedCategory(null);
           }}
+          initialData={selectedCategory}
+          onSuccess={handleSuccess}
         />
       </div>
     </AdminLayout>
