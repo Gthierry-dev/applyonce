@@ -135,8 +135,8 @@ const AdminOpportunities = () => {
           ) : filteredOpportunities?.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
               {searchQuery ? 'No opportunities found matching your search.' : 'No opportunities found.'}
-            </div>
-          ) : (
+          </div>
+        ) : (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -155,8 +155,8 @@ const AdminOpportunities = () => {
                     <TableCell>{opportunity.category?.title}</TableCell>
                     <TableCell>
                       {new Date(opportunity.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-right">
+                      </TableCell>
+                      <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -188,8 +188,8 @@ const AdminOpportunities = () => {
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction 
                                   className="bg-destructive text-destructive-foreground"
-                                  onClick={() => handleDeleteClick(opportunity.id)}
-                                >
+                            onClick={() => handleDeleteClick(opportunity.id)}
+                          >
                                   Delete
                                 </AlertDialogAction>
                               </AlertDialogFooter>
@@ -197,13 +197,13 @@ const AdminOpportunities = () => {
                           </AlertDialog>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
+                      </TableCell>
+                    </TableRow>
                 ))}
               </TableBody>
             </Table>
           )}
-        </div>
+          </div>
 
         <OpportunityDrawer
           isOpen={isCreateDrawerOpen}
