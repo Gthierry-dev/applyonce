@@ -170,15 +170,13 @@ const AdminLogin = () => {
                 type="button"
                 variant="ghost"
                 className="w-full"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/admin/dashboard')}
               >
-                Return to Home
+                Go to Admin
               </Button>
             </CardFooter>
           </form>
-          <Link to="../admin/dashboard">
-  <button>admin</button>
-</Link>
+           
           
           <div className="p-4 pt-0">
             <Separator className="my-4" />
