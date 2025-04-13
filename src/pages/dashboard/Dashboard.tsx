@@ -98,10 +98,10 @@ const Dashboard = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground">
-              Welcome to your ApplyOnce dashboard. Here you can manage all your applications and explore opportunities.
-            </p>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Welcome to your ApplyOnce dashboard. Here you can manage all your applications and explore opportunities.
+        </p>
           </div>
           <div className="flex gap-2">
             <Button asChild>
@@ -122,7 +122,7 @@ const Dashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold">
                 {applications?.filter(app => app.status === 'pending').length || 0}
-              </div>
+          </div>
               <p className="text-xs text-muted-foreground">Applications in progress</p>
             </CardContent>
           </Card>
@@ -221,7 +221,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                   ))}
-                </div>
+          </div>
               )}
             </CardContent>
           </Card>

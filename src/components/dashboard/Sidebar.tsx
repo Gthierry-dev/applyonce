@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   const userLinks = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { name: 'Opportunities', icon: <Search size={20} />, path: '/opportunities' },
-    { name: 'Applications', icon: <FileText size={20} />, path: '/applications' },
+    // { name: 'Applications', icon: <FileText size={20} />, path: '/applications' },
     { name: 'Application Status', icon: <ClipboardList size={20} />, path: '/application-status' },
     { name: 'Categories', icon: <Folder size={20} />, path: '/categories' },
     { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
@@ -56,6 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
 
   const links = isAdmin ? adminLinks : userLinks;
   const homeLink = isAdmin ? '/admin/dashboard' : '/dashboard';
+
 
   const handleToggleCollapse = () => {
     setCollapsed(!collapsed);
