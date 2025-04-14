@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -42,29 +41,43 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
     <Card className="overflow-hidden hover:shadow-md transition-all duration-300 relative">
       <CategoryFormDrawer 
         categoryName={title}
-        categoryIcon={IconComponent ? <IconComponent className="h-5 w-5" /> : null}
+        categoryIcon={
+          <div 
+            className="w-6 h-6 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: color }}
+          >
+            <span className="text-white text-xs">
+              {iconName.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        }
         trigger={
           <div>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-4">
-                  <div className={`p-2 rounded-md ${color}`}>
-                    {IconComponent && <IconComponent className="h-5 w-5 text-blue-600" />}
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: color }}
+                  >
+                    <span className="text-white text-base font-medium">
+                      {iconName.charAt(0).toUpperCase()}
+                    </span>
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="font-semibold text-lg flex items-center">
+                  <div className="space-y-1.5">
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
                       {title}
-                      <Badge variant="outline" className="ml-2 text-xs">
+                      <Badge variant="outline" className="text-xs">
                         {count}
                       </Badge>
                       {configured && (
-                        <CheckCircle className="h-4 w-4 text-green-500 ml-2" />
+                        <CheckCircle className="h-4 w-4 text-green-500" />
                       )}
                     </h3>
-                    <p className="text-muted-foreground text-sm">{description}</p>
+                    <p className="text-muted-foreground text-sm line-clamp-2">{description}</p>
                   </div>
                 </div>
-                <div onClick={handleToggleClick}>
+                <div onClick={handleToggleClick} className="shrink-0">
                   <Switch 
                     checked={enabled} 
                     onCheckedChange={onToggle} 
@@ -72,19 +85,19 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="p-6 pt-0 flex justify-between">
+            <CardFooter className="p-4 pt-0 flex justify-between">
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="flex items-center gap-1"
+                className="flex items-center gap-1.5"
               >
-                <Settings className="h-3 w-3" />
+                <Settings className="h-3.5 w-3.5" />
                 Configure
               </Button>
-              <Button asChild variant="ghost" size="sm">
+              <Button asChild variant="ghost" size="sm" className="flex items-center gap-1.5">
                 <Link to={`/opportunities?category=${encodeURIComponent(title)}`}>
                   Browse
-                  <ArrowRight className="ml-1 h-3 w-3" />
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </Button>
             </CardFooter>
