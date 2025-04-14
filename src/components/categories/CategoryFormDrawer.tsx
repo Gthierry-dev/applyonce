@@ -174,7 +174,7 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
 
       setIsOpen(false);
     } catch (error) {
-      toast({
+    toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'Failed to submit form',
         variant: 'destructive',
@@ -327,7 +327,7 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
                 {field.required && <span className="text-destructive ml-1">*</span>}
               </Label>
               {renderField(field)}
-            </div>
+        </div>
           ))}
 
           <div className="flex justify-end space-x-2 pt-4">
@@ -337,7 +337,7 @@ const CategoryFormDrawer: React.FC<CategoryFormDrawerProps> = ({
             <Button type="submit" disabled={isLoading}>
               {isLoading ? 'Saving...' : existingResponseId ? 'Update Configuration' : 'Save Configuration'}
             </Button>
-          </div>
+        </div>
         </form>
       </DrawerContentComponent>
     </DrawerComponent>

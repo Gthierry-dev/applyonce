@@ -15,8 +15,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import CategoryForm from './CategoryForm';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
 const categorySchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -41,9 +39,8 @@ export function CategoryDrawer({
   onSuccess,
 }: CategoryDrawerProps) {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<'details' | 'form'>('details');
-  const [categoryId, setCategoryId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
     defaultValues: initialData || {
@@ -54,7 +51,7 @@ export function CategoryDrawer({
     },
   });
 
-  const handleDetailsSubmit = async (data: CategoryFormData) => {
+  const onSubmit = async (data: CategoryFormData) => {
     try {
       setIsSubmitting(true);
       if (initialData) {
@@ -69,42 +66,27 @@ export function CategoryDrawer({
           .eq('id', initialData.id);
         
         if (error) throw error;
-        setCategoryId(initialData.id);
-        setActiveTab('form');
+        toast({
+          title: 'Success',
+          description: 'Category updated successfully',
+        });
       } else {
-        const { data: newCategory, error } = await supabase
+        const { error } = await supabase
           .from('categories')
           .insert([{
             title: data.title,
             description: data.description,
             icon_name: data.icon_name,
             color: data.color,
-          }])
-          .select()
-          .single();
+          }]);
         
         if (error) throw error;
-        setCategoryId(newCategory.id);
-        setActiveTab('form');
+        toast({
+          title: 'Success',
+          description: 'Category created successfully',
+        });
       }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'An error occurred',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleComplete = async () => {
-    try {
-      setIsSubmitting(true);
-      toast({
-        title: 'Success',
-        description: 'Category and form fields saved successfully',
-      });
+      
       reset();
       onSuccess?.();
       onClose();
@@ -127,90 +109,63 @@ export function CategoryDrawer({
             {initialData ? 'Edit Category' : 'Create Category'}
           </SheetTitle>
           <SheetDescription>
-            {activeTab === 'details' 
-              ? 'Enter category details'
-              : 'Configure form fields'}
+            {initialData 
+              ? 'Update category details'
+              : 'Create a new category'}
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-4">
-          {activeTab === 'details' ? (
-            <form id="category-form" onSubmit={handleSubmit(handleDetailsSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  {...register('title')}
-                  placeholder="Enter category title"
-                />
-                {errors.title && (
-                  <p className="text-sm text-destructive">{errors.title.message}</p>
-                )}
-              </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              {...register('title')}
+              placeholder="Enter category title"
+            />
+            {errors.title && (
+              <p className="text-sm text-destructive">{errors.title.message}</p>
+            )}
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  {...register('description')}
-                  placeholder="Enter category description"
-                  rows={4}
-                />
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              {...register('description')}
+              placeholder="Enter category description"
+              rows={4}
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="icon_name">Icon Name</Label>
-                <Input
-                  id="icon_name"
-                  {...register('icon_name')}
-                  placeholder="Enter icon name (optional)"
-                />
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="icon_name">Icon Name</Label>
+            <Input
+              id="icon_name"
+              {...register('icon_name')}
+              placeholder="Enter icon name (optional)"
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="color">Color</Label>
-                <Input
-                  id="color"
-                  type="color"
-                  {...register('color')}
-                  className="h-10 px-2"
-                />
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="color">Color</Label>
+            <Input
+              id="color"
+              type="color"
+              {...register('color')}
+              className="h-10 px-2"
+            />
+          </div>
 
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button variant="outline" type="button" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : 'Next: Form Fields'}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              <CategoryForm categoryId={categoryId || initialData?.id} />
-              
-              <div className="flex justify-between space-x-2 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setActiveTab('details')}
-                  disabled={isSubmitting}
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Details
-                </Button>
-                <Button
-                  onClick={handleComplete}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Saving...' : 'Complete'}
-                  <Check className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button variant="outline" type="button" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : initialData ? 'Update Category' : 'Create Category'}
+            </Button>
+          </div>
+        </form>
       </SheetContent>
     </Sheet>
   );

@@ -182,6 +182,10 @@ const Login = () => {
           <Link to="/admin/login" className="text-primary hover:underline">
             Admin Login
           </Link>
+          {' '}&bull;{' '}
+          <Link to="/company/login" className="text-primary hover:underline">
+            Company Login
+          </Link>
         </div>
       </div>
     </Layout>

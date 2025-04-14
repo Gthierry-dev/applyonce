@@ -39,6 +39,14 @@ import Pricing from "./pages/Pricing";
 import Support from "./pages/Support";
 import SocialAuthComingSoon from "./pages/auth/SocialAuthComingSoon";
 
+// Company routes
+import CompanyLogin from "./pages/company/Login";
+import CompanyDashboard from "./pages/company/Dashboard";
+import CompanyProfile from "./pages/company/Profile";
+import CompanyApplications from "./pages/company/Applications";
+import CompanyCategories from "./pages/company/Categories";
+import CompanySettings from "./pages/company/Settings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -54,6 +62,7 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/signup" element={<AdminSignup />} />
+            <Route path="/company/login" element={<CompanyLogin />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -68,6 +77,15 @@ const App = () => (
               <Route path="/opportunities" element={<Opportunities />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
+
+            {/* Protected Company Routes */}
+            {/* <Route element={<ProtectedRoute />}> */}
+              <Route path="/company/dashboard" element={<CompanyDashboard />} />
+              <Route path="/company/profile" element={<CompanyProfile />} />
+              <Route path="/company/applications" element={<CompanyApplications />} />
+              <Route path="/company/categories" element={<CompanyCategories />} />
+              <Route path="/company/settings" element={<CompanySettings />} />
+            {/* </Route> */}
 
             {/* Admin Dashboard Routes */}
 {/*             <Route element={<AdminRoute />}> */}
