@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,10 +13,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import CategoryForm from './CategoryForm';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
 const categorySchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -41,6 +41,9 @@ export function CategoryDrawer({
   onSuccess,
 }: CategoryDrawerProps) {
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<'details' | 'form'>('details');
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
     defaultValues: initialData || {
@@ -51,8 +54,9 @@ export function CategoryDrawer({
     },
   });
 
-  const onSubmit = async (data: CategoryFormData) => {
+  const handleDetailsSubmit = async (data: CategoryFormData) => {
     try {
+      setIsSubmitting(true);
       if (initialData) {
         const { error } = await supabase
           .from('categories')
@@ -65,27 +69,42 @@ export function CategoryDrawer({
           .eq('id', initialData.id);
         
         if (error) throw error;
-        toast({
-          title: 'Success',
-          description: 'Category updated successfully',
-        });
+        setCategoryId(initialData.id);
+        setActiveTab('form');
       } else {
-        const { error } = await supabase
+        const { data: newCategory, error } = await supabase
           .from('categories')
           .insert([{
             title: data.title,
             description: data.description,
             icon_name: data.icon_name,
             color: data.color,
-          }]);
+          }])
+          .select()
+          .single();
         
         if (error) throw error;
-        toast({
-          title: 'Success',
-          description: 'Category created successfully',
-        });
+        setCategoryId(newCategory.id);
+        setActiveTab('form');
       }
-      
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'An error occurred',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleComplete = async () => {
+    try {
+      setIsSubmitting(true);
+      toast({
+        title: 'Success',
+        description: 'Category and form fields saved successfully',
+      });
       reset();
       onSuccess?.();
       onClose();
@@ -95,6 +114,8 @@ export function CategoryDrawer({
         description: error instanceof Error ? error.message : 'An error occurred',
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -106,20 +127,15 @@ export function CategoryDrawer({
             {initialData ? 'Edit Category' : 'Create Category'}
           </SheetTitle>
           <SheetDescription>
-            {initialData 
-              ? 'Update category details and form fields'
-              : 'Create a new category and configure its form fields'}
+            {activeTab === 'details' 
+              ? 'Enter category details'
+              : 'Configure form fields'}
           </SheetDescription>
         </SheetHeader>
 
-        <Tabs defaultValue="details" className="mt-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="form">Form Fields</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="details" className="mt-4 space-y-4">
-            <form id="category-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="mt-4">
+          {activeTab === 'details' ? (
+            <form id="category-form" onSubmit={handleSubmit(handleDetailsSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
                 <Input
@@ -165,17 +181,36 @@ export function CategoryDrawer({
                 <Button variant="outline" type="button" onClick={onClose}>
                   Cancel
                 </Button>
-                <Button type="submit">
-                  {initialData ? 'Update Category' : 'Create Category'}
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : 'Next: Form Fields'}
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
             </form>
-          </TabsContent>
-
-          <TabsContent value="form" className="mt-4">
-            <CategoryForm categoryId={initialData?.id} />
-          </TabsContent>
-        </Tabs>
+          ) : (
+            <div className="space-y-4">
+              <CategoryForm categoryId={categoryId || initialData?.id} />
+              
+              <div className="flex justify-between space-x-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setActiveTab('details')}
+                  disabled={isSubmitting}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Details
+                </Button>
+                <Button
+                  onClick={handleComplete}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Saving...' : 'Complete'}
+                  <Check className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   );

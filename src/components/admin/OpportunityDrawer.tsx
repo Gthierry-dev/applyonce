@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -23,13 +22,14 @@ import {
 } from "@/components/ui/select";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useCategories } from '@/hooks/useCategories';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
 const opportunitySchema = z.object({
-  title: z.string().min(1, 'Position name is required'),
+  title: z.string().min(1, 'Title is required'),
   company_name: z.string().min(1, 'Company name is required'),
-  description: z.string().min(1, 'Description is required'),
+  description: z.string().optional(),
   category_id: z.string().min(1, 'Category is required'),
+  config: z.record(z.any()).optional(),
 });
 
 type OpportunityFormData = z.infer<typeof opportunitySchema>;
@@ -41,14 +41,9 @@ interface OpportunityDrawerProps {
   onSuccess?: () => void;
 }
 
-interface CategoryField {
+interface Category {
   id: string;
-  label: string;
-  name: string;
-  type: string;
-  placeholder?: string;
-  required?: boolean;
-  options?: string[];
+  title: string;
 }
 
 export function OpportunityDrawer({
@@ -58,101 +53,102 @@ export function OpportunityDrawer({
   onSuccess,
 }: OpportunityDrawerProps) {
   const { toast } = useToast();
-  const { data: categories } = useCategories();
-  const [activeTab, setActiveTab] = useState('general');
-  const [categoryFields, setCategoryFields] = useState<CategoryField[]>([]);
-  const [configData, setConfigData] = useState<Record<string, any>>({});
+  const [activeTab, setActiveTab] = useState<'details' | 'form'>('details');
+  const [opportunityId, setOpportunityId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
 
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<OpportunityFormData>({
+  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<OpportunityFormData>({
     resolver: zodResolver(opportunitySchema),
     defaultValues: initialData || {
       title: '',
       company_name: '',
       description: '',
       category_id: '',
+      config: {},
     },
   });
 
-  const selectedCategoryId = watch('category_id');
-
-  // Fetch category fields when category changes
   useEffect(() => {
-    if (selectedCategoryId) {
-      fetchCategoryFields(selectedCategoryId);
-    } else {
-      setCategoryFields([]);
-      setConfigData({});
+    if (isOpen) {
+      fetchCategories();
     }
-  }, [selectedCategoryId]);
+  }, [isOpen]);
 
-  const fetchCategoryFields = async (categoryId: string) => {
+  const fetchCategories = async () => {
     try {
+      setIsLoadingCategories(true);
       const { data, error } = await supabase
-        .from('category_fields')
-        .select('*')
-        .eq('category_id', categoryId)
-        .order('order');
+        .from('categories')
+        .select('id, title')
+        .order('title');
 
       if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to fetch categories',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  };
 
-      setCategoryFields(data || []);
-      
-      // Initialize config data with existing values or empty strings
-      if (initialData?.config) {
-        setConfigData(initialData.config);
+  const handleDetailsSubmit = async (data: OpportunityFormData) => {
+    try {
+      setIsSubmitting(true);
+      if (initialData) {
+        const { error } = await supabase
+          .from('opportunities')
+          .update({
+            title: data.title,
+            company_name: data.company_name,
+            description: data.description,
+            category_id: data.category_id,
+          })
+          .eq('id', initialData.id);
+        
+        if (error) throw error;
+        setOpportunityId(initialData.id);
+        setActiveTab('form');
       } else {
-        const newConfigData = (data || []).reduce((acc, field) => ({
-          ...acc,
-          [field.name]: '',
-        }), {});
-        setConfigData(newConfigData);
+        const { data: newOpportunity, error } = await supabase
+          .from('opportunities')
+          .insert([{
+            title: data.title,
+            company_name: data.company_name,
+            description: data.description,
+            category_id: data.category_id,
+            config: {},
+          }])
+          .select()
+          .single();
+        
+        if (error) throw error;
+        setOpportunityId(newOpportunity.id);
+        setActiveTab('form');
       }
     } catch (error) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to fetch category fields',
+        description: error instanceof Error ? error.message : 'An error occurred',
         variant: 'destructive',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleConfigChange = (fieldName: string, value: string) => {
-    setConfigData(prev => ({
-      ...prev,
-      [fieldName]: value,
-    }));
-  };
-
-  const onSubmit = async (data: OpportunityFormData) => {
+  const handleComplete = async () => {
     try {
-      const opportunityData = {
-        ...data,
-        config: configData,
-      };
-
-      if (initialData) {
-        const { error } = await supabase
-          .from('opportunities')
-          .update(opportunityData)
-          .eq('id', initialData.id);
-        
-        if (error) throw error;
-        toast({
-          title: 'Success',
-          description: 'Opportunity updated successfully',
-        });
-      } else {
-        const { error } = await supabase
-          .from('opportunities')
-          .insert([opportunityData]);
-        
-        if (error) throw error;
-        toast({
-          title: 'Success',
-          description: 'Opportunity created successfully',
-        });
-      }
-      
+      setIsSubmitting(true);
+      toast({
+        title: 'Success',
+        description: 'Opportunity saved successfully',
+      });
       reset();
       onSuccess?.();
       onClose();
@@ -162,66 +158,8 @@ export function OpportunityDrawer({
         description: error instanceof Error ? error.message : 'An error occurred',
         variant: 'destructive',
       });
-    }
-  };
-
-  const renderField = (field: CategoryField) => {
-    switch (field.type) {
-      case 'textarea':
-        return (
-          <Textarea
-            value={configData[field.name] || ''}
-            onChange={(e) => handleConfigChange(field.name, e.target.value)}
-            placeholder={field.placeholder}
-            required={field.required}
-          />
-        );
-      case 'select':
-        return (
-          <Select
-            value={configData[field.name] || ''}
-            onValueChange={(value) => handleConfigChange(field.name, value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={field.placeholder} />
-            </SelectTrigger>
-            <SelectContent>
-              {field.options?.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-      case 'checkbox':
-        return (
-          <Input
-            type="checkbox"
-            checked={configData[field.name] || false}
-            onChange={(e) => handleConfigChange(field.name, e.target.checked.toString())}
-            className="w-4 h-4"
-          />
-        );
-      case 'date':
-        return (
-          <Input
-            type="date"
-            value={configData[field.name] || ''}
-            onChange={(e) => handleConfigChange(field.name, e.target.value)}
-            required={field.required}
-          />
-        );
-      default:
-        return (
-          <Input
-            type={field.type}
-            value={configData[field.name] || ''}
-            onChange={(e) => handleConfigChange(field.name, e.target.value)}
-            placeholder={field.placeholder}
-            required={field.required}
-          />
-        );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -233,53 +171,21 @@ export function OpportunityDrawer({
             {initialData ? 'Edit Opportunity' : 'Create Opportunity'}
           </SheetTitle>
           <SheetDescription>
-            {initialData 
-              ? 'Update opportunity details and configuration'
-              : 'Create a new opportunity with details and category-specific configuration'}
+            {activeTab === 'details' 
+              ? 'Enter opportunity details'
+              : 'Configure form fields'}
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="general">General Details</TabsTrigger>
-              <TabsTrigger value="config" disabled={!selectedCategoryId}>
-                Configuration
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="general" className="mt-4 space-y-4">
+        <div className="mt-4">
+          {activeTab === 'details' ? (
+            <form id="opportunity-form" onSubmit={handleSubmit(handleDetailsSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="category_id">Category</Label>
-                <Select
-                  value={selectedCategoryId}
-                  onValueChange={(value) => {
-                    const event = { target: { value } };
-                    register('category_id').onChange(event);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories?.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.category_id && (
-                  <p className="text-sm text-destructive">{errors.category_id.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="title">Position Name</Label>
+                <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
                   {...register('title')}
-                  placeholder="Enter position name"
+                  placeholder="Enter opportunity title"
                 />
                 {errors.title && (
                   <p className="text-sm text-destructive">{errors.title.message}</p>
@@ -306,42 +212,64 @@ export function OpportunityDrawer({
                   placeholder="Enter opportunity description"
                   rows={4}
                 />
-                {errors.description && (
-                  <p className="text-sm text-destructive">{errors.description.message}</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category_id">Category</Label>
+                <Select
+                  value={initialData?.category_id}
+                  onValueChange={(value) => setValue('category_id', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.category_id && (
+                  <p className="text-sm text-destructive">{errors.category_id.message}</p>
                 )}
               </div>
-            </TabsContent>
 
-            <TabsContent value="config" className="mt-4 space-y-4">
-              {categoryFields.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">
-                  {selectedCategoryId 
-                    ? 'No configuration fields found for this category.'
-                    : 'Please select a category first.'}
-                </p>
-              ) : (
-                categoryFields.map((field) => (
-                  <div key={field.id} className="space-y-2">
-                    <Label htmlFor={field.name}>
-                      {field.label}
-                      {field.required && <span className="text-destructive ml-1">*</span>}
-                    </Label>
-                    {renderField(field)}
-                  </div>
-                ))
-              )}
-            </TabsContent>
-          </Tabs>
-
-          <div className="flex justify-end space-x-2 mt-6 pt-4 border-t">
-            <Button variant="outline" type="button" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">
-              {initialData ? 'Update Opportunity' : 'Create Opportunity'}
-            </Button>
-          </div>
-        </form>
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" type="button" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting || isLoadingCategories}>
+                  {isSubmitting ? 'Saving...' : 'Next: Form Fields'}
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className="space-y-4">
+              {/* Form fields configuration will go here */}
+              
+              <div className="flex justify-between space-x-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setActiveTab('details')}
+                  disabled={isSubmitting}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Details
+                </Button>
+                <Button
+                  onClick={handleComplete}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Saving...' : 'Complete'}
+                  <Check className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   );
