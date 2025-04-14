@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Category } from '@/types/category';
+import { Database } from '@/integrations/supabase/types';
+
+type Category = Database['public']['Tables']['categories']['Row'];
 
 export const useCategories = () => {
   const { data: categories = [], isLoading, error } = useQuery({
@@ -9,7 +11,7 @@ export const useCategories = () => {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('name', { ascending: true });
+        .order('title', { ascending: true });
 
       if (error) throw error;
       return data as Category[];

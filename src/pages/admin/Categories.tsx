@@ -30,12 +30,12 @@ import { useCategories } from '@/hooks/useCategories';
 interface Category {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   icon_name: string;
   color: string;
-  count: number;
-  created_at: string;
-  updated_at: string;
+  count: number | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 const AdminCategories = () => {
@@ -46,7 +46,7 @@ const AdminCategories = () => {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
-  const { data: categories, isLoading } = useCategories();
+  const { categories, isLoading } = useCategories();
 
   const filteredCategories = categories?.filter(category =>
     category.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
