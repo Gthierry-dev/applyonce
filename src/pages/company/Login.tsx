@@ -100,8 +100,8 @@ export default function CompanyLogin() {
         <CardFooter className="flex flex-col space-y-2">
           <p className="text-sm text-center text-gray-600">
             Don't have an account?{' '}
-            <Link to="/company/register" className="text-primary hover:underline">
-              Register here
+            <Link to="/company/dashboard" className="text-primary hover:underline">
+              Skip for now
             </Link>
           </p>
           <p className="text-sm text-center text-gray-600">

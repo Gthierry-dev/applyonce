@@ -195,8 +195,8 @@ export default function CompanyRegister() {
         <CardFooter className="flex flex-col space-y-2">
           <p className="text-sm text-center text-gray-600">
             Already have an account?{' '}
-            <Link to="/company/login" className="text-primary hover:underline">
-              Login here
+            <Link to="/company/dashboard" className="text-primary hover:underline">
+             skip for now
             </Link>
           </p>
           <p className="text-sm text-center text-gray-600">
