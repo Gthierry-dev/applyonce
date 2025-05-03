@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      applications: {
+        Row: {
+          id: string
+          last_updated: string | null
+          notes: string | null
+          opportunity_id: string | null
+          responses: Json | null
+          status: string | null
+          submitted_date: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          last_updated?: string | null
+          notes?: string | null
+          opportunity_id?: string | null
+          responses?: Json | null
+          status?: string | null
+          submitted_date?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          last_updated?: string | null
+          notes?: string | null
+          opportunity_id?: string | null
+          responses?: Json | null
+          status?: string | null
+          submitted_date?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           color: string
@@ -89,10 +130,46 @@ export type Database = {
           },
         ]
       }
+      category_responses: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          id: string
+          responses: Json
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          responses: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          responses?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "category_responses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       opportunities: {
         Row: {
           categories: string[] | null
           category: string
+          category_id: string | null
           created_at: string
           deadline: string
           description: string
@@ -111,6 +188,7 @@ export type Database = {
         Insert: {
           categories?: string[] | null
           category: string
+          category_id?: string | null
           created_at?: string
           deadline: string
           description: string
@@ -129,6 +207,7 @@ export type Database = {
         Update: {
           categories?: string[] | null
           category?: string
+          category_id?: string | null
           created_at?: string
           deadline?: string
           description?: string
@@ -144,7 +223,57 @@ export type Database = {
           updated_at?: string
           website_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "opportunities_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      opportunity_fields: {
+        Row: {
+          created_at: string | null
+          field_id: string | null
+          id: string
+          is_enabled: boolean | null
+          opportunity_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          field_id?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          opportunity_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          field_id?: string | null
+          id?: string
+          is_enabled?: boolean | null
+          opportunity_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunity_fields_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "category_fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "opportunity_fields_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

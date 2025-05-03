@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -95,7 +96,7 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         .from('category_fields')
         .select('*')
         .eq('category_id', categoryId)
-        .order('order', { ascending: true });
+        .order('display_order', { ascending: true });
 
       if (error) throw error;
       setFields(data || []);
@@ -196,4 +197,4 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
   );
 };
 
-export default ApplicationForm; 
+export default ApplicationForm;

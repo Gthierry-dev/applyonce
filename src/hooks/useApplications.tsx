@@ -16,15 +16,15 @@ export const useApplications = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // In real implementation with a proper applications table, this query would work
-  // For now, we'll return a hardcoded empty array to avoid database errors
   const { data, isLoading, error } = useQuery({
     queryKey: ['applications'],
     queryFn: async (): Promise<ApplicationWithDetails[]> => {
-      // Since we have applications table issues, return empty array for now
-      return [];
+      const { data: session } = await supabase.auth.getSession();
       
-      /* Enable this code when applications table is properly set up:
+      if (!session.session) {
+        return [];
+      }
+      
       const { data: applications, error: appError } = await supabase
         .from('applications')
         .select(`
@@ -35,59 +35,56 @@ export const useApplications = () => {
           submitted_date,
           last_updated,
           notes,
-          opportunities:opportunity_id (
+          opportunity:opportunities(
             title,
             organization,
             category
           )
-        `);
+        `)
+        .eq('user_id', session.session.user.id);
 
       if (appError) throw appError;
 
       if (!applications) return [];
 
-      // Transform the data to match our Application interface
+      // Transform the data to match our ApplicationWithDetails interface
       return applications.map(app => ({
         id: app.id,
         user_id: app.user_id,
         opportunity_id: app.opportunity_id,
-        title: app.opportunities?.title || 'Unknown Opportunity',
-        organization: app.opportunities?.organization || 'Unknown Organization',
-        category: app.opportunities?.category || 'Other',
-        submitted_date: app.submitted_date,
+        title: app.opportunity?.title || 'Unknown Opportunity',
+        organization: app.opportunity?.organization || 'Unknown Organization',
+        category: app.opportunity?.category || 'Other',
         status: app.status as ApplicationStatus,
+        submitted_date: app.submitted_date,
         last_updated: app.last_updated,
-        notes: app.notes
+        notes: app.notes,
+        responses: app.responses
       }));
-      */
     },
-    enabled: !!supabase.auth.getSession
   });
 
   const createApplication = useMutation({
-    mutationFn: async (data: { opportunity_id: string }) => {
+    mutationFn: async (data: { opportunity_id: string; responses?: Record<string, any> }) => {
       const { data: sessionData } = await supabase.auth.getSession();
       
       if (!sessionData.session) {
         throw new Error("You must be logged in to apply");
       }
 
-      // Debug - this is commented out for now
-      /*
       const { error } = await supabase
         .from('applications')
         .insert({
           user_id: sessionData.session.user.id,
           opportunity_id: data.opportunity_id,
           status: 'pending',
+          responses: data.responses || {},
           submitted_date: new Date().toISOString(),
           last_updated: new Date().toISOString()
         });
 
       if (error) throw error;
-      */
       
-      // Just return true for now
       return true;
     },
     onSuccess: () => {

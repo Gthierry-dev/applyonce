@@ -16,16 +16,42 @@ export type Category = Database['public']['Tables']['categories']['Row'];
 export type Opportunity = Database['public']['Tables']['opportunities']['Row'];
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 
-// Define Application type manually to match the database schema
-export type Application = {
-  id: string;
-  user_id: string;
-  opportunity_id: string;
-  status: string;
-  submitted_date: string;
-  last_updated: string;
-  notes?: string;
-};
+// Define additional types for our form builder functionality
+export type CategoryField = Database['public']['Tables']['category_fields']['Row'];
+export type OpportunityField = Database['public']['Tables']['opportunity_fields']['Row'];
+
+// Define Application type to match the database schema
+export type Application = Database['public']['Tables']['applications']['Row'];
+
+// Define field types for form builder
+export type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'checkbox' | 'date' | 'file' | 'url';
 
 // Add Role type
-export type UserRole = 'user' | 'admin';
+export type UserRole = 'user' | 'admin' | 'company';
+
+// Helper function to check if user is authenticated
+export const isAuthenticated = async () => {
+  const { data } = await supabase.auth.getSession();
+  return !!data.session;
+};
+
+// Helper function to get current user
+export const getCurrentUser = async () => {
+  const { data } = await supabase.auth.getUser();
+  return data?.user || null;
+};
+
+// Helper function to get user profile with role
+export const getUserProfile = async () => {
+  const { data: user } = await supabase.auth.getUser();
+  
+  if (!user.user) return null;
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.user.id)
+    .single();
+    
+  return profile;
+};
