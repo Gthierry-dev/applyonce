@@ -23,13 +23,20 @@ export const useCategoryFields = (categoryId?: string) => {
     queryFn: async () => {
       if (!categoryId) return [];
       
+      console.log('Fetching fields for category:', categoryId);
+      
       const { data, error } = await supabase
         .from('category_fields')
         .select('*')
         .eq('category_id', categoryId)
         .order('display_order', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching category fields:', error);
+        throw error;
+      }
+      
+      console.log('Fetched fields:', data);
       return data as CategoryField[];
     },
     enabled: !!categoryId

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,7 +23,11 @@ import {
 } from "@/components/ui/select";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
+import { useCategoryFields } from '@/hooks/useCategoryFields';
+import { CategoryField } from '@/types/category';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 
 const opportunitySchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -54,12 +59,16 @@ export function OpportunityDrawer({
 }: OpportunityDrawerProps) {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'details' | 'form'>('details');
-  const [opportunityId, setOpportunityId] = useState<string | null>(null);
+  const [opportunityId, setOpportunityId] = useState<string | null>(initialData?.id || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialData?.category_id || '');
+  const [enabledFields, setEnabledFields] = useState<Record<string, boolean>>({});
 
-  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<OpportunityFormData>({
+  const { fields, isLoading: isLoadingFields } = useCategoryFields(selectedCategory);
+
+  const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm<OpportunityFormData>({
     resolver: zodResolver(opportunitySchema),
     defaultValues: initialData || {
       title: '',
@@ -70,11 +79,62 @@ export function OpportunityDrawer({
     },
   });
 
+  // Watch for category_id changes to update selectedCategory
+  const watchedCategoryId = watch('category_id');
+
+  useEffect(() => {
+    if (watchedCategoryId && watchedCategoryId !== selectedCategory) {
+      setSelectedCategory(watchedCategoryId);
+    }
+  }, [watchedCategoryId]);
+
   useEffect(() => {
     if (isOpen) {
       fetchCategories();
+      
+      // If initialData, set opportunityId and fetch enabled fields
+      if (initialData?.id) {
+        setOpportunityId(initialData.id);
+        fetchEnabledFields(initialData.id);
+      }
     }
   }, [isOpen]);
+
+  // Initialize enabled fields from the category fields
+  useEffect(() => {
+    if (fields.length > 0) {
+      const initialEnabledFields: Record<string, boolean> = {};
+      fields.forEach(field => {
+        initialEnabledFields[field.id] = true;
+      });
+      
+      // Only set default enabled fields if we don't have existing ones
+      if (Object.keys(enabledFields).length === 0) {
+        setEnabledFields(initialEnabledFields);
+      }
+    }
+  }, [fields]);
+
+  const fetchEnabledFields = async (oppId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('opportunity_fields')
+        .select('field_id, is_enabled')
+        .eq('opportunity_id', oppId);
+        
+      if (error) throw error;
+      
+      const enabledFieldsMap: Record<string, boolean> = {};
+      if (data && data.length > 0) {
+        data.forEach(item => {
+          enabledFieldsMap[item.field_id] = item.is_enabled;
+        });
+        setEnabledFields(enabledFieldsMap);
+      }
+    } catch (error) {
+      console.error('Error fetching enabled fields:', error);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -142,13 +202,50 @@ export function OpportunityDrawer({
     }
   };
 
+  const handleToggleField = (fieldId: string) => {
+    setEnabledFields(prev => ({
+      ...prev,
+      [fieldId]: !prev[fieldId]
+    }));
+  };
+
   const handleComplete = async () => {
     try {
       setIsSubmitting(true);
+      
+      if (!opportunityId) {
+        throw new Error('Opportunity ID is missing');
+      }
+      
+      // Save field configurations
+      const fieldUpdates = fields.map(field => ({
+        opportunity_id: opportunityId,
+        field_id: field.id,
+        is_enabled: enabledFields[field.id] ?? true
+      }));
+      
+      // Delete existing field configurations
+      const { error: deleteError } = await supabase
+        .from('opportunity_fields')
+        .delete()
+        .eq('opportunity_id', opportunityId);
+        
+      if (deleteError) throw deleteError;
+      
+      // Insert new field configurations
+      if (fieldUpdates.length > 0) {
+        const { error: insertError } = await supabase
+          .from('opportunity_fields')
+          .insert(fieldUpdates);
+          
+        if (insertError) throw insertError;
+      }
+      
       toast({
         title: 'Success',
         description: 'Opportunity saved successfully',
       });
+      
       reset();
       onSuccess?.();
       onClose();
@@ -217,8 +314,11 @@ export function OpportunityDrawer({
               <div className="space-y-2">
                 <Label htmlFor="category_id">Category</Label>
                 <Select
-                  value={initialData?.category_id}
-                  onValueChange={(value) => setValue('category_id', value)}
+                  value={selectedCategory}
+                  onValueChange={(value) => {
+                    setValue('category_id', value);
+                    setSelectedCategory(value);
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
@@ -248,7 +348,41 @@ export function OpportunityDrawer({
             </form>
           ) : (
             <div className="space-y-4">
-              {/* Form fields configuration will go here */}
+              {isLoadingFields ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : fields.length > 0 ? (
+                <>
+                  <h3 className="text-lg font-medium">Form Fields</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Toggle which fields to include in this opportunity's application form.
+                  </p>
+                  <div className="space-y-4 mt-4">
+                    {fields.map((field: CategoryField) => (
+                      <div key={field.id} className="flex items-center justify-between p-3 rounded-lg border">
+                        <div>
+                          <h4 className="font-medium">{field.label}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Type: {field.type} {field.required ? '(Required)' : '(Optional)'}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm">{enabledFields[field.id] ? 'Enabled' : 'Disabled'}</span>
+                          <Switch
+                            checked={enabledFields[field.id] ?? true}
+                            onCheckedChange={() => handleToggleField(field.id)}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">No form fields have been created for this category.</p>
+                </div>
+              )}
               
               <div className="flex justify-between space-x-2 pt-4">
                 <Button
@@ -273,4 +407,4 @@ export function OpportunityDrawer({
       </SheetContent>
     </Sheet>
   );
-} 
+}
