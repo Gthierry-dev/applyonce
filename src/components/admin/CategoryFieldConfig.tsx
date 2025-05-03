@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { PlusCircle, Grip, ChevronDown, ChevronUp, Trash, Settings, Code } from 'lucide-react';
@@ -23,10 +22,8 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { supabase, CategoryField } from '@/integrations/supabase/client';
-import { useCategoryFields } from '@/hooks/useCategoryFields';
-
-export type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'checkbox' | 'date' | 'file' | 'url';
+import { CategoryField, FieldType } from '@/types/supabase';
+import { useCategoryFields, CategoryFieldForm } from '@/hooks/useCategoryFields';
 
 interface CategoryFieldConfigProps {
   categoryId: string;
@@ -71,13 +68,8 @@ export const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ catego
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     
-    // Update the display_order for each item
-    const updatedItems = items.map((item, index) => ({
-      ...item,
-      display_order: index,
-    }));
-    
-    reorderFields.mutate(updatedItems);
+    // Since we can't update display_order in the database, we just refresh the UI
+    reorderFields.mutate(items);
   };
 
   const handleAddField = () => {
@@ -92,9 +84,11 @@ export const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ catego
   };
 
   const handleUpdateField = (field: CategoryField, updates: Partial<CategoryField>) => {
+    // Add display_order for the hook's type requirements, but it won't be used
     updateField.mutate({
       ...field,
       ...updates,
+      display_order: 0, // This won't be used but needed for the type
     });
   };
 
@@ -120,17 +114,14 @@ export const CategoryFieldConfig: React.FC<CategoryFieldConfigProps> = ({ catego
       // Add fields in sequence
       const addFieldsSequentially = async () => {
         for (const field of parsed) {
-          await supabase
-            .from('category_fields')
-            .insert([{
-              ...field,
-              category_id: categoryId,
-              display_order: fields.length + parsed.indexOf(field)
-            }]);
+          // Add display_order for the function's type requirements, but it won't be used
+          createField.mutate({
+            ...field,
+            category_id: categoryId,
+            display_order: 0, // This won't be used but needed for the type
+          });
         }
         
-        // Refresh the fields
-        useCategoryFields(categoryId).reorderFields.mutate(fields);
         setJsonMode(false);
         toast({
           title: 'Success',

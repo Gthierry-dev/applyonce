@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,7 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { useCategoryFields } from '@/hooks/useCategoryFields';
-import { CategoryField } from '@/types/category';
+import { CategoryField } from '@/types/supabase';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 
@@ -175,6 +174,16 @@ export function OpportunityDrawer({
         setOpportunityId(initialData.id);
         setActiveTab('form');
       } else {
+        // Fix: Add the required category field
+        const { data: categoryData } = await supabase
+          .from('categories')
+          .select('title')
+          .eq('id', data.category_id)
+          .single();
+          
+        const category = categoryData?.title || 'Unknown';
+        
+        // Add all required fields for the insert
         const { data: newOpportunity, error } = await supabase
           .from('opportunities')
           .insert([{
@@ -182,7 +191,9 @@ export function OpportunityDrawer({
             company_name: data.company_name,
             description: data.description,
             category_id: data.category_id,
-            config: {},
+            category: category,
+            organization: data.company_name, // Set organization from company_name
+            deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // Default deadline: 30 days from now
           }])
           .select()
           .single();

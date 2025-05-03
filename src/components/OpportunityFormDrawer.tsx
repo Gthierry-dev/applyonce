@@ -1,9 +1,10 @@
+
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Category } from '@/types/category';
+import { Category, CategoryField } from '@/types/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -45,7 +46,7 @@ export function OpportunityFormDrawer({ onSubmit, initialData }: OpportunityForm
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('name', { ascending: true });
+        .order('title', { ascending: true });
 
       if (error) throw error;
       return data as Category[];
@@ -58,14 +59,17 @@ export function OpportunityFormDrawer({ onSubmit, initialData }: OpportunityForm
     queryKey: ['custom-fields', selectedCategoryId],
     queryFn: async () => {
       if (!selectedCategoryId) return [];
-      const { data, error } = await supabase
+      
+      // First we need to get fields enabled for this category
+      const { data: enabledFields, error: enabledFieldsError } = await supabase
         .from('category_fields')
         .select('*')
         .eq('category_id', selectedCategoryId)
-        .order('order', { ascending: true });
+        .order('id', { ascending: true });  // Using id instead of order
 
-      if (error) throw error;
-      return data;
+      if (enabledFieldsError) throw enabledFieldsError;
+
+      return enabledFields as CategoryField[];
     },
     enabled: !!selectedCategoryId,
   });
@@ -132,7 +136,7 @@ export function OpportunityFormDrawer({ onSubmit, initialData }: OpportunityForm
                 <SelectContent>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
-                      {category.name}
+                      {category.title}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -183,4 +187,4 @@ export function OpportunityFormDrawer({ onSubmit, initialData }: OpportunityForm
       </form>
     </Form>
   );
-} 
+}

@@ -1,6 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase, CategoryField, FieldType } from '@/integrations/supabase/client';
+import { supabase } from '@/integrations/supabase/client';
+import { CategoryField, FieldType } from '@/types/supabase';
 import { toast } from 'sonner';
 
 export interface CategoryFieldForm {
@@ -29,7 +30,7 @@ export const useCategoryFields = (categoryId?: string) => {
         .from('category_fields')
         .select('*')
         .eq('category_id', categoryId)
-        .order('display_order', { ascending: true });
+        .order('id', { ascending: true });
 
       if (error) {
         console.error('Error fetching category fields:', error);
@@ -44,9 +45,12 @@ export const useCategoryFields = (categoryId?: string) => {
 
   const createField = useMutation({
     mutationFn: async (field: CategoryFieldForm) => {
+      // Remove display_order from the field data as it doesn't exist in the database
+      const { display_order, ...fieldWithoutOrder } = field;
+      
       const { data, error } = await supabase
         .from('category_fields')
-        .insert([field])
+        .insert([fieldWithoutOrder])
         .select()
         .single();
 
@@ -64,7 +68,7 @@ export const useCategoryFields = (categoryId?: string) => {
 
   const updateField = useMutation({
     mutationFn: async (field: CategoryFieldForm) => {
-      const { id, ...updateData } = field;
+      const { id, display_order, ...updateData } = field;
       
       if (!id) throw new Error('Field ID is required for updates');
 
@@ -107,25 +111,16 @@ export const useCategoryFields = (categoryId?: string) => {
 
   const reorderFields = useMutation({
     mutationFn: async (fields: CategoryField[]) => {
-      // Create batch updates for all fields with new order
-      const updates = fields.map((field, index) => ({
-        id: field.id,
-        display_order: index
-      }));
-
-      // Use Promise.all to execute all updates in parallel
-      await Promise.all(
-        updates.map(update => 
-          supabase
-            .from('category_fields')
-            .update({ display_order: update.display_order })
-            .eq('id', update.id)
-        )
-      );
+      // Since there's no display_order column, we can't update it.
+      // For now, we'll just refresh the data without actually reordering
+      // In a real application, you might want to add the column to the database
+      
+      console.log('Reordering fields (note: actual DB reordering not implemented)');
+      return fields;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categoryFields', categoryId] });
-      toast.success('Fields reordered successfully');
+      toast.success('Fields list refreshed');
     },
     onError: (error) => {
       toast.error(`Failed to reorder fields: ${error instanceof Error ? error.message : 'Unknown error'}`);

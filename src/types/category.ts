@@ -1,12 +1,15 @@
 
-import { FieldType } from '@/components/admin/CategoryFieldConfig';
+import { FieldType } from '@/types/supabase';
 
 export interface Category {
   id: string;
-  name: string;
+  title: string;
   description?: string;
-  icon: string;
+  icon_name: string;
   color: string;
+  count?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface CategoryField {
@@ -18,7 +21,6 @@ export interface CategoryField {
   required: boolean;
   placeholder?: string;
   options?: string[];
-  display_order: number;
   created_at?: string;
   updated_at?: string;
 }
