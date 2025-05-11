@@ -37,37 +37,25 @@ const HeroSection = () => {
               </button>
             </div>
 
-            {/* Trusted Partners - Grid Layout */}
+            {/* Trusted Partners - Inline Layout */}
             <div className="mt-12">
-              <p className="text-sm text-gray-500 mb-6">Trusted Partners</p>
-              <div className="grid grid-cols-2 gap-8">
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <FaLinkedin className="h-8 w-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">LinkedIn</span>
-                    <span className="text-xs text-gray-500">Professional Network</span>
-                  </div>
+              <p className="text-sm text-[#8B8B8B] mb-3">Built for everyday people, powered by smart opportunities</p>
+              <div className="flex items-center gap-8">
+                <div className="flex items-center gap-2 group cursor-pointer">
+                  <FaLinkedin className="h-5 w-5 text-[#8B8B8B]" />
+                  <span className="text-sm text-[#8B8B8B]">LinkedIn</span>
                 </div>
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <FaBriefcase className="h-8 w-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">Indeed</span>
-                    <span className="text-xs text-gray-500">Job Platform</span>
-                  </div>
+                <div className="flex items-center gap-2 group cursor-pointer">
+                  <FaBriefcase className="h-5 w-5 text-[#8B8B8B]" />
+                  <span className="text-sm text-[#8B8B8B]">Indeed</span>
                 </div>
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <FaGraduationCap className="h-8 w-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">ALU</span>
-                    <span className="text-xs text-gray-500">Education Partner</span>
-                  </div>
+                <div className="flex items-center gap-2 group cursor-pointer">
+                  <FaGraduationCap className="h-5 w-5 text-[#8B8B8B]" />
+                  <span className="text-sm text-[#8B8B8B]">ALU</span>
                 </div>
-                <div className="flex items-center gap-4 group cursor-pointer">
-                  <FaBuilding className="h-8 w-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">Andela</span>
-                    <span className="text-xs text-gray-500">Tech Talent</span>
-                  </div>
+                <div className="flex items-center gap-2 group cursor-pointer">
+                  <FaBuilding className="h-5 w-5 text-[#8B8B8B]" />
+                  <span className="text-sm text-[#8B8B8B]">Andela</span>
                 </div>
               </div>
             </div>
