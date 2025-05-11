@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { categoryData, iconMap } from '@/data/categories';
 import { Badge } from '@/components/ui/badge';
+import OpportunitiesDropdown from './OpportunitiesDropdown';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -54,8 +55,8 @@ const Navbar = () => {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-lg',
-        scrolled ? 'bg-background/80 shadow-sm' : 'bg-transparent'
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        scrolled ? 'bg-background/60 backdrop-blur-md border-b' : 'bg-transparent'
       )}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -89,32 +90,10 @@ const Navbar = () => {
                 </NavigationMenuItem>
 
                 {/* Opportunities dropdown */}
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>Opportunities</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid grid-cols-4 gap-3 p-4 md:w-[600px] lg:w-[700px]">
-                      {categoryData.map((category) => {
-                        const IconComponent = iconMap[category.iconName];
-                        return (
-                          <Link
-                            key={category.title}
-                            to={`/opportunities?category=${encodeURIComponent(category.title)}`}
-                            className="flex items-start gap-2 p-2 rounded-md hover:bg-accent"
-                          >
-                            <div className={`p-1.5 rounded-md ${category.color}`}>
-                              <IconComponent className="h-4 w-4 text-blue-600" />
-                            </div>
-                            <div>
-                              <div className="font-medium">{category.title}</div>
-                              <p className="text-xs text-muted-foreground">{category.description}</p>
-                              <Badge variant="outline" className="mt-1 text-xs">
-                                {category.count}
-                              </Badge>
-                            </div>
-                          </Link>
-                        );
-                      })}
-                    </div>
+                <NavigationMenuItem className="static">
+                  <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50">Opportunities</NavigationMenuTrigger>
+                  <NavigationMenuContent className="w-screen">
+                    <OpportunitiesDropdown />
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
