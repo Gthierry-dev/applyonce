@@ -1,25 +1,21 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
+  darkMode: ["class"],
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
-      keyframes: {
-        'flip-out': {
-          '0%, 80%': { transform: 'rotateX(0deg)', opacity: 1 },
-          '100%': { transform: 'rotateX(90deg)', opacity: 0 },
-        },
-        'flip-in': {
-          '0%': { transform: 'rotateX(-90deg)', opacity: 0 },
-          '100%': { transform: 'rotateX(0deg)', opacity: 1 },
-        },
-      },
-      animation: {
-        'flip-out': 'flip-out 2s infinite',
-        'flip-in': 'flip-in 2s infinite',
-      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -59,6 +55,20 @@ module.exports = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      animation: {
+        'marquee-left': 'marquee-left 25s linear infinite',
+        'marquee-right': 'marquee-right 25s linear infinite',
+      },
+      keyframes: {
+        'marquee-left': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        'marquee-right': {
+          '0%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
       },
     },
   },
