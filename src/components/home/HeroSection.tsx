@@ -1,4 +1,10 @@
 import React from 'react';
+import { 
+  FaLinkedin,
+  FaBriefcase,
+  FaGraduationCap,
+  FaBuilding
+} from 'react-icons/fa';
 
 const HeroSection = () => {
   return (
@@ -31,13 +37,38 @@ const HeroSection = () => {
               </button>
             </div>
 
-            {/* Trusted by logos */}
+            {/* Trusted Partners - Grid Layout */}
             <div className="mt-12">
-              <p className="text-sm text-gray-500 mb-4">Trusted by leading institutions</p>
-              <div className="flex items-center gap-8 opacity-75">
-                <img src="/logos/linkedin.svg" alt="LinkedIn" className="h-6" />
-                <img src="/logos/indeed.svg" alt="Indeed" className="h-6" />
-                <img src="/logos/glassdoor.svg" alt="Glassdoor" className="h-6" />
+              <p className="text-sm text-gray-500 mb-6">Trusted Partners</p>
+              <div className="grid grid-cols-2 gap-8">
+                <div className="flex items-center gap-4 group cursor-pointer">
+                  <FaLinkedin className="h-8 w-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">LinkedIn</span>
+                    <span className="text-xs text-gray-500">Professional Network</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 group cursor-pointer">
+                  <FaBriefcase className="h-8 w-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Indeed</span>
+                    <span className="text-xs text-gray-500">Job Platform</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 group cursor-pointer">
+                  <FaGraduationCap className="h-8 w-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">ALU</span>
+                    <span className="text-xs text-gray-500">Education Partner</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 group cursor-pointer">
+                  <FaBuilding className="h-8 w-8 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">Andela</span>
+                    <span className="text-xs text-gray-500">Tech Talent</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
