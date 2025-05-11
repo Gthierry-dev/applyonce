@@ -1,103 +1,73 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Search, Briefcase, GraduationCap, Trophy, Award } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-background">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent"
-          animate={{
-            backgroundPosition: ['0% 0%', '100% 100%'],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            repeatType: 'reverse',
-          }}
-        />
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-              Apply Once, Get Multiple Opportunities
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 py-20">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+          {/* Left side - Text content */}
+          <div className="flex-1 max-w-2xl">
+            <h1 className="text-[2.75rem] leading-tight font-bold text-navy-900 mb-6">
+              Get opportunities early,
+              <br />
+              apply for jobs, grants,
+              <br />
+              and scholarships.
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Streamline your application process. One profile, multiple opportunities. 
-              Jobs, internships, grants, scholarships, and competitions - all in one place.
+            <p className="text-gray-600 text-lg mb-8">
+              Your gateway to success with simple application processes,
+              powerful integrations, and comprehensive opportunity management tools.
             </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-wrap justify-center gap-4 mb-12"
-          >
-            <Button
-              asChild
-              size="lg"
-              className="font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <Link to="/signup">
+            
+            {/* Email signup form */}
+            <div className="flex gap-4 max-w-md">
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-500"
+              />
+              <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 Get Started
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="font-medium hover:bg-primary/10 transition-colors duration-300"
-            >
-              <Link to="/explore">Browse Opportunities</Link>
-            </Button>
-          </motion.div>
+              </button>
+            </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto"
-          >
-            {[
-              { icon: Briefcase, label: 'Jobs', count: '10K+' },
-              { icon: GraduationCap, label: 'Internships', count: '5K+' },
-              { icon: Award, label: 'Grants', count: '2K+' },
-              { icon: Trophy, label: 'Scholarships', count: '3K+' },
-            ].map((item, index) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-                className="bg-background/50 backdrop-blur-sm p-4 rounded-lg border border-border/50 hover:border-primary/50 transition-colors duration-300"
-              >
-                <div className="flex flex-col items-center">
-                  <item.icon className="h-6 w-6 text-primary mb-2" />
-                  <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
-                  <span className="text-lg font-bold">{item.count}</span>
+            {/* Trusted by logos */}
+            <div className="mt-12">
+              <p className="text-sm text-gray-500 mb-4">Trusted by leading institutions</p>
+              <div className="flex items-center gap-8 opacity-75">
+                <img src="/logos/linkedin.svg" alt="LinkedIn" className="h-6" />
+                <img src="/logos/indeed.svg" alt="Indeed" className="h-6" />
+                <img src="/logos/glassdoor.svg" alt="Glassdoor" className="h-6" />
+              </div>
+            </div>
+          </div>
+
+          {/* Right side - Image */}
+          <div className="flex-1 relative">
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <img src="/icons/resume.svg" alt="" className="w-6 h-6" />
                 </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                <div>
+                  <p className="text-sm text-gray-500">Your Application</p>
+                  <p className="font-semibold">Multiple Opportunities</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="h-2 bg-gray-100 rounded-full w-full">
+                  <div className="h-2 bg-blue-500 rounded-full w-3/4"></div>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-blue-600 font-medium">75% Complete</span>
+                  <span className="text-gray-500">25 applications</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Decorative elements */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-    </section>
+    </div>
   );
 };
 
