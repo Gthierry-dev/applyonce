@@ -4,7 +4,7 @@ import { categoryData, iconMap } from '@/data/categories';
 
 const OpportunitiesDropdown = () => {
   return (
-    <div className="fixed mx-4 bg-red-500 inset-x-0 top-16 bg-background/95 backdrop-blur-lg border-b">
+    <div className="fixed mx-4 rounded-2xl bg-[#ebebff] inset-x-0 top-16 bg-background/95 backdrop-blur-lg border-b">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-[calc(65vh-4rem)] max-h-[36rem] overflow-y-auto">
           <div className="grid grid-cols-12 gap-8 py-6">
