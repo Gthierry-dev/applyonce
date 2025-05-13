@@ -1,7 +1,4 @@
-
 import React from 'react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const testimonials = [
@@ -12,7 +9,7 @@ const testimonials = [
     role: "Product Designer",
     company: {
       name: "Mailchimp",
-      logo: "🌟" // Replace with actual Mailchimp logo
+      logo: "🌟"
     }
   },
   {
@@ -22,55 +19,52 @@ const testimonials = [
     role: "Product Designer",
     company: {
       name: "Mailchimp",
-      logo: "🌟" // Replace with actual Mailchimp logo
+      logo: "🌟"
     }
   }
 ];
 
 const TestimonialsSection = () => {
   return (
-    <section className="py-20">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row gap-12">
+    <section className="pt-24 bg-white">
+      <div className="container mx-auto px-4 max-w-7xl">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Title Section */}
           <div className="lg:w-1/3 flex flex-col justify-between">
-            <h2 className="text-3xl font-bold text-[#0A2942]">Review of People Who Have Found Jobs</h2>
-            <div className="flex gap-2 mt-8">
-              <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-2">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full h-10 w-10 border-2">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            <h2 className="text-3xl font-bold text-gray-800">Review of People Who Have Found Jobs</h2>
+            <div className="flex gap-3 mt-6">
+              <button className="h-10 w-10 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                <ChevronLeft className="h-5 w-5 text-gray-500" />
+              </button>
+              <button className="h-10 w-10 rounded-full border-2 border-gray-800 bg-gray-800 flex items-center justify-center">
+                <ChevronRight className="h-5 w-5 text-white" />
+              </button>
             </div>
           </div>
 
-          {/* Testimonials Scroll Section */}
-          <div className="lg:w-2/3 overflow-hidden">
-            <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar">
+          {/* Testimonials Section */}
+          <div className="lg:w-2/3">
+            <div className="flex gap-6 overflow-x-none">
               {testimonials.map((testimonial) => (
                 <div
                   key={testimonial.id}
-                  className="min-w-[400px] flex-none snap-start bg-white rounded-xl p-6 border shadow-sm"
+                  className="w-1/2 flex-none bg-white rounded-xl p-6 border border-gray-200 shadow-sm"
                 >
-                  <div className="flex flex-col gap-6">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{testimonial.company.logo}</span>
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="bg-yellow-200 p-1 rounded-md">
+                        <span className="text-xl">{testimonial.company.logo}</span>
+                      </div>
                       <span className="font-medium">{testimonial.company.name}</span>
                     </div>
-                    <p className="text-[#4A5567] leading-relaxed">{testimonial.content}</p>
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-gray-200 overflow-hidden">
-                        {/* Replace with actual avatar image */}
-                        <img 
-                          src="/placeholder-avatar.jpg" 
-                          alt={testimonial.author}
-                          className="w-full h-full object-cover"
-                        />
+                    <p className="text-gray-600 leading-relaxed text-sm flex-grow mb-4">"{testimonial.content}"</p>
+                    <div className="flex items-center gap-3 mt-auto">
+                      <div className="h-10 w-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                        <img src="/api/placeholder/40/40" alt={testimonial.author} />
                       </div>
                       <div>
-                        <h3 className="font-medium text-[#0A2942]">{testimonial.author}</h3>
-                        <p className="text-sm text-[#4A5567]">{testimonial.role}</p>
+                        <h3 className="font-medium text-gray-800">{testimonial.author}</h3>
+                        <p className="text-sm text-gray-500">{testimonial.role}</p>
                       </div>
                     </div>
                   </div>
