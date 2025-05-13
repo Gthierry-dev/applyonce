@@ -4,7 +4,7 @@ import { categoryData, iconMap } from '@/data/categories';
 
 const OpportunitiesDropdown = () => {
   return (
-    <div className="fixed inset-x-0 top-16 bg-gradient-to-b from-white via-white/95 to-blue-50/90 backdrop-blur-lg border-b shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-50">
+    <div className="fixed mx-4 bg-red-500 inset-x-0 top-16 bg-background/95 backdrop-blur-lg border-b">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-[calc(65vh-4rem)] max-h-[36rem] overflow-y-auto">
           <div className="grid grid-cols-12 gap-8 py-6">
@@ -17,7 +17,7 @@ const OpportunitiesDropdown = () => {
                     <Link
                       key={category.title}
                       to={`/opportunities?category=${encodeURIComponent(category.title)}`}
-                      className="group flex items-start p-3 rounded-lg hover:bg-white/50 transition-colors"
+                      className="group flex items-start p-3 rounded-lg hover:bg-accent/50 transition-colors"
                     >
                       <div className="flex gap-3">
                         <div className={`shrink-0 p-2 rounded-md ${category.color} bg-opacity-10`}>
