@@ -38,8 +38,8 @@ const HeroSection = () => {
             </div>
 
             {/* Trusted Partners - Inline Layout */}
-            <div className="mt-8 sm:mt-12">
-              <p className="text-sm text-[#8B8B8B] mb-3">Built for everyday people, powered by smart opportunities</p>
+            <div className="mt-8 sm:mt-8">
+              <p className="text-sm text-[#8B8B8B] mb-6">Built for everyday people, powered by smart opportunities</p>
               <div className="flex flex-wrap items-center gap-4 sm:gap-8">
                 <div className="flex items-center gap-2 group cursor-pointer">
                   <img 
