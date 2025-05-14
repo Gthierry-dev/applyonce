@@ -69,14 +69,13 @@ const App = () => (
             <Route path="/social-auth-coming-soon" element={<SocialAuthComingSoon />} />
             
             {/* Protected Dashboard Routes */}
-            <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/applications" element={<Applications />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/application-status" element={<ApplicationStatus />} />
               <Route path="/opportunities" element={<Opportunities />} />
               <Route path="/settings" element={<Settings />} />
-            </Route>
+            
 
             {/* Protected Company Routes */}
             {/* <Route element={<ProtectedRoute />}> */}
