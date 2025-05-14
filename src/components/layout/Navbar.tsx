@@ -56,7 +56,7 @@ const Navbar = () => {
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        scrolled ? 'bg-background/60 backdrop-blur-md border-b' : 'bg-gradient-to-br from-gray-50 to-gray-100'
+        scrolled ? 'bg-background border-b' : 'bg-transparent'
       )}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,7 +84,7 @@ const Navbar = () => {
                     className={cn(
                       'px-3 py-2 rounded-md text-sm font-medium transition-colors',
                       location.pathname === "/"
-                        ? 'text '
+                        ? 'text-main_color'
                         : 'text-foreground/70 hover:text-foreground hover:bg-accent'
                     )}
                   >

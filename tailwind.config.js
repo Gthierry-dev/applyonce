@@ -2,10 +2,10 @@
 export default {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   theme: {
     container: {
@@ -17,6 +17,14 @@ export default {
     },
     extend: {
       colors: {
+        // new colors
+        main_color: "#306c6a",
+        text_color: "#0D1C1C",
+
+
+
+
+
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -57,20 +65,20 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       animation: {
-        'marquee-left': 'marquee-left 25s linear infinite',
-        'marquee-right': 'marquee-right 25s linear infinite',
+        "marquee-left": "marquee-left 25s linear infinite",
+        "marquee-right": "marquee-right 25s linear infinite",
       },
       keyframes: {
-        'marquee-left': {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-50%)' },
+        "marquee-left": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
         },
-        'marquee-right': {
-          '0%': { transform: 'translateX(-50%)' },
-          '100%': { transform: 'translateX(0)' },
+        "marquee-right": {
+          "0%": { transform: "translateX(-50%)" },
+          "100%": { transform: "translateX(0)" },
         },
       },
     },
   },
   plugins: [],
-}
+};

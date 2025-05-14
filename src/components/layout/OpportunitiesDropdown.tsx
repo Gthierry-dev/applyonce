@@ -1,84 +1,75 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { categoryData, iconMap } from '@/data/categories';
+import React from "react";
+import { Link } from "react-router-dom";
+import { categoryData, iconMap } from "@/data/categories";
+import { LucidePlayCircle } from "lucide-react";
+import { FaPlay } from "react-icons/fa";
 
 const OpportunitiesDropdown = () => {
   return (
-    <div className="fixed mx-4 rounded-2xl bg-[#ebebff] inset-x-0 top-16 bg-background/95 backdrop-blur-lg border-b">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="h-[calc(65vh-4rem)] max-h-[36rem] overflow-y-auto">
-          <div className="grid grid-cols-12 gap-8 py-6">
-            {/* Categories grid */}
-            <div className="col-span-8">
-              <div className="grid grid-cols-3 gap-4">
-                {categoryData.map((category) => {
-                  const IconComponent = iconMap[category.iconName];
-                  return (
-                    <Link
-                      key={category.title}
-                      to={`/opportunities?category=${encodeURIComponent(category.title)}`}
-                      className="group flex items-start p-3 rounded-lg hover:bg-accent/50 transition-colors"
-                    >
-                      <div className="flex gap-3">
-                        <div className={`shrink-0 p-2 rounded-md ${category.color} bg-opacity-10`}>
-                          <IconComponent className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <div className="font-medium group-hover:text-primary transition-colors">{category.title}</div>
-                          <p className="text-sm text-muted-foreground mt-0.5">{category.description}</p>
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-            
-            {/* Featured section */}
-            <div className="col-span-4 border-l pl-8">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-lg">Featured Opportunities</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Discover our most popular and trending opportunities
-                  </p>
-                </div>
-                
-                <div className="space-y-3">
-                  {categoryData.slice(0, 3).map((category) => (
-                    <Link
-                      key={`featured-${category.title}`}
-                      to={`/opportunities?category=${encodeURIComponent(category.title)}`}
-                      className="block group"
-                    >
-                      <div className="font-medium group-hover:text-primary transition-colors">
-                        {category.title}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{category.description}</p>
-                    </Link>
-                  ))}
-                </div>
-                
-                <Link
-                  to="/opportunities"
-                  className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80"
-                >
-                  View all opportunities
-                  <svg
-                    className="ml-1 h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+    <div className="fixed mx-auto max-w-[1300px] rounded-2xl bg-white inset-x-0 top-[70px] bg-background/95 backdrop-blur-lg border">
+      <div className="h-full max-h-[calc(65vh-4rem)] p-4">
+        <div className="grid grid-cols-12 gap-4">
+          {/* Categories grid */}
+          <div className="col-span-8">
+            <div className="grid grid-cols-3 gap-1">
+              {categoryData.map((category) => {
+                const IconComponent = iconMap[category.iconName];
+                return (
+                  <Link
+                    key={category.title}
+                    to={`/opportunities?category=${encodeURIComponent(
+                      category.title
+                    )}`}
+                    className="group flex items-start px-4 py-3 rounded-xl hover:bg-main_color/5 transition-colors"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
-              </div>
+                    <div className="flex gap-3">
+                      <div
+                        className={`shrink-0 h-fit w-fit p-2 rounded-xl bg-white ring-1 ring-stone-200/60`}
+                      >
+                        <IconComponent className="size-6 min-w-6 stroke-[1.2px]" />
+                      </div>
+                      <div>
+                        <div className="font-medium group-hover:text-main_color transition-colors">
+                          {category.title}
+                        </div>
+                        <p className="text-sm text-text_color/60 mt-0.5">
+                          {category.description}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Featured section */}
+          <div className="h-full col-span-4 border-l pl-4 overflow-hidden">
+            <div className="h-full py-5 px-6 bg-main_color/5 rounded-2xl flex flex-col">
+              <h3 className="font-semibold text-base">How it works</h3>
+              <p className="text-sm text-text_color/60 mt-1 max-w-[70%]">
+                Learn about Apply Once an how you can benefit from it.
+              </p>
+
+              <a
+                href="https://www.youtube.com/"
+                target="_blank"
+                className="mt-5 flex-1 w-full overflow-hidden rounded-lg relative group"
+              >
+                <div className="w-full h-full absolute top-0 left-0 bg-gradient-to-tr from-black/40 to-transparent flex items-center justify-center flex-col gap-0 text-white">
+                  <div className="bg-white/20 size-14 p-1 flex items-center backdrop-blur-sm justify-center rounded-full group-hover:scale-110 transition">
+                    <FaPlay className="text-2xl ml-1 text-white/80 stroke-[1px]" />
+                  </div>
+                  <img
+                    src="/youtube.png"
+                    className="absolute bottom-4 left-4 h-4 opacity-85 "
+                  />
+                </div>
+                <img
+                  src="./work_from_home.png"
+                  className="w-full h-56 object-cover object-top"
+                />
+              </a>
             </div>
           </div>
         </div>

@@ -23,8 +23,6 @@ export default {
         display: ["SF Pro Display", "Inter", "sans-serif"],
       },
       colors: {
-        // new colors
-        main_color: "#306c6a",
 
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
