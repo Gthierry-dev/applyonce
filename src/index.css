@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Habibi&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -94,6 +95,10 @@
     @apply bg-background text-foreground;
     font-feature-settings: "ss01", "ss03", "cv01", "cv03";
   }
+}
+
+*{
+  font-family: "Inter", sans-serif;
 }
 
 /* Smooth scrolling for the entire page */

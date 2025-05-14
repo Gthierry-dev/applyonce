@@ -63,8 +63,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
-              <div className="rounded-md bg-primary p-1.5">
+              {/* <div className="rounded-md bg-primary p-1.5">
                 <span className="text-primary-foreground font-bold text-sm">AO</span>
+              </div> */}
+              <div className='w-fit h-7'>
+                <img src="./favicon.png" alt="" className='h-full' />
               </div>
               <span className="font-display font-semibold text-lg">ApplyOnce</span>
             </Link>
@@ -81,7 +84,7 @@ const Navbar = () => {
                     className={cn(
                       'px-3 py-2 rounded-md text-sm font-medium transition-colors',
                       location.pathname === "/"
-                        ? 'text-primary'
+                        ? 'text '
                         : 'text-foreground/70 hover:text-foreground hover:bg-accent'
                     )}
                   >
