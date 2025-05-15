@@ -1,12 +1,14 @@
 import React from "react";
 import { FaFire } from "react-icons/fa";
+import { RiChatSmileAiFill, RiChatSmileAiLine } from "react-icons/ri";
+import { MdOutlineAutoMode } from "react-icons/md";
 
 const HeroSection = () => {
   return (
     <div className="bg-gradient-to-br bg-white py-12 sm:py-16 lg:py-20 z-10 relative overflow-clip">
       <FaFire className="text-[800px] absolute top-[10%] -left-[10%] max-lg:hidden -z-10 text-[#eaf0f067]" />
       <div className="mx-auto max-w-[1400px] px-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
+        <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-12">
           {/* Left side - Text content */}
           <div className="flex-1 max-w-2xl w-full">
             <h1 className="text-6xl leading-[72px] max-lg:text-5xl max-md:text-4xl font-bold my-6 text-foreground/85 HubotSans">
@@ -105,13 +107,75 @@ const HeroSection = () => {
               </div>
             </div> */}
 
-            <div className="w-full h-[180px] flex gap-4">
-              <div className="w-[270px] h-[180px] bg-[#eaf0f0] flex rounded-3xl"></div>
-              <div className="flex-1 h-[180px] bg-[#eaf0f0] flex rounded-3xl"></div>
+            <div className="w-full h-[180px] max-lg:h-fit flex max-lg:flex-col gap-4 text-text_color">
+              <div className="w-[270px] h-[180px] max-lg:w-full bg-[#eaf0f0c0] flex rounded-3xl p-5 flex-col items-start justify-between">
+                <h1 className="text-5xl font-bold text-main_color">50+</h1>
+                <h1 className="pr-4 opacity-85">
+                  Best-fit Opportunities for you
+                </h1>
+              </div>
+              <div className="flex-1 h-[180px] bg-[#eaf0f0c0] flex rounded-3xl p-5 flex-col items-start justify-between overflow-clip">
+                <div className="w-full h-fit flex items-center justify-between">
+                  <h1 className="pr-4 text-main_color font-medium">
+                    Ai Suggestions
+                  </h1>
+                  <RiChatSmileAiFill className="text-3xl text-main_color" />
+                </div>
+                <div className="w-full h-fit flex-1 flex flex-col gap-1 mt-3">
+                  {[
+                    "Use a clear and professional profile photo",
+                    "Write a compelling headline that reflects your expertise",
+                    "Highlight results in your project descriptions",
+                    "Keep your bio concise and achievement-focused",
+                  ].map((item, index) => (
+                    <div
+                      key={index}
+                      className="w-full px-4 py-2.5 rounded-xl flex items-start justify-start gap-3 bg-white/80 "
+                    >
+                      <RiChatSmileAiLine className="text-sm min-w-[14px] text-main_color" />
+                      <p className="line-clamp-2 text-xs">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="w-full h-[380px] flex gap-4">
-              <div className="h-full flex-1 bg-[#eaf0f0] flex rounded-3xl"></div>
-              <div className="h-full w-[270px] bg-[#eaf0f0] flex rounded-3xl"></div>
+            <div className="w-full h-[380px] max-lg:h-fit flex max-lg:flex-col gap-4 text-text_color">
+              <div className="h-full flex-1 bg-[#eaf0f0c0] max-lg:max-h-[320px] flex rounded-3xl overflow-hidden relative">
+                <div className="w-full h-full absolute top-0 left-0 p-5 flex flex-col items-start justify-between text-white font-medium text-xl">
+                  <p>
+                    Feedback after <br /> rejections
+                  </p>
+                  <div className="w-full flex items-center justify-end">
+                    <RiChatSmileAiFill className="text-3xl" />
+                  </div>
+                </div>
+                <img
+                  src="./woman1.png"
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="h-full w-[270px] max-lg:w-full flex lg:flex-col max-lg:flex-col gap-4">
+                <div className="lg:h-1/2 max-lg:h-full w-full bg-[#eaf0f0c0] flex rounded-3xl p-5 flex-col items-start justify-between">
+                  <div className="w-full h-fit flex items-center justify-between">
+                    <h1 className="pr-4 font-medium text-main_color">
+                      Auto Apply
+                    </h1>
+                    <MdOutlineAutoMode className="text-xl text-main_color" />
+                  </div>
+                  <h1 className="pr-4 opacity-85">
+                    We’ll submit applications for you when you turn on
+                    auto-apply
+                  </h1>
+                </div>
+                <div className="lg:h-1/2 max-lg:h-full w-full bg-[#eaf0f0c0] flex rounded-3xl p-5 flex-col items-start justify-between">
+                  <h1 className="text-main_color font-medium">Ad-Free</h1>
+                  <h1 className="pr-4 opacity-85">
+                    No pop-ups, no clutter <br /> just the opportunities that
+                    matter
+                  </h1>
+                </div>
+              </div>
             </div>
           </div>
         </div>
