@@ -6,7 +6,7 @@ import { FaPlay } from "react-icons/fa";
 
 const OpportunitiesDropdown = () => {
   return (
-    <div className="fixed mx-auto max-w-[1300px] rounded-2xl bg-white inset-x-0 top-[70px] bg-background/95 backdrop-blur-lg border">
+    <div className="fixed mx-auto max-w-[1340px] rounded-2xl bg-white inset-x-0 top-[70px] bg-background/95 backdrop-blur-lg border">
       <div className="h-full max-h-[calc(65vh-4rem)] p-4">
         <div className="grid grid-cols-12 gap-4">
           {/* Categories grid */}
@@ -45,29 +45,29 @@ const OpportunitiesDropdown = () => {
 
           {/* Featured section */}
           <div className="h-full col-span-4 border-l pl-4 overflow-hidden">
-            <div className="h-full py-5 px-6 bg-main_color/5 rounded-2xl flex flex-col">
+            <div className="h-full p-5 bg-accent rounded-xl flex flex-col">
               <h3 className="font-semibold text-base">How it works</h3>
-              <p className="text-sm text-text_color/60 mt-1 max-w-[70%]">
-                Learn about Apply Once an how you can benefit from it.
+              <p className="text-sm text-text_color/60 max-w-[70%]">
+                Learn how to use applyonce.
               </p>
 
               <a
                 href="https://www.youtube.com/"
                 target="_blank"
-                className="mt-5 flex-1 w-full overflow-hidden rounded-lg relative group"
+                className="mt-4 flex-1 w-full overflow-hidden rounded-md relative group"
               >
-                <div className="w-full h-full absolute top-0 left-0 bg-gradient-to-tr from-black/40 to-transparent flex items-center justify-center flex-col gap-0 text-white">
-                  <div className="bg-white/20 size-14 p-1 flex items-center backdrop-blur-sm justify-center rounded-full group-hover:scale-110 transition">
-                    <FaPlay className="text-2xl ml-1 text-white/80 stroke-[1px]" />
+                <div className="w-full h-full absolute top-0 left-0 bg-gradient-to-tr from-black/20 to-transparent flex items-center justify-center flex-col gap-0 text-white">
+                  <div className="bg-main_color size-12 p-1 flex items-center backdrop-blur-sm justify-center rounded-full group-hover:scale-110 transition">
+                    <FaPlay className="text-xl ml-1 text-white stroke-[1px]" />
                   </div>
                   <img
                     src="/youtube.png"
-                    className="absolute bottom-4 left-4 h-4 opacity-85 "
+                    className="absolute bottom-4 left-4 h-5 opacity-85 "
                   />
                 </div>
                 <img
                   src="./work_from_home.png"
-                  className="w-full h-56 object-cover object-top"
+                  className="w-full h-48 object-cover object-center"
                 />
               </a>
             </div>

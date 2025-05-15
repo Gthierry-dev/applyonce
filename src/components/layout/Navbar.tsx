@@ -53,20 +53,20 @@ const Navbar = () => {
   ];
 
   return (
-    <header
+    <div
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        scrolled ? 'bg-background border-b' : 'bg-transparent'
+        scrolled ? 'bg-background border-b' : 'bg-[unset]'
       )}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2">
-              {/* <div className="rounded-md bg-primary p-1.5">
-                <span className="text-primary-foreground font-bold text-sm">AO</span>
+              {/* <div className="rounded-md bg-main_color p-1.5">
+                <span className="text-main_color-foreground font-bold text-sm">AO</span>
               </div> */}
-              <div className='w-fit h-7'>
+              <div className='w-fit h-7 min-w-7'>
                 <img src="./favicon.png" alt="" className='h-full' />
               </div>
               <span className="font-display font-semibold text-lg">ApplyOnce</span>
@@ -82,10 +82,10 @@ const Navbar = () => {
                   <Link
                     to="/"
                     className={cn(
-                      'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                      'px-3 h-11 flex items-center justify-center rounded-xl text-sm font-medium transition-colors',
                       location.pathname === "/"
                         ? 'text-main_color'
-                        : 'text-foreground/70 hover:text-foreground hover:bg-accent'
+                        : 'text-foreground hover:bg-accent'
                     )}
                   >
                     Home
@@ -94,7 +94,7 @@ const Navbar = () => {
 
                 {/* Opportunities dropdown */}
                 <NavigationMenuItem className="static">
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-accent/50">Opportunities</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="bg-transparent text-foreground hover:bg-accent">Opportunities</NavigationMenuTrigger>
                   <NavigationMenuContent className="w-screen">
                     <OpportunitiesDropdown />
                   </NavigationMenuContent>
@@ -106,10 +106,10 @@ const Navbar = () => {
                     <Link
                       to={item.path}
                       className={cn(
-                        'px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                        'px-3 h-11 flex items-center justify-center rounded-xl text-sm font-medium transition-colors',
                         location.pathname === item.path
-                          ? 'text-primary'
-                          : 'text-foreground/70 hover:text-foreground hover:bg-accent'
+                          ? 'text-main_color'
+                          : 'text-foreground hover:bg-accent'
                       )}
                     >
                       {item.name}
@@ -151,7 +151,7 @@ const Navbar = () => {
                 </TooltipProvider>
 
                 <Link to="/profile">
-                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                  <div className="h-8 w-8 rounded-full bg-main_color/10 flex items-center justify-center text-main_color font-medium">
                     U
                   </div>
                 </Link>
@@ -163,14 +163,14 @@ const Navbar = () => {
                     <Button variant="ghost">Log in</Button>
                   </Link>
                 )}
-                <Link to="/signup">
-                  <Button variant="default" className="shadow-sm">Get Started</Button>
+                <Link to="/signup" className=''>
+                  <Button variant="default" className="shadow-sm rounded-xl text-white bg-main_color hover:brightness-90">Get Started</Button>
                 </Link>
               </>
             )}
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
+            <div className="md:hidden flex items-center text-main_color">
               <Button
                 variant="ghost"
                 size="icon"
@@ -195,7 +195,7 @@ const Navbar = () => {
                 className={cn(
                   'block px-3 py-2 rounded-md text-base font-medium transition-colors',
                   location.pathname === item.path
-                    ? 'text-primary bg-primary/10'
+                    ? 'text-main_color bg-main_color/10'
                     : 'text-foreground/70 hover:text-foreground hover:bg-accent'
                 )}
               >
@@ -218,7 +218,7 @@ const Navbar = () => {
                 ))}
                 <Link
                   to="/opportunities"
-                  className="block px-3 py-1.5 rounded-md text-sm font-medium text-primary hover:bg-accent"
+                  className="block px-3 py-1.5 rounded-md text-sm font-medium text-main_color hover:bg-accent"
                 >
                   View all →
                 </Link>
@@ -236,7 +236,7 @@ const Navbar = () => {
           </div>
         </div>
       )}
-    </header>
+    </div>
   );
 };
 
