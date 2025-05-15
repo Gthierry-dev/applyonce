@@ -21,7 +21,7 @@ There are several ways of editing your application.
 ## What technologies are used for this project?
 
 This project is built with .
-
+-additional resourceses i forgot
 - Vite
 - TypeScript
 - React
