@@ -17,10 +17,8 @@ const SocialAuthComingSoon = () => {
         
         <Card className="w-full animate-scale-in">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4">
-              <div className="rounded-md bg-primary p-2">
-                <span className="text-primary-foreground font-bold text-sm">A1</span>
-              </div>
+            <div className="mx-auto w-16 mb-4">
+              <img src="./2.png" alt="" className='rounded-md'/>
             </div>
             <CardTitle className="text-2xl">Social Login Coming Soon!</CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
@@ -34,7 +32,7 @@ const SocialAuthComingSoon = () => {
             
             <div className="flex flex-col gap-2">
               <Button asChild>
-                <Link to="/login">Go to Login</Link>
+                <Link className='text-white' to="/login">Go to Login</Link>
               </Button>
               <Button variant="outline" asChild>
                 <Link to="/">Back to Home</Link>
