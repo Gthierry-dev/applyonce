@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LockKeyhole, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import SocialLoginButton from '@/components/auth/SocialLoginButton';
 import { Separator } from '@/components/ui/separator';
 
 const AdminLogin = () => {
@@ -90,102 +91,123 @@ const AdminLogin = () => {
     }
   };
 
+  const handleSocialLogin = async (provider: 'google' | 'linkedin') => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/admin/auth/callback`
+        }
+      });
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Social login error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to login with social provider');
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Could not complete social login. Please try again.",
+      });
+    }
+  };
+
   return (
-    <Layout noFooter className="flex items-center justify-center min-h-screen bg-gradient-to-b from-muted/40 to-background">
-      <div className="w-full max-w-md px-4">
-        <Link 
-          to="/" 
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
-        >
+    <Layout noFooter className="bg-background">
+      <div className="container max-w-lg mx-auto flex-1 flex flex-col justify-center py-12 px-4">
+        <Link to="/" className="flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to home
         </Link>
         
-        <Card className="w-full border-2 shadow-lg">
-          <CardHeader className="space-y-1 pb-2">
-            <div className="flex justify-center mb-4">
-              <div className="rounded-full bg-primary/10 p-3">
-                <LockKeyhole className="h-6 w-6 text-primary" />
-              </div>
+        <Card className="w-full animate-scale-in">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4">
+              <img src="./2.png" alt="" className='rounded-md w-16' />
             </div>
-            <CardTitle className="text-2xl text-center font-bold">Admin Portal</CardTitle>
-            <CardDescription className="text-center">
-              Secure access to administrative functions
-            </CardDescription>
+            <CardTitle className="text-2xl">Admin Login</CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Enter your administrator credentials
+            </p>
           </CardHeader>
           
-          <form onSubmit={handleAdminLogin}>
-            <CardContent className="space-y-4 pt-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+          <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
+            <div className="grid grid-cols-2 gap-2">
+              <SocialLoginButton 
+                provider="google" 
+                onClick={() => handleSocialLogin('google')} 
+              />
+              <SocialLoginButton 
+                provider="linkedin" 
+                onClick={() => handleSocialLogin('linkedin')} 
+              />
+            </div>
+            
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-card px-2 text-xs text-muted-foreground">OR CONTINUE WITH EMAIL</span>
+              </div>
+            </div>
+            
+            <form onSubmit={handleAdminLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="admin@example.com" 
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  autoComplete="email"
-                  className="h-11"
+                  className="focus-visible:ring-[#447A79]"
                 />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <Link to="/admin/forgot-password" className="text-sm text-primary hover:underline">
+                  <Link to="/forgot-password" className="text-sm text-[#447A79] hover:text-[#447A79]/80">
                     Forgot password?
                   </Link>
                 </div>
-                <Input 
-                  id="password" 
-                  type="password" 
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  autoComplete="current-password"
-                  className="h-11"
+                  className="focus-visible:ring-[#447A79]"
                 />
               </div>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-4">
-              <Button 
-                type="submit" 
-                className="w-full h-11 font-medium" 
-                disabled={loading}
-              >
+              <Button type="submit" className="w-full text-white bg-[#447A79] hover:bg-[#447A79]/90" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Authenticating...
+                    Logging in...
                   </>
-                ) : 'Login to Admin Portal'}
+                ) : 'Log in'}
               </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={() => navigate('/admin/dashboard')}
-              >
-                Go to Admin
-              </Button>
-            </CardFooter>
-          </form>
-           
+            </form>
+          </CardContent>
           
-          <div className="p-4 pt-0">
-            <Separator className="my-4" />
-            <div className="text-center text-xs text-muted-foreground">
-              <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link>
-              {' '}&bull;{' '}
-              <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-            </div>
-          </div>
+          <CardFooter className="flex flex-col">
+            <p className="text-center text-sm mt-4">
+              Not an administrator?{' '}
+              <Link to="/login" className="text-[#447A79] hover:text-[#447A79]/80">
+                Regular Login
+              </Link>
+            </p>
+          </CardFooter>
         </Card>
       </div>
     </Layout>

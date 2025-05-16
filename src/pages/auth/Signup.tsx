@@ -70,10 +70,8 @@ const Signup = () => {
         
         <Card className="w-full animate-scale-in">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4">
-              <div className="rounded-md bg-primary p-2">
-                <span className="text-primary-foreground font-bold text-sm">A1</span>
-              </div>
+            <div className="mx-auto w-16 mb-4"> 
+                <img src="./2.png" alt="" className='rounded-md' /> 
             </div>
             <CardTitle className="text-2xl">Create your account</CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
@@ -81,14 +79,14 @@ const Signup = () => {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <SocialLoginButton 
                 provider="google" 
-                onClick={() => handleSocialLogin('google')} 
+                onClick={() => handleSocialSignup('google')} 
               />
               <SocialLoginButton 
                 provider="linkedin" 
-                onClick={() => handleSocialLogin('linkedin')} 
+                onClick={() => handleSocialSignup('linkedin')} 
               />
             </div>
             
@@ -111,6 +109,7 @@ const Signup = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  className="focus-visible:ring-[#447A79]"
                 />
               </div>
               <div className="space-y-2">
@@ -122,6 +121,7 @@ const Signup = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="focus-visible:ring-[#447A79]"
                 />
               </div>
               <div className="space-y-2">
@@ -133,6 +133,7 @@ const Signup = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="focus-visible:ring-[#447A79]"
                 />
               </div>
               <div className="space-y-2">
@@ -144,6 +145,7 @@ const Signup = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  className="focus-visible:ring-[#447A79]"
                 />
               </div>
               <div className="flex items-center space-x-2 pt-2">
@@ -152,22 +154,27 @@ const Signup = () => {
                   checked={agreeTerms}
                   onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
                   required
+                  className="border-[#447A79] data-[state=checked]:bg-[#447A79] data-[state=checked]:text-primary-foreground"
                 />
                 <label
                   htmlFor="terms"
                   className="text-sm font-medium leading-none cursor-pointer"
                 >
                   I agree to the{' '}
-                  <Link to="/terms" className="text-primary hover:underline">
+                  <Link to="/terms" className="text-[#447A79] hover:text-[#447A79]/80">
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link to="/privacy" className="text-primary hover:underline">
+                  <Link to="/privacy" className="text-[#447A79] hover:text-[#447A79]/80">
                     Privacy Policy
                   </Link>
                 </label>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full bg-[#447A79] hover:bg-[#447A79]/90 text-white" 
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -180,7 +187,7 @@ const Signup = () => {
           <CardFooter className="flex flex-col">
             <p className="text-center text-sm mt-4">
               Already have an account?{' '}
-              <Link to="/login" className="text-primary hover:underline">
+              <Link to="/login" className="text-[#447A79] hover:text-[#447A79]/80">
                 Log in
               </Link>
             </p>

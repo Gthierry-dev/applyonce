@@ -63,10 +63,8 @@ const Login = () => {
         
         <Card className="w-full animate-scale-in">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4">
-              <div className="rounded-md bg-primary p-2">
-                <span className="text-primary-foreground font-bold text-sm">A1</span>
-              </div>
+            <div className="mx-auto w-16 mb-4"> 
+                <img src="./2.png" alt="" className='rounded-md' /> 
             </div>
             <CardTitle className="text-2xl">Log in to ApplyOnce</CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
@@ -112,12 +110,13 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="focus-visible:ring-[#447A79]"
                 />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                  <Link to="/forgot-password" className="text-sm text-[#447A79] hover:text-[#447A79]/80">
                     Forgot password?
                   </Link>
                 </div>
@@ -128,6 +127,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="focus-visible:ring-[#447A79]"
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -136,6 +136,7 @@ const Login = () => {
                     id="remember-me"
                     checked={rememberMe}
                     onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                    className="border-[#447A79] data-[state=checked]:bg-[#447A79] data-[state=checked]:text-primary-foreground"
                   />
                   <label
                     htmlFor="remember-me"
@@ -145,7 +146,11 @@ const Login = () => {
                   </label>
                 </div>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full bg-[#447A79] hover:bg-[#447A79]/90 text-white" 
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -159,7 +164,7 @@ const Login = () => {
           <CardFooter className="flex flex-col">
             <p className="text-center text-sm mt-4">
               Don't have an account?{' '}
-              <Link to="/signup" className="text-primary hover:underline">
+              <Link to="/signup" className="text-[#447A79] hover:underline">
                 Sign up
               </Link>
             </p>
@@ -168,22 +173,22 @@ const Login = () => {
         
         <div className="text-center text-xs text-muted-foreground mt-8">
           By continuing, you agree to ApplyOnce's{' '}
-          <Link to="/terms" className="text-primary hover:underline">
+          <Link to="/terms" className="text-[#447A79] hover:underline">
             Terms of Service
           </Link>{' '}
           and{' '}
-          <Link to="/privacy" className="text-primary hover:underline">
+          <Link to="/privacy" className="text-[#447A79] hover:underline">
             Privacy Policy
           </Link>
           .
         </div>
         
         <div className="text-center text-xs text-muted-foreground mt-4">
-          <Link to="/admin/login" className="text-primary hover:underline">
+          <Link to="/admin/login" className="text-[#447A79] hover:underline">
             Admin Login
           </Link>
           {' '}&bull;{' '}
-          <Link to="/company/login" className="text-primary hover:underline">
+          <Link to="/company/login" className="text-[#447A79] hover:underline">
             Company Login
           </Link>
         </div>
