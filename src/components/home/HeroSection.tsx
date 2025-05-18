@@ -6,17 +6,17 @@ import { MdOutlineAutoMode } from "react-icons/md";
 const HeroSection = () => {
   return (
     <div className="bg-gradient-to-br bg-white py-12 sm:py-16 lg:py-20 z-10 relative overflow-clip">
-      <FaFire className="text-[800px] absolute top-[10%] -left-[10%] max-lg:hidden -z-10 text-[#eaf0f067]" />
+      {/* <FaFire className="text-[800px] absolute top-[10%] -left-[10%] max-lg:hidden -z-10 text-[#eaf0f067]" /> */}
       <div className="mx-auto max-w-[1400px] px-8">
         <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-12">
           {/* Left side - Text content */}
           <div className="flex-1 max-w-2xl w-full">
-            <h1 className="text-6xl leading-[72px] max-lg:text-5xl max-md:text-4xl font-bold my-6 text-foreground/85 HubotSans">
+            <h1 className="text-6xl leading-[72px] max-lg:text-5xl max-lg:leading-[56px] max-md:text-4xl max-md:leading-[48px] font-medium my-6 text-foreground/85 ">
               <span className="text-main_color">One</span> form <br />
               Endless <br />
               Opportunities
             </h1>
-            <p className="text-gray-600 text-base sm:text-lg mb-6 sm:mb-8">
+            <p className="text-foreground/70 text-base sm:text-lg mb-6 sm:mb-8">
               Apply for jobs, scholarships, workshops, and more with one
               profile.
             </p>
@@ -108,13 +108,13 @@ const HeroSection = () => {
             </div> */}
 
             <div className="w-full h-[180px] max-lg:h-fit flex max-lg:flex-col gap-4 text-text_color">
-              <div className="w-[270px] h-[180px] max-lg:w-full bg-[#eaf0f0c0] flex rounded-3xl p-5 flex-col items-start justify-between">
-                <h1 className="text-5xl font-bold text-main_color">50+</h1>
+              <div className="w-[270px] h-[180px] max-lg:w-full bg-[#f7f9f9] flex rounded-3xl p-5 flex-col items-start justify-between">
+                <h1 className="text-4xl font-medium text-main_color">50+</h1>
                 <h1 className="pr-4 opacity-85">
                   Best-fit Opportunities for you
                 </h1>
               </div>
-              <div className="flex-1 h-[180px] bg-[#eaf0f0c0] flex rounded-3xl p-5 flex-col items-start justify-between overflow-clip">
+              <div className="flex-1 h-[180px] bg-[#f7f9f9] flex rounded-3xl p-5 flex-col items-start justify-between overflow-clip">
                 <div className="w-full h-fit flex items-center justify-between">
                   <h1 className="pr-4 text-main_color font-medium">
                     Ai Suggestions
@@ -140,7 +140,7 @@ const HeroSection = () => {
               </div>
             </div>
             <div className="w-full h-[380px] max-lg:h-fit flex max-lg:flex-col gap-4 text-text_color">
-              <div className="h-full flex-1 bg-[#eaf0f0c0] max-lg:max-h-[320px] flex rounded-3xl overflow-hidden relative">
+              <div className="h-full flex-1 bg-[#f7f9f9] max-lg:max-h-[320px] flex rounded-3xl overflow-hidden relative">
                 <div className="w-full h-full absolute top-0 left-0 p-5 flex flex-col items-start justify-between text-white font-medium text-xl">
                   <p>
                     Feedback after <br /> rejections
@@ -156,7 +156,7 @@ const HeroSection = () => {
                 />
               </div>
               <div className="h-full w-[270px] max-lg:w-full flex lg:flex-col max-lg:flex-col gap-4">
-                <div className="lg:h-1/2 max-lg:h-full w-full bg-[#eaf0f0c0] flex rounded-3xl p-5 flex-col items-start justify-between">
+                <div className="lg:h-1/2 max-lg:h-full w-full bg-[#f7f9f9] flex rounded-3xl p-5 flex-col items-start justify-between">
                   <div className="w-full h-fit flex items-center justify-between">
                     <h1 className="pr-4 font-medium text-main_color">
                       Auto Apply
@@ -168,7 +168,7 @@ const HeroSection = () => {
                     auto-apply
                   </h1>
                 </div>
-                <div className="lg:h-1/2 max-lg:h-full w-full bg-[#eaf0f0c0] flex rounded-3xl p-5 flex-col items-start justify-between">
+                <div className="lg:h-1/2 max-lg:h-full w-full bg-[#f7f9f9] flex rounded-3xl p-5 flex-col items-start justify-between">
                   <h1 className="text-main_color font-medium">Ad-Free</h1>
                   <h1 className="pr-4 opacity-85">
                     No pop-ups, no clutter <br /> just the opportunities that

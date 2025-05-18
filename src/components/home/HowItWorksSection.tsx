@@ -1,149 +1,205 @@
-import React from 'react';
-import { Play } from 'lucide-react';
+import React from "react";
+import { Play } from "lucide-react";
+import { PiPlugsConnectedFill, PiUserFill } from "react-icons/pi";
+import { BiLogoGmail } from "react-icons/bi";
+import { HiDocument, HiLockClosed } from "react-icons/hi2";
+import { IoToggle } from "react-icons/io5";
+import { BsCheckLg, BsFillPatchCheckFill } from "react-icons/bs";
+
+const opportunities = [
+  { title: "Junior Web Developer at CodeNest", match: "Skills match." },
+  { title: "Marketing Assistant at BrightPath", match: "Relevant experience." },
+  { title: "IT Support Trainee at TechEase", match: "Profile fit." },
+  { title: "Content Writer at InkWave", match: "Good match." },
+];
+const Notifications = [
+  {
+    title: "Content Writer at InkWave",
+    status: "accepted!",
+    feedback: "Send a short writing sample.",
+    time: "now",
+  },
+  {
+    title: "Junior Web Developer at CodeNest",
+    status: "accepted!",
+    feedback: "You're in! Interview on Monday.",
+    time: "18:34",
+  },
+  {
+    title: "Marketing Assistant at BrightPath",
+    status: "rejected!",
+    feedback: "Needs stronger campaign work.",
+    time: "17:50",
+  },
+  {
+    title: "IT Support Trainee at TechEase",
+    status: "rejected!",
+    feedback: "Missing a key certification.",
+    time: "16:12",
+  },
+];
 
 const steps = [
   {
-    number: '1',
-    title: 'Create Your Profile',
-    description: 'Build your comprehensive profile once with all your qualifications, experience, and achievements. No need to repeat the process for each application.',
+    number: "1",
+    title: "Create Your Profile",
+    description: "Upload your CV, certificates, and fill out one form",
     image: (
-      <div className="relative">
-        <div className="bg-white/20 p-4 rounded-xl relative">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-full bg-white/30 flex items-center justify-center">
-              <img src="/api/placeholder/24/24" alt="avatar" className="w-5 h-5 rounded-full" />
-            </div>
-            <span className="text-white text-sm">Adam</span>
-          </div>
-          <div className="h-20 bg-white/10 rounded-lg flex items-center justify-center">
-            <div className="w-full px-2">
-              <div className="h-8 flex items-center">
-                <div className="h-3 bg-white/40 rounded-full w-1/4 mx-1"></div>
-                <div className="h-5 bg-white/40 rounded-full w-1/6 mx-1"></div>
-                <div className="h-4 bg-white/40 rounded-full w-1/5 mx-1"></div>
-                <div className="h-6 bg-white/40 rounded-full w-1/4 mx-1"></div>
-              </div>
-            </div>
-          </div>
-          <div className="absolute right-0 top-1/2 transform translate-x-1/4 -translate-y-1/2">
-            <div className="bg-white p-3 rounded-xl shadow-lg">
-              <div className="text-xs font-semibold mb-1">Record Track List</div>
-              <div className="space-y-2">
-                {['Teresa', 'Emily', 'Terry'].map((name, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-full bg-gray-200"></div>
-                    <span className="text-xs">{name}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+      <div className="relative h-full w-full bg-white/5 flex flex-col gap-2 px-4 pt-4 rounded-2xl">
+        <div className="absolute bottom-0 left-0 w-full h-[70%] bg-gradient-to-t from-main_color to-transparent "></div>
+        <h1 className="mb-4 mt-2 text-sm font-semibold text-center w-full">
+          Create Account
+        </h1>
+        <div className="w-full flex items-center justify-start gap-3 py-2.5 px-3 rounded-xl bg-white/10 text-sm font-medium">
+          <PiUserFill />
+          Name
+        </div>
+        <div className="w-full flex items-center justify-start gap-3 py-2.5 px-3 rounded-xl bg-white/10 text-sm font-medium">
+          <BiLogoGmail />
+          Email
+        </div>
+        <div className="w-full flex items-center justify-start gap-3 py-2.5 px-3 rounded-xl bg-white/10 text-sm font-medium">
+          <HiDocument />
+          CV
+        </div>
+        <div className="w-full flex items-center justify-start gap-3 py-2.5 px-3 rounded-xl bg-white/10 text-sm font-medium">
+          <HiLockClosed />
+          Password
         </div>
       </div>
-    )
+    ),
   },
-    {
-      number: '2',
-      title: 'Browse Opportunities',
-      description: 'Explore thousands of verified opportunities across different categories. Our smart matching system helps you find the perfect fit for your profile.',
-      image: (
-        <div className="relative flex justify-center">
-          <div className="bg-white p-4 rounded-xl shadow-lg transform rotate-3">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                <img src="/api/placeholder/24/24" alt="avatar" className="w-5 h-5 rounded-full" />
-              </div>
-              <span className="text-sm">Adam</span>
+  {
+    number: "2",
+    title: "We Match You",
+    description: "Our system finds the best-fit opportunities for you",
+    image: (
+      <div className="relative h-full w-full flex flex-col gap-2 rounded-2xl">
+        <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-main_color to-transparent" />
+        {opportunities.map((item, idx) => (
+          <div
+            key={idx}
+            className="w-full flex items-start gap-3 py-2 px-3 rounded-2xl bg-white/10 text-sm font-medium"
+          >
+            <PiPlugsConnectedFill className="mt-2 text-2xl mx-1" />
+            <div className="flex-1">
+              <p className="break-all line-clamp-1 pr-4 text-sm">
+                {item.title}
+              </p>
+              <p className="text-xs text-white/65 pt-0.5">
+                Matched: {item.match}
+              </p>
             </div>
-            <div className="text-center text-lg font-medium mb-1">Screening...</div>
-            <div className="h-6 flex items-center justify-center gap-1">
-              {Array(8).fill(0).map((_, i) => (
-                <div key={i} className="h-4 bg-purple-400 rounded-full w-1" style={{ height: `${Math.random() * 16 + 4}px` }}></div>
-              ))}
-            </div>
-            <div className="text-xs text-center mt-1 text-gray-500">in 15s your sound ready</div>
+            <IoToggle className="text-3xl" />
           </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    number: "3",
+    title: "We Apply for You",
+    description: "We handle manual applications to save you time",
+    image: (
+      <div className="relative bg-white/10 w-full h-full rounded-2xl py-7 px-4 flex flex-col items-center text-center gap-1">
+        <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-main_color to-transparent" />
+        <div className="relative w-fit h-fit opacity-85">
+          <BsFillPatchCheckFill className="text-6xl text-white mb-3 animate-slow-spin" />
+          <BsCheckLg className="text-3xl stroke-[1px] -translate-y-1.5 -translate-x-0.5 text-main_color bg-white absolute top-0 left-0 bottom-0 right-0 m-auto" />
         </div>
-      )
-    },
-    {
-      number: '3',
-      title: 'Apply with One Click',
-      description: 'Apply to multiple opportunities with a single click. Your profile automatically adapts to each application, saving you time and effort.',
-      image: (
-        <div className="relative">
-          <div className="bg-white p-4 rounded-xl shadow-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                <img src="/api/placeholder/24/24" alt="avatar" className="w-5 h-5 rounded-full" />
-              </div>
-              <div className="flex justify-between w-full">
-                <span className="text-sm">Adam</span>
-                <span className="text-sm">04:00</span>
-              </div>
+        <h1 className="font-semibold text-lg">Application Sent</h1>
+        <p className="text-sm leading-5 mb-3">
+          Application auto-submitted, <br /> We’ll keep you updated.
+        </p>
+        <button
+          disabled
+          className="w-full py-2 mt-2 rounded-xl bg-white font-medium text-main_color"
+        >
+          OK
+        </button>
+      </div>
+    ),
+  },
+  {
+    number: "4",
+    title: "Feedback after rejection",
+    description: "Just update your docs and kep apply for you",
+    image: (
+      <div className="relative h-full overflow-hidden w-full flex flex-col gap-2">
+        <div className="absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-main_color to-transparent z-20" />
+        {Notifications.map((item, idx) => (
+          <div
+            key={idx}
+            className="w-full flex items-start gap-3 py-2 pl-3 rounded-2xl z-10 bg-white/10 text-sm font-medium"
+          >
+            <div className="size-10 min-w-10 bg-white opacity-75 -z-10 overflow-hidden p-2.5 rounded-full mt-1">
+              <img src="./3.png" className="w-full h-full object-cover" />
             </div>
-            <div className="flex justify-center mb-2">
-              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                <Play size={16} className="text-purple-500 ml-1" />
-              </div>
+            <div className="flex-1 pt-1">
+              <p className="break-all capitalize line-clamp-1 pr-4 text-xs">
+                {item.status}
+              </p>
+
+              <p className="break-all line-clamp-1 pr-4 pt-0.5 text-xs">
+                {item.title}
+              </p>
+
+              <p className="text-xs text-white/65 pt-0.5">
+                {item.feedback}
+              </p>
+              <p className="text-xs text-white/65 pt-2 pb-1 w-full text-end">
+                {item.time}
+              </p>
             </div>
-            <div className="text-xs text-gray-500 mb-1">AI <span className="font-medium">Abram</span></div>
-            <button className="w-full bg-purple-100 text-purple-600 text-xs py-1 rounded-lg">
-              Add to workspace
-            </button>
+            <p></p>
           </div>
-          <div className="absolute -bottom-6 right-8">
-            <div className="flex items-center gap-1">
-              <div className="w-5 h-5 rounded-full bg-white/40 flex items-center justify-center">
-                <div className="w-3 h-3 bg-white/80 rounded-full"></div>
-              </div>
-              <span className="text-white text-sm">Your Voice</span>
-            </div>
+        ))}
+      </div>
+    ),
+  },
+];
+
+const HowItWorksSection = () => {
+  return (
+    <section className="py-20 bg-main_color text-white">
+      <div className="mx-auto max-w-[1400px] px-8">
+        <div className="text-center mb-16">
+          <div className="inline-block px-4 py-1.5 bg-gradient-to-br from-white/10 to-white/5 text-white rounded-xl text-sm font-medium mb-6">
+            How it works
           </div>
+          <h2 className="text-5xl font-medium mb-6">
+            Your Job Hunt, Simplified
+          </h2>
+          <p className="text-base max-w-[600px] text-white/80 mx-auto">
+            Upload documents, complete profile, receive tailored opportunities,
+            track progress, and stay updated.
+          </p>
         </div>
-      )
-    }
-  ];
 
-  const HowItWorksSection = () => {
-    return (
-      <section className="py-20 mx-8 rounded-3xl" style={{ background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)" }}>
-        <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center mb-16">
-            <div className="inline-block px-4 py-1.5 bg-white rounded-full text-sm font-medium mb-6">
-              How it works
-            </div>
-            <h2 className="text-4xl font-bold text-white mb-6">3 Easy steps to success</h2>
-            <p className="text-lg text-white/90 max-w-3xl mx-auto">
-              Get started with ApplyOnce in just three simple steps. 
-              Our streamlined process makes it easy to find and apply for opportunities.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {steps.map((step, index) => (
-              <div 
-                key={step.number}
-                className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-6"
-              >
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">
-                      {step.number}
-                    </div>
-                    <h3 className="text-xl font-semibold text-white">{step.title}</h3>
-                  </div>
-                  <p className="text-white/80 text-sm mb-6">{step.description}</p>
-                  <div className="h-48 flex items-center justify-center">
-                    {step.image}
-                  </div>
+        <div className="grid grid-cols-4 max-xl:grid-cols-2 max-lg:grid-cols-1 gap-5">
+          {steps.map((step, index) => (
+            <div
+              key={step.number}
+              className="relative backdrop-blur-sm rounded-[25px] p-[2px] bg-gradient-to-b from-white/10 via-white/5 to-main_color shadow-2xl shadow-black/10"
+            >
+              <div className="flex flex-col gap-1 justify-center h-full rounded-[24px] bg-main_color p-6">
+                <div className="max-h-64 overflow-hidden flex-1 mb-2 flex items-center justify-center">
+                  {step.image}
                 </div>
+                <div className="flex items-start gap-2 mb-1 flex-col">
+                  <div className="bg-white/10 size-7 rounded-full flex items-center justify-center text-sm text-white/80 font-medium">
+                    {step.number}
+                  </div>
+                  <h3 className="text-xl font-semibold ">{step.title}</h3>
+                </div>
+                <p className=" text-sm text-white/80">{step.description}</p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-      </section>
-    );
-  };
+      </div>
+    </section>
+  );
+};
 
-  export default HowItWorksSection;
+export default HowItWorksSection;
