@@ -286,11 +286,10 @@ const Pricing = () => {
       </div>
     </div>
   </div>
-
+    
+    <div className='mb-12'>
       <FAQSection />
-      <div className='mb-12'>
-
-      </div>
+    </div>
     </Layout>
   );
 };
