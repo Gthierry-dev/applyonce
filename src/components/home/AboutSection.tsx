@@ -1,71 +1,95 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+// Import Swiper
+import "swiper/css";
+import "swiper/css/effect-fade";
+import "swiper/css/pagination";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, EffectCoverflow } from "swiper/modules";
+import { LucideArrowLeft, LucideArrowRight, LucideCheckCircle2 } from "lucide-react";
 
 const AboutSection = () => {
+  const WhatwedoImages = [
+    "./about_us_1.jpg",
+    "./about_us_2.jpg",
+    "./about_us_3.jpg",
+  ];
+
   return (
-    <section className="py-20 bg-accent/10">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Content */}
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold leading-tight">
-              Simplifying Your Journey to <span className="text-primary">Success</span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              ApplyOnce streamlines your application process across multiple opportunities. 
-              Whether you're seeking jobs, internships, grants, or scholarships, we've got you covered 
-              with a single, unified platform.
-            </p>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+    <section className="py-20 max-md:pb-0 bg-accent/10">
+      <div className="w-full h-fit pt-12 z-10 relative overflowx-x-clip">
+        <div className="w-full h-fit max-w-[1300px] mx-auto grid grid-cols-2 max-lg:flex max-lg:flex-col gap-14 max-lg:gap-5 px-14 max-lg:px-8">
+          <div className="w-full h-full max-h-[650px] max-lg:h-[300px] relative shadow-xl rounded-3xl">
+            <div className="w-full h-full max-lg:grid-cols-2 max-md:grid-cols-1 max-lg:gap-5">
+              <Swiper
+                slidesPerView={1}
+                spaceBetween={10}
+                speed={1000}
+                autoplay={{
+                  delay: 3000,
+                  disableOnInteraction: false,
+                }}
+                modules={[Navigation, Autoplay]}
+                loop={true}
+                navigation={{
+                  nextEl: ".swiper-button-next",
+                  prevEl: ".swiper-button-prev",
+                }}
+                className="mySwiper rounded-3xl"
+              >
+                {WhatwedoImages.map((src, index) => (
+                  <SwiperSlide key={index}>
+                    <img
+                      src={src}
+                      className="h-full w-full object-cover rounded-3xl"
+                    />
+                  </SwiperSlide>
+                ))}
+                <div className="swiper-button-next aboutUs max-md:hidden">
+                  <LucideArrowRight />
                 </div>
-                <div>
-                  <h3 className="font-medium">One Application, Multiple Opportunities</h3>
-                  <p className="text-muted-foreground">Apply to multiple positions with a single profile</p>
+                <div className="swiper-button-prev aboutUs max-md:hidden">
+                  <LucideArrowLeft />
                 </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium">Smart Matching</h3>
-                  <p className="text-muted-foreground">Get matched with opportunities that fit your profile</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium">Track Your Progress</h3>
-                  <p className="text-muted-foreground">Monitor all your applications in one place</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-4 pt-4">
-              <Button asChild>
-                <Link to="/signup">Get Started</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link to="/about">Learn More</Link>
-              </Button>
+              </Swiper>
             </div>
           </div>
-
-          {/* Image */}
-          <div className="relative">
-            <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent">
-              {/* Add your about section image here */}
+          <div className="w-full h-full max-h-[650px] py-10 flex flex-col">
+            <h1 className="text-sm mb-0 text-main_color">
+              GET TO KNOW US
+            </h1>
+            <h1 className="text-6xl max-lg:text-5xl max-md:text-4xl font-bold my-6 text-foreground/85">
+              What we do
+            </h1>
+            <h1 className="mb-0 font-normal text-[20px] max-md:text-sm max-w-[480px] max-lg:max-w-full text-text_color/80">
+              ApplyOnce streamlines your application process across multiple
+              opportunities. Whether you're seeking jobs, internships, grants,
+              or scholarships, we've got you covered with a single, unified
+              platform.
+            </h1>
+            <div className="w-full flex flex-col gap-6 mt-6">
+              <div className="w-full flex items-start justify-start gap-2">
+                <LucideCheckCircle2 className="fill-main_color text-white size-7" />
+                <p className="flex flex-col">
+                  <span className="max-md:text-sm">One Application, Multiple Opportunities</span>
+                  <span className="text-sm text-foreground/50">Apply to multiple positions with a single profile</span>
+                </p>
+              </div>
+              <div className="w-full flex items-start justify-start gap-2">
+                <LucideCheckCircle2 className="fill-main_color text-white size-7" />
+                <p className="flex flex-col">
+                  <span className="max-md:text-sm">Smart Matching</span>
+                  <span className="text-sm text-foreground/50">Get matched with opportunities that fit your profile</span>
+                </p>
+              </div>
+              <div className="w-full flex items-start justify-start gap-2">
+                <LucideCheckCircle2 className="fill-main_color text-white size-7" />
+                <p className="flex flex-col">
+                  <span className="max-md:text-sm">Track Your Progress</span>
+                  <span className="text-sm text-foreground/50">Monitor all your applications in one place</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>

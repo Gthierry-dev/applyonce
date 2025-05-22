@@ -1,24 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Habibi&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Hubot+Sans:ital,wght@0,200..900;1,200..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Habibi&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Hubot+Sans:ital,wght@0,200..900;1,200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
 .Archivo {
   font-family: "Archivo", sans-serif;
 }
 
-.HubotSans{
+.HubotSans {
   font-family: "Hubot Sans", sans-serif;
 }
 
-.DoHyeon{
+.DoHyeon {
   font-family: "Do Hyeon", sans-serif;
 }
 
@@ -33,7 +32,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 10%;
 
-    --primary: 210 100% 56%;
+    --primary: 178, 38%, 31%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96.1%;
@@ -92,7 +91,7 @@
     --border: 220 20% 12%;
     --input: 220 20% 12%;
     --ring: 210 100% 56%;
-    
+
     --sidebar-background: 220 20% 4%;
     --sidebar-foreground: 210 20% 98%;
     --sidebar-primary: 210 100% 56%;
@@ -115,7 +114,7 @@
   }
 }
 
-*{
+* {
   font-family: "Inter", sans-serif;
 }
 
@@ -165,8 +164,8 @@ html {
 }
 
 /* Add Inter font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-@import url('https://rsms.me/inter/inter.css');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url("https://rsms.me/inter/inter.css");
 
 .hide-scrollbar {
   -ms-overflow-style: none;
@@ -175,4 +174,111 @@ html {
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+  min-height: 100% !important;
+  text-align: center;
+  font-size: 18px;
+  /* Center slide text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* .swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+} */
+
+.swiper-button-next,
+.swiper-button-prev,
+.swiper-button-next2,
+.swiper-button-prev2 {
+  position: absolute;
+  top: 35%;
+  width: 40px;
+  height: 40px;
+  background-color: #ffffffd3;
+  color: #111;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 20px;
+  opacity: 0;
+  transition: 0.2s;
+}
+
+.swiper-button-next.aboutUs,
+.swiper-button-prev.aboutUs {
+  top: 0;
+  bottom: 0;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.swiper-button-next.not_this,
+.swiper-button-prev.not_this {
+  opacity: 1 !important;
+}
+
+.swiper:hover .swiper-button-next,
+.swiper:hover .swiper-button-prev {
+  opacity: 1;
+}
+
+.swiper-button-next {
+  right: 20px;
+}
+
+.swiper-button-prev {
+  left: 20px;
+}
+
+.swiper-button-next2,
+.swiper-button-prev2 {
+  opacity: 1 !important;
+  position: relative;
+  right: unset !important;
+  left: unset !important;
+  border: 1px solid #e4e4e4;
+}
+
+.swiper-button-prev.hero {
+  opacity: 1 !important;
+  top: unset !important;
+  left: unset !important;
+  right: 80px !important;
+  bottom: 30px !important;
+  background: #fff !important;
+}
+
+.swiper-button-next.hero {
+  opacity: 1 !important;
+  top: unset !important;
+  right: 30px !important;
+  bottom: 30px !important;
+  background: #fff !important;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background-color: #fff;
+  border: 1px solid #111;
+  color: #111;
+}
+
+.swiper-button-next:active,
+.swiper-button-prev:active {
+  scale: 0.91;
 }

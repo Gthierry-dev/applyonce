@@ -56,7 +56,7 @@ const categories = [
 const CategorySection = () => {
   return (
     <section className="py-16 bg-[#f7f9f9]">
-      <div className="mx-auto max-w-[1400px] px-8">
+      <div className="mx-auto max-w-[1400px] px-14 max-lg:px-8">
         <div className="flex items-center justify-between mb-10">
           <h2 className="text-2xl font-medium text-foreground/85">
             One platform Many Solutions

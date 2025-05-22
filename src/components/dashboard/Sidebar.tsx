@@ -282,7 +282,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
         ) : (
           <Button
             onClick={handleLogout}
-            className="flex items-center w-full px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
+            className="flex items-center w-full px-3 py-2 rounded-md text-sm text-white hover:bg-sidebar-accent/50 transition-colors"
           >
             <LogOut size={20} className="mr-3" />
             <span>Logout</span>

@@ -7,7 +7,7 @@ const HeroSection = () => {
   return (
     <div className="bg-gradient-to-br bg-white py-12 sm:py-16 lg:py-20 z-10 relative overflow-clip">
       {/* <FaFire className="text-[800px] absolute top-[10%] -left-[10%] max-lg:hidden -z-10 text-[#eaf0f067]" /> */}
-      <div className="mx-auto max-w-[1400px] px-8">
+      <div className="mx-auto max-w-[1400px] px-14 max-lg:px-8">
         <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-12">
           {/* Left side - Text content */}
           <div className="flex-1 max-w-2xl w-full">

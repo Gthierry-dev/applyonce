@@ -1,10 +1,9 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { ChevronRight, Heart } from 'lucide-react';
-import { Container } from '@/components/ui/container';
-import { Separator } from '@/components/ui/separator';
+import React from "react";
+import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { ChevronRight, Heart } from "lucide-react";
+import { Container } from "@/components/ui/container";
+import { Separator } from "@/components/ui/separator";
 
 interface FooterProps {
   className?: string;
@@ -12,46 +11,52 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ className }) => {
   const currentYear = new Date().getFullYear();
-  
+
   return (
     <footer className={cn("border-t bg-background", className)}>
-      <Container>
+      <div className="max-w-[1400px] px-14 max-lg:px-8 m-auto">
         <div className="py-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-4">
               <Link to="/" className="flex items-center gap-2">
-                <div className="rounded-md bg-primary p-1.5">
-                  <span className="text-primary-foreground font-bold text-sm">AO</span>
+                {/* <div className="rounded-md bg-main_color p-1.5">
+                <span className="text-main_color-foreground font-bold text-sm">AO</span>
+              </div> */}
+                <div className="w-fit h-7 min-w-7">
+                  <img src="./favicon.png" alt="" className="h-full" />
                 </div>
-                <span className="font-display font-semibold text-lg">ApplyOnce</span>
+                <span className="font-display font-semibold text-lg">
+                  ApplyOnce
+                </span>
               </Link>
               <p className="text-sm text-muted-foreground">
-                Streamline your application process. Apply once, unlock many opportunities.
+                Streamline your application process. Apply once, unlock many
+                opportunities.
               </p>
             </div>
-            
+
             <div>
               <h4 className="font-medium text-sm mb-4">Resources</h4>
               <ul className="space-y-3">
                 <li>
-                  <Link 
-                    to="/resources" 
+                  <Link
+                    to="/resources"
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Resource Library
                   </Link>
                 </li>
                 <li>
-                  <Link 
-                    to="/support" 
+                  <Link
+                    to="/support"
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Support Center
                   </Link>
                 </li>
                 <li>
-                  <Link 
-                    to="/pricing" 
+                  <Link
+                    to="/pricing"
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Pricing & Plans
@@ -59,29 +64,29 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
                 </li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-medium text-sm mb-4">Company</h4>
               <ul className="space-y-3">
                 <li>
-                  <Link 
-                    to="/about" 
+                  <Link
+                    to="/about"
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link 
-                    to="/community" 
+                  <Link
+                    to="/community"
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Community
                   </Link>
                 </li>
                 <li>
-                  <Link 
-                    to="/blog" 
+                  <Link
+                    to="/blog"
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Blog
@@ -89,12 +94,12 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
                 </li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-medium text-sm mb-4">Get Started</h4>
               <div className="space-y-3">
-                <Link 
-                  to="/signup" 
+                <Link
+                  to="/signup"
                   className="inline-flex items-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/80 h-9 px-4 py-2"
                 >
                   Sign Up
@@ -113,22 +118,22 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
             </div>
           </div>
         </div>
-        
+
         <Separator />
-        
+
         <div className="py-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
             &copy; {currentYear} ApplyOnce. All rights reserved.
           </p>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <Link 
-              to="/privacy" 
+            <Link
+              to="/privacy"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Privacy
             </Link>
-            <Link 
-              to="/terms" 
+            <Link
+              to="/terms"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Terms
@@ -138,7 +143,7 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
             </span>
           </div>
         </div>
-      </Container>
+      </div>
     </footer>
   );
 };

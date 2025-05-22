@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 
 const CTASection = () => {
   return (
-    <section className="">
-      <div className="container mx-auto">
+    <section className="py-20">
+      <div className="max-w-[1400px] px-14 max-lg:px-8 m-auto">
         <div className="bg-[#004D43] rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
           {/* Grid pattern overlay */}
           <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
