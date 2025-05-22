@@ -1,6 +1,7 @@
 
 import React from 'react';
 import Layout from '@/components/layout/Layout';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, BookOpen, HelpCircle, Newspaper } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
