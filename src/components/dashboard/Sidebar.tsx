@@ -48,6 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   const userLinks = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { name: 'Opportunities', icon: <Search size={20} />, path: '/opportunities' },
+    // { name: 'Applications', icon: <FileText size={20} />, path: '/applications' },
     { name: 'Application Status', icon: <ClipboardList size={20} />, path: '/application-status' },
     { name: 'Categories', icon: <Folder size={20} />, path: '/categories' },
     { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
@@ -55,6 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
 
   const links = isAdmin ? adminLinks : userLinks;
   const homeLink = isAdmin ? '/admin/dashboard' : '/dashboard';
+
 
   const handleToggleCollapse = () => {
     setCollapsed(!collapsed);
@@ -92,7 +94,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
           variant="ghost"
           size="icon"
           onClick={handleMobileToggle}
-          className="fixed top-4 left-4 z-50 text-main_color"
+          className="fixed top-4 left-4 z-50"
           aria-label="Toggle menu"
         >
           <Menu size={20} />
@@ -115,13 +117,13 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
           ></div>
 
           {/* Sidebar content */}
-          <nav className="relative w-64 h-full bg-main_color text-white p-4 flex flex-col overflow-y-auto">
+          <nav className="relative w-64 h-full bg-sidebar text-sidebar-foreground p-4 flex flex-col overflow-y-auto">
             <div className="flex items-center justify-between mb-8">
               <Link to={homeLink} className="flex items-center gap-2">
-                <div className="rounded-md bg-white p-1.5">
-                  <span className="text-main_color font-bold text-sm">A1</span>
+                <div className="rounded-md bg-primary p-1.5">
+                  <span className="text-primary-foreground font-bold text-sm">A1</span>
                 </div>
-                <span className="font-display font-semibold text-lg text-white">
+                <span className="font-display font-semibold text-lg text-sidebar-foreground">
                   {isAdmin ? 'Admin Panel' : 'ApplyOnce'}
                 </span>
               </Link>
@@ -129,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setMobileOpen(false)}
-                className="text-white hover:text-white hover:bg-main_color_dark"
+                className="text-sidebar-foreground hover:text-white hover:bg-sidebar-accent"
               >
                 <ChevronLeft size={20} />
               </Button>
@@ -143,8 +145,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                   className={cn(
                     'flex items-center px-3 py-2 rounded-md text-sm transition-colors',
                     location.pathname === link.path
-                      ? 'bg-white/20 text-white'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
                   )}
                 >
                   <span className="mr-3">{link.icon}</span>
@@ -156,7 +158,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
             <div className="mt-auto">
               <Button
                 onClick={handleLogout}
-                className="flex items-center w-full px-3 py-2 rounded-md text-sm text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                className="flex items-center w-full px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
               >
                 <LogOut size={20} className="mr-3" />
                 <span>Logout</span>
@@ -172,7 +174,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   return (
     <aside
       className={cn(
-        'h-screen sticky top-0 flex flex-col bg-main_color text-white transition-all duration-300 overflow-y-auto',
+        'h-screen sticky top-0 flex flex-col bg-sidebar text-sidebar-foreground transition-all duration-300 overflow-y-auto',
         collapsed ? 'w-[70px]' : 'w-64',
         className
       )}
@@ -180,18 +182,18 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
       <div className="p-4 flex items-center justify-between">
         {!collapsed && (
           <Link to={homeLink} className="flex items-center gap-2">
-            <div className="rounded-md bg-white p-1.5">
-              <span className="text-main_color font-bold text-sm">A1</span>
+            <div className="rounded-md bg-primary p-1.5">
+              <span className="text-primary-foreground font-bold text-sm">A1</span>
             </div>
-            <span className="font-display font-semibold text-lg text-white">
+            <span className="font-display font-semibold text-lg text-sidebar-foreground">
               {isAdmin ? 'Admin Panel' : 'ApplyOnce'}
             </span>
           </Link>
         )}
         {collapsed && (
           <div className="mx-auto">
-            <div className="rounded-md bg-white p-1.5">
-              <span className="text-main_color font-bold text-sm">A1</span>
+            <div className="rounded-md bg-primary p-1.5">
+              <span className="text-primary-foreground font-bold text-sm">A1</span>
             </div>
           </div>
         )}
@@ -200,7 +202,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
             variant="ghost"
             size="icon"
             onClick={handleToggleCollapse}
-            className="text-white hover:text-white hover:bg-white/10"
+            className="text-sidebar-foreground hover:text-white hover:bg-sidebar-accent"
           >
             <ChevronLeft size={18} />
           </Button>
@@ -210,7 +212,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
             variant="ghost"
             size="icon"
             onClick={handleToggleCollapse}
-            className="w-full text-white hover:text-white hover:bg-white/10"
+            className="w-full text-sidebar-foreground hover:text-white hover:bg-sidebar-accent"
           >
             <ChevronRight size={18} />
           </Button>
@@ -230,8 +232,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                         className={cn(
                           'flex items-center justify-center py-2 rounded-md transition-colors',
                           location.pathname === link.path
-                            ? 'bg-white/20 text-white'
-                            : 'text-white/70 hover:text-white hover:bg-white/10'
+                            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                            : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
                         )}
                       >
                         {link.icon}
@@ -250,8 +252,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                 className={cn(
                   'flex items-center px-3 py-2 rounded-md text-sm transition-colors',
                   location.pathname === link.path
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                    : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
                 )}
               >
                 <span className="mr-3">{link.icon}</span>
@@ -269,7 +271,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
               <TooltipTrigger asChild>
                 <Button
                   onClick={handleLogout}
-                  className="flex items-center justify-center py-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                  className="flex items-center justify-center py-2 rounded-md text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
                 >
                   <LogOut size={20} />
                 </Button>
@@ -280,7 +282,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
         ) : (
           <Button
             onClick={handleLogout}
-            className="flex items-center w-full px-3 py-2 rounded-md text-sm text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+            className="flex items-center w-full px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
           >
             <LogOut size={20} className="mr-3" />
             <span>Logout</span>

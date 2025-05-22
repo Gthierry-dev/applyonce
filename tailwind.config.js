@@ -1,4 +1,3 @@
-
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ["class"],
@@ -18,12 +17,9 @@ export default {
     },
     extend: {
       colors: {
-        // main colors
+        // new colors
         main_color: "#306c6a",
-        main_color_light: "#4a8c8a",
-        main_color_dark: "#1e4e4c",
         text_color: "#0D1C1C",
-        secondary_color: "#f7f9f9",
 
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -67,7 +63,6 @@ export default {
       animation: {
         "marquee-left": "marquee-left 25s linear infinite",
         "marquee-right": "marquee-right 25s linear infinite",
-        "slow-spin": "slowSpin 40s linear infinite",
       },
       keyframes: {
         "marquee-left": {
@@ -78,10 +73,15 @@ export default {
           "0%": { transform: "translateX(-50%)" },
           "100%": { transform: "translateX(0)" },
         },
-        slowSpin: {
-          "0%": { transform: "rotate(0deg)" },
-          "100%": { transform: "rotate(360deg)" },
-        },
+      },
+    },
+    animation: {
+      "slow-spin": "slowSpin 40s linear infinite",
+    },
+    keyframes: {
+      slowSpin: {
+        "0%": { transform: "rotate(0deg)" },
+        "100%": { transform: "rotate(360deg)" },
       },
     },
   },
