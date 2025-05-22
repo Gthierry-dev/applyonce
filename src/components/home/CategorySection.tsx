@@ -1,3 +1,4 @@
+
 import {
   ArrowRight,
   Briefcase,
@@ -28,14 +29,14 @@ const categories = [
     jobs: "58 Available",
     icon: <PiStudent size={24} />,
   },
-  { title: "Grants", jobs: "48 Jobs Available", icon: <PiCoins size={24} /> },
+  { title: "Grants", jobs: "48 Available", icon: <PiCoins size={24} /> },
   {
-    title: "Interneship",
+    title: "Internships",
     jobs: "78 Available",
     icon: <PiBuilding size={24} />,
   },
   {
-    title: "felowship",
+    title: "Fellowships",
     jobs: "120 Available",
     icon: <PiUsersThree size={24} />,
   },
@@ -46,7 +47,7 @@ const categories = [
   },
   { title: "Workshops", jobs: "31 Available", icon: <PiToolbox size={24} /> },
   {
-    title: "Studies abroad",
+    title: "Study Abroad",
     jobs: "52 Available",
     icon: <PiAirplaneTakeoff size={24} />,
   },
@@ -55,29 +56,29 @@ const categories = [
 
 const CategorySection = () => {
   return (
-    <section className="py-16 bg-[#f7f9f9]">
+    <section className="py-16 bg-secondary_color">
       <div className="mx-auto max-w-[1400px] px-8">
         <div className="flex items-center justify-between mb-10">
           <h2 className="text-2xl font-medium text-foreground/85">
-            One platform Many Solutions
+            One Platform, Many Solutions
           </h2>
           <a
             href="#"
-            className="text-main_color text-sm font-medium flex items-center gap-1"
+            className="text-main_color text-sm font-medium flex items-center gap-1 hover:underline"
           >
             See All Opportunities
             <ArrowRight size={16} />
           </a>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {categories.map((category) => (
             <a
               key={category.title}
               href="#"
-              className="flex items-center gap-4 p-2 rounded-2xl border border-stone-200/70 bg-white hover:border-main_color/40 hover:bg-main_color/10 group transition-all duration-300"
+              className="flex items-center gap-4 p-4 rounded-2xl border border-stone-200/70 bg-white hover:border-main_color hover:shadow-md hover:shadow-main_color/10 group transition-all duration-300"
             >
-              <div className="flex items-center justify-center size-[48px] rounded-xl bg-[#f7f9f9] text-main_color group-hover:bg-main_color/80 transition-all duration-300 group-hover:scale-110 group-hover:text-white">
+              <div className="flex items-center justify-center size-[48px] rounded-xl bg-secondary_color text-main_color group-hover:bg-main_color transition-all duration-300 group-hover:scale-110 group-hover:text-white">
                 {category.icon}
               </div>
               <div>

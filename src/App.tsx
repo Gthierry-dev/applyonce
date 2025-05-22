@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -68,32 +69,27 @@ const App = () => (
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/social-auth-coming-soon" element={<SocialAuthComingSoon />} />
             
-            {/* Protected Dashboard Routes */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/applications" element={<Applications />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/application-status" element={<ApplicationStatus />} />
-              <Route path="/opportunities" element={<Opportunities />} />
-              <Route path="/settings" element={<Settings />} />
+            {/* Dashboard Routes - Not protected during development */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/applications" element={<Applications />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/application-status" element={<ApplicationStatus />} />
+            <Route path="/opportunities" element={<Opportunities />} />
+            <Route path="/settings" element={<Settings />} />
             
-
-            {/* Protected Company Routes */}
-            {/* <Route element={<ProtectedRoute />}> */}
-              <Route path="/company/dashboard" element={<CompanyDashboard />} />
-              <Route path="/company/profile" element={<CompanyProfile />} />
-              <Route path="/company/applications" element={<CompanyApplications />} />
-              <Route path="/company/categories" element={<CompanyCategories />} />
-              <Route path="/company/settings" element={<CompanySettings />} />
-            {/* </Route> */}
-
-            {/* Admin Dashboard Routes */}
-{/*             <Route element={<AdminRoute />}> */}
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/opportunities" element={<AdminOpportunities />} />
-              <Route path="/admin/categories" element={<AdminCategories />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/settings" element={<AdminSettings />} />
-{/*             </Route> */}
+            {/* Company Routes - Not protected during development */}
+            <Route path="/company/dashboard" element={<CompanyDashboard />} />
+            <Route path="/company/profile" element={<CompanyProfile />} />
+            <Route path="/company/applications" element={<CompanyApplications />} />
+            <Route path="/company/categories" element={<CompanyCategories />} />
+            <Route path="/company/settings" element={<CompanySettings />} />
+            
+            {/* Admin Routes - Not protected during development */}
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/opportunities" element={<AdminOpportunities />} />
+            <Route path="/admin/categories" element={<AdminCategories />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
             
             {/* New Navigation Routes */}
             <Route path="/community" element={<Community />} />
@@ -101,7 +97,7 @@ const App = () => (
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/support" element={<Support />} />
             
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

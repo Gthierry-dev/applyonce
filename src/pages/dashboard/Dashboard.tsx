@@ -1,3 +1,4 @@
+
 import React from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -98,13 +99,13 @@ const Dashboard = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome to your ApplyOnce dashboard. Here you can manage all your applications and explore opportunities.
-        </p>
+            <h1 className="text-3xl font-bold tracking-tight text-main_color">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Welcome to your ApplyOnce dashboard. Here you can manage all your applications and explore opportunities.
+            </p>
           </div>
           <div className="flex gap-2">
-            <Button asChild>
+            <Button asChild className="bg-main_color text-white hover:bg-main_color_dark">
               <Link to="/opportunities">
                 <Search className="mr-2 h-4 w-4" />
                 Browse Opportunities
@@ -113,41 +114,47 @@ const Dashboard = () => {
           </div>
         </div>
         
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Card className="bg-card text-card-foreground rounded-lg border shadow">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="bg-card text-card-foreground rounded-lg border shadow hover:border-main_color/50 transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Applications</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+              <FileText className="h-4 w-4 text-main_color" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-main_color">
                 {applications?.filter(app => app.status === 'pending').length || 0}
-          </div>
-              <p className="text-xs text-muted-foreground">Applications in progress</p>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Applications in progress
+              </p>
             </CardContent>
           </Card>
           
-          <Card className="bg-card text-card-foreground rounded-lg border shadow">
+          <Card className="bg-card text-card-foreground rounded-lg border shadow hover:border-main_color/50 transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Saved Opportunities</CardTitle>
-              <BookmarkIcon className="h-4 w-4 text-muted-foreground" />
+              <BookmarkIcon className="h-4 w-4 text-main_color" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
-              <p className="text-xs text-muted-foreground">Opportunities bookmarked</p>
+              <div className="text-2xl font-bold text-main_color">0</div>
+              <p className="text-xs text-muted-foreground">
+                Opportunities bookmarked
+              </p>
             </CardContent>
           </Card>
           
-          <Card className="bg-card text-card-foreground rounded-lg border shadow">
+          <Card className="bg-card text-card-foreground rounded-lg border shadow hover:border-main_color/50 transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Completed Applications</CardTitle>
-              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              <CheckCircle className="h-4 w-4 text-main_color" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-main_color">
                 {applications?.filter(app => ['accepted', 'rejected', 'withdrawn'].includes(app.status)).length || 0}
               </div>
-              <p className="text-xs text-muted-foreground">Successfully submitted</p>
+              <p className="text-xs text-muted-foreground">
+                Successfully submitted
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -155,15 +162,15 @@ const Dashboard = () => {
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="bg-card text-card-foreground rounded-lg border shadow">
             <CardHeader>
-              <CardTitle>Recent Applications</CardTitle>
+              <CardTitle className="text-main_color">Recent Applications</CardTitle>
             </CardHeader>
             <CardContent>
               {applicationsLoading ? (
                 <div className="flex items-center justify-center h-32">
-                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <Loader2 className="h-6 w-6 animate-spin text-main_color" />
                 </div>
               ) : applications?.length === 0 ? (
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground p-6 text-center border border-dashed rounded-lg">
                   No recent applications to display.
                 </div>
               ) : (
@@ -171,7 +178,7 @@ const Dashboard = () => {
                   {applications?.map((application) => {
                     const StatusIcon = statusConfig[application.status].icon;
                     return (
-                      <div key={application.id} className="flex items-center justify-between">
+                      <div key={application.id} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-lg transition-colors">
                         <div>
                           <p className="font-medium">{application.opportunity.title}</p>
                           <p className="text-sm text-muted-foreground">
@@ -195,33 +202,33 @@ const Dashboard = () => {
 
           <Card className="bg-card text-card-foreground rounded-lg border shadow">
             <CardHeader>
-              <CardTitle>Recommended Opportunities</CardTitle>
+              <CardTitle className="text-main_color">Recommended Opportunities</CardTitle>
             </CardHeader>
             <CardContent>
               {opportunitiesLoading ? (
                 <div className="flex items-center justify-center h-32">
-                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <Loader2 className="h-6 w-6 animate-spin text-main_color" />
                 </div>
               ) : opportunities?.length === 0 ? (
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground p-6 text-center border border-dashed rounded-lg">
                   No recommended opportunities yet.
                 </div>
               ) : (
                 <div className="space-y-4">
                   {opportunities?.map((opportunity) => (
-                    <div key={opportunity.id} className="space-y-1">
+                    <div key={opportunity.id} className="space-y-1 p-3 hover:bg-slate-50 rounded-lg transition-colors">
                       <p className="font-medium">{opportunity.title}</p>
                       <div className="flex items-center justify-between">
                         <p className="text-sm text-muted-foreground">
                           {opportunity.organization}
                         </p>
-                        <Badge variant="outline">
+                        <Badge variant="outline" className="bg-main_color/10 text-main_color border-main_color/20">
                           {opportunity.category.name}
                         </Badge>
                       </div>
                     </div>
                   ))}
-          </div>
+                </div>
               )}
             </CardContent>
           </Card>
