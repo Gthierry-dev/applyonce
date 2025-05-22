@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 const CTASection = () => {
   return (
-    <section className="py-16 px-4 md:px-8 lg:px-16">
+    <section className="">
       <div className="container mx-auto">
         <div className="bg-[#004D43] rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
           {/* Grid pattern overlay */}
