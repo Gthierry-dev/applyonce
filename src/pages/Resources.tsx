@@ -1,6 +1,7 @@
 
 import React from 'react';
 import Layout from '@/components/layout/Layout';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, BookOpen, HelpCircle, Newspaper } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -127,12 +128,7 @@ const Resources = () => {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-4">{webinar.description}</p>
-                        <a 
-                          href="#" 
-                          className="block w-full text-center py-2 px-4 bg-[#004D43] hover:bg-[#003D33] text-white rounded-md"
-                        >
-                          Register Now
-                        </a>
+                        <Button className="w-full">Register Now</Button>
                       </CardContent>
                     </Card>
                   ))}
@@ -172,12 +168,7 @@ const Resources = () => {
                           <span>{template.downloads} downloads</span>
                           <span>{template.format}</span>
                         </div>
-                        <a 
-                          href="#" 
-                          className="block w-full text-center py-2 px-4 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md"
-                        >
-                          Download
-                        </a>
+                        <Button variant="outline" className="w-full">Download</Button>
                       </CardContent>
                     </Card>
                   ))}
