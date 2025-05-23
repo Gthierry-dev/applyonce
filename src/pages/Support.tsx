@@ -58,85 +58,89 @@ const Support = () => {
             ))}
           </div>
 
-          <div className="max-w-3xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Us</CardTitle>
-                <CardDescription>
-                  Fill out the form below and we'll get back to you as soon as possible
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="first-name" className="text-sm font-medium">First Name</label>
-                      <Input id="first-name" placeholder="Enter your first name" />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="last-name" className="text-sm font-medium">Last Name</label>
-                      <Input id="last-name" placeholder="Enter your last name" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">Email</label>
-                    <Input id="email" type="email" placeholder="your@email.com" />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-medium">Message</label>
-                    <Textarea id="message" placeholder="How can we help?" rows={5} />
-                  </div>
-                  <Button className="w-full bg-[#004D43] hover:bg-[#003D33] text-white">Submit</Button>
-                </form>
-              </CardContent>
-            </Card>
-            
-            <div className="flex flex-col md:flex-row gap-6 mt-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Contact Form */}
               <Card className="flex-1">
                 <CardHeader>
-                  <CardTitle>Contact Information</CardTitle>
-                  <CardDescription>Get in touch with us</CardDescription>
+                  <CardTitle>Contact Us</CardTitle>
+                  <CardDescription>
+                    Fill out the form below and we'll get back to you as soon as possible
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-[#004D43]" />
-                    <div>
-                      <h4 className="font-medium">Email</h4>
-                      <p className="text-sm text-muted-foreground">support@applyonce.com</p>
+                <CardContent>
+                  <form className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label htmlFor="first-name" className="text-sm font-medium">First Name</label>
+                        <Input id="first-name" placeholder="Enter your first name" />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="last-name" className="text-sm font-medium">Last Name</label>
+                        <Input id="last-name" placeholder="Enter your last name" />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <PhoneCall className="h-5 w-5 text-[#004D43]" />
-                    <div>
-                      <h4 className="font-medium">Phone</h4>
-                      <p className="text-sm text-muted-foreground">+250 791 284 815</p>
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="text-sm font-medium">Email</label>
+                      <Input id="email" type="email" placeholder="your@email.com" />
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <MapPin className="h-5 w-5 text-[#004D43]" />
-                    <div>
-                      <h4 className="font-medium">Address</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Norsken<br />
-                        Kigali, Rwanda
-                      </p>
+                    <div className="space-y-2">
+                      <label htmlFor="message" className="text-sm font-medium">Message</label>
+                      <Textarea id="message" placeholder="How can we help?" rows={5} />
                     </div>
-                  </div>
+                    <Button className="w-full bg-[#004D43] hover:bg-[#003D33] text-white">Submit</Button>
+                  </form>
                 </CardContent>
               </Card>
               
-              <Card className="flex-1">
-                <CardContent className="p-0">
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.5077632384716!2d30.0582!3d-1.9441!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca42bf2b9b8d7%3A0x5a3b1c3f88b92cb7!2sNorsken%20Rwanda!5e0!3m2!1sen!2srw!4v1645564750986!5m2!1sen!2srw"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0, minHeight: "300px" }}
-                    allowFullScreen
-                    loading="lazy"
-                  ></iframe>
-                </CardContent>
-              </Card>
+              {/* Contact Information and Map */}
+              <div className="flex-1 flex flex-col gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Contact Information</CardTitle>
+                    <CardDescription>Get in touch with us</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-5 w-5 text-[#004D43]" />
+                      <div>
+                        <h4 className="font-medium">Email</h4>
+                        <p className="text-sm text-muted-foreground">support@applyonce.com</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <PhoneCall className="h-5 w-5 text-[#004D43]" />
+                      <div>
+                        <h4 className="font-medium">Phone</h4>
+                        <p className="text-sm text-muted-foreground">+250 791 284 815</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <MapPin className="h-5 w-5 text-[#004D43]" />
+                      <div>
+                        <h4 className="font-medium">Address</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Norsken<br />
+                          Kigali, Rwanda
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="p-0">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.5077632384716!2d30.0582!3d-1.9441!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca42bf2b9b8d7%3A0x5a3b1c3f88b92cb7!2sNorsken%20Rwanda!5e0!3m2!1sen!2srw!4v1645564750986!5m2!1sen!2srw"
+                      width="100%"
+                      height="250"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                    ></iframe>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
