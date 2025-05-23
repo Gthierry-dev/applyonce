@@ -73,20 +73,38 @@ const Support = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label htmlFor="first-name" className="text-sm font-medium">First Name</label>
-                        <Input id="first-name" placeholder="Enter your first name" />
+                        <Input 
+                          id="first-name" 
+                          placeholder="Enter your first name" 
+                          className="focus-visible:ring-[#004D43] focus-visible:ring-offset-0"
+                        />
                       </div>
                       <div className="space-y-2">
                         <label htmlFor="last-name" className="text-sm font-medium">Last Name</label>
-                        <Input id="last-name" placeholder="Enter your last name" />
+                        <Input 
+                          id="last-name" 
+                          placeholder="Enter your last name" 
+                          className="focus-visible:ring-[#004D43] focus-visible:ring-offset-0"
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="email" className="text-sm font-medium">Email</label>
-                      <Input id="email" type="email" placeholder="your@email.com" />
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="your@email.com" 
+                        className="focus-visible:ring-[#004D43] focus-visible:ring-offset-0"
+                      />
                     </div>
                     <div className="space-y-2">
                       <label htmlFor="message" className="text-sm font-medium">Message</label>
-                      <Textarea id="message" placeholder="How can we help?" rows={5} />
+                      <Textarea 
+                        id="message" 
+                        placeholder="How can we help?" 
+                        rows={5} 
+                        className="focus-visible:ring-[#004D43] focus-visible:ring-offset-0"
+                      />
                     </div>
                     <Button className="w-full bg-[#004D43] hover:bg-[#003D33] text-white">Submit</Button>
                   </form>
