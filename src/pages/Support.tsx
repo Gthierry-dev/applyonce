@@ -91,52 +91,53 @@ const Support = () => {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
-                <CardDescription>Get in touch with us</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-[#004D43]" />
-                  <div>
-                    <h4 className="font-medium">Email</h4>
-                    <p className="text-sm text-muted-foreground">support@applyonce.com</p>
+            <div className="flex flex-col md:flex-row gap-6 mt-6">
+              <Card className="flex-1">
+                <CardHeader>
+                  <CardTitle>Contact Information</CardTitle>
+                  <CardDescription>Get in touch with us</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Mail className="h-5 w-5 text-[#004D43]" />
+                    <div>
+                      <h4 className="font-medium">Email</h4>
+                      <p className="text-sm text-muted-foreground">support@applyonce.com</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <PhoneCall className="h-5 w-5 text-[#004D43]" />
-                  <div>
-                    <h4 className="font-medium">Phone</h4>
-                    <p className="text-sm text-muted-foreground">+1 (555) 123-4567</p>
+                  <div className="flex items-center gap-3">
+                    <PhoneCall className="h-5 w-5 text-[#004D43]" />
+                    <div>
+                      <h4 className="font-medium">Phone</h4>
+                      <p className="text-sm text-muted-foreground">+250 791 284 815</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-[#004D43]" />
-                  <div>
-                    <h4 className="font-medium">Address</h4>
-                    <p className="text-sm text-muted-foreground">
-                      123 Business Street<br />
-                      New York, NY 10001<br />
-                      United States
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <MapPin className="h-5 w-5 text-[#004D43]" />
+                    <div>
+                      <h4 className="font-medium">Address</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Norsken<br />
+                        Kigali, Rwanda
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-0">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.15830869428!2d-74.11976397304603!3d40.697403442292485!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1645564750986!5m2!1sen!2s"
-                  width="100%"
-                  height="400"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                ></iframe>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+              
+              <Card className="flex-1">
+                <CardContent className="p-0">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.5077632384716!2d30.0582!3d-1.9441!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca42bf2b9b8d7%3A0x5a3b1c3f88b92cb7!2sNorsken%20Rwanda!5e0!3m2!1sen!2srw!4v1645564750986!5m2!1sen!2srw"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, minHeight: "300px" }}
+                    allowFullScreen
+                    loading="lazy"
+                  ></iframe>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
