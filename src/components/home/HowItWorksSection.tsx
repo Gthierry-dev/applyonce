@@ -168,11 +168,10 @@ const HowItWorksSection = () => {
             How it works
           </div>
           <h2 className="text-5xl font-medium mb-6">
-            Your Job Hunt, Simplified
+            4 Steps to Success
           </h2>
           <p className="text-base max-w-[600px] text-white/80 mx-auto">
-            Upload documents, complete profile, receive tailored opportunities,
-            track progress, and stay updated.
+            From profile creation to landing your dream opportunity—we've simplified every step of the way.
           </p>
         </div>
 

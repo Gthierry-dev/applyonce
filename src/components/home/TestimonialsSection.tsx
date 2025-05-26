@@ -57,18 +57,11 @@ const TestimonialsSection = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Title Section */}
           <div className="lg:w-1/3 flex flex-col justify-between gap-3 pb-4">
-            <h1 className="text-sm mb-0 text-main_color">GET TO KNOW US</h1>
+            <h1 className="text-sm mb-0 text-main_color">SUCCESS STORIES</h1>
             <h2 className="text-3xl max-lg:text-xl pr-5 font-semibold text-gray-800">
-              Review of People Who Have Found Jobs
+             Review from our satisfied users 
             </h2>
-            {/* <div className="flex gap-3 mt-6">
-              <button className="h-10 w-10 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                <ChevronLeft className="h-5 w-5 text-gray-500" />
-              </button>
-              <button className="h-10 w-10 rounded-full border-2 border-gray-800 bg-gray-800 flex items-center justify-center">
-                <ChevronRight className="h-5 w-5 text-white" />
-              </button>
-            </div> */}
+            
             <div className="w-full flex items-end justify-start gap-1 flex-1">
               <div className="swiper-button-prev2 testimonials max-md:hidden">
                 <LucideArrowLeft />

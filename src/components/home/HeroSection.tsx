@@ -12,22 +12,21 @@ const HeroSection = () => {
           {/* Left side - Text content */}
           <div className="flex-1 max-w-2xl w-full">
             <h1 className="text-6xl leading-[72px] max-lg:text-5xl max-lg:leading-[56px] max-md:text-4xl max-md:leading-[48px] font-medium my-6 text-foreground/85 ">
-              <span className="text-main_color">One</span> form <br />
-              Endless <br />
-              Opportunities
+            Land More <span className="text-main_color">Opportunities</span> with a Single Click.
             </h1>
             <p className="text-foreground/70 text-base sm:text-lg mb-6 sm:mb-8">
-              Apply for jobs, scholarships, workshops, and more with one
-              profile.
+            Tired of filling out the same forms over and over? We use your information once to apply to every opportunity for you—fast, accurate, and hassle-free.
+
+            {/* “Say goodbye to repetitive applications. With just one click, we apply to all the best opportunities for you using your profile—so you can focus on what really matters.”
+
+“We automate the boring stuff—no more copy-pasting your resume or retyping the same answers. One profile, unlimited applications, zero stress.”
+
+“We streamline your journey to success by using your profile to automatically apply to multiple opportunities—saving you hours of repetitive work.” */}
             </p>
 
             {/* Email signup form */}
-            <div className="flex flex-col sm:flex-row gap-3 max-sm:gap-4 max-w-md w-full">
-              {/* <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:border-main_color w-full"
-              /> */}
+            <div className="flex flex-col sm:flex-row gap-2 max-sm:gap-4 max-w-md w-full">
+              
               <button className="px-6 py-3 min-w-[200px] max-lg:min-w-fit font-medium bg-main_color text-white rounded-xl hover:bg-main_color transition-colors whitespace-nowrap">
                 Get Started
               </button>
@@ -37,7 +36,7 @@ const HeroSection = () => {
             </div>
 
             {/* Trusted Partners - Inline Layout */}
-            <div className="mt-16">
+            <div className="mt-12">
               <p className="text-sm text-[#8B8B8B] mb-6">
                 Built for everyday people, powered by smart opportunities
               </p>

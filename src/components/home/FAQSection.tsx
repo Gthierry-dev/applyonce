@@ -54,9 +54,9 @@ const FAQSection = () => {
         <div className="flex items-start justify-between w-full max-lg:flex-col">
           <div className="text-center space-y-4 mb-5">
             <h2 className="text-4xl max-md:text-2xl font-bold text-left leading-snug">
-              Got Questions?
+              Common Questions
               <br />
-              <span className="text-primary">We've Got Answers!</span>
+              <span className="text-primary">About ApplyOnce</span>
             </h2>
           </div>
 
