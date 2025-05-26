@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   FileText,
@@ -15,13 +14,24 @@ import {
   ChevronLeft,
   Menu,
   ClipboardList,
-  BarChart
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useAuth } from '@/contexts/AuthContext';
+  BarChart,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
+import { GoSidebarExpand } from "react-icons/go";
+import { GoSidebarCollapse } from "react-icons/go";
+import { TbSmartHome } from "react-icons/tb";
+import { TbSearch } from "react-icons/tb";
+import { TbClipboardList } from "react-icons/tb";
+import { TbFolder } from "react-icons/tb";
 
 interface SidebarProps {
   className?: string;
@@ -37,26 +47,53 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   const navigate = useNavigate();
 
   const adminLinks = [
-    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
-    { name: 'Opportunities', icon: <FileText size={20} />, path: '/admin/opportunities' },
-    { name: 'Categories', icon: <Folder size={20} />, path: '/admin/categories' },
-    { name: 'Users', icon: <Users size={20} />, path: '/admin/users' },
-    { name: 'Analytics', icon: <BarChart size={20} />, path: '/admin/analytics' },
-    { name: 'Settings', icon: <Settings size={20} />, path: '/admin/settings' },
+    {
+      name: "Dashboard",
+      icon: <LayoutDashboard size={20} />,
+      path: "/admin/dashboard",
+    },
+    {
+      name: "Opportunities",
+      icon: <FileText size={20} />,
+      path: "/admin/opportunities",
+    },
+    {
+      name: "Categories",
+      icon: <Folder size={20} />,
+      path: "/admin/categories",
+    },
+    { name: "Users", icon: <Users size={20} />, path: "/admin/users" },
+    {
+      name: "Analytics",
+      icon: <BarChart size={20} />,
+      path: "/admin/analytics",
+    },
+    { name: "Settings", icon: <Settings size={20} />, path: "/admin/settings" },
   ];
 
   const userLinks = [
-    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-    { name: 'Opportunities', icon: <Search size={20} />, path: '/opportunities' },
+    {
+      name: "Dashboard",
+      icon: <TbSmartHome size={20} />,
+      path: "/dashboard",
+    },
+    {
+      name: "Opportunities",
+      icon: <TbSearch size={20} />,
+      path: "/opportunities",
+    },
     // { name: 'Applications', icon: <FileText size={20} />, path: '/applications' },
-    { name: 'Application Status', icon: <ClipboardList size={20} />, path: '/application-status' },
-    { name: 'Categories', icon: <Folder size={20} />, path: '/categories' },
-    { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
+    {
+      name: "Application Status",
+      icon: <TbClipboardList size={20} />,
+      path: "/application-status",
+    },
+    { name: "Categories", icon: <TbFolder size={20} />, path: "/categories" },
+    { name: "Settings", icon: <Settings size={20} />, path: "/settings" },
   ];
 
   const links = isAdmin ? adminLinks : userLinks;
-  const homeLink = isAdmin ? '/admin/dashboard' : '/dashboard';
-
+  const homeLink = isAdmin ? "/admin/dashboard" : "/dashboard";
 
   const handleToggleCollapse = () => {
     setCollapsed(!collapsed);
@@ -79,8 +116,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
 
   // Determine if we're in the admin section
   useEffect(() => {
-    const isCurrentlyAdmin = location.pathname.startsWith('/admin');
-    if (isAdmin !== isCurrentlyAdmin && location.pathname !== '/') {
+    const isCurrentlyAdmin = location.pathname.startsWith("/admin");
+    if (isAdmin !== isCurrentlyAdmin && location.pathname !== "/") {
       // This is a prop-based check, you might want to handle this differently
       // in a real implementation with authentication
     }
@@ -103,15 +140,15 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
         {/* Mobile sidebar */}
         <div
           className={cn(
-            'fixed inset-0 z-40 transform transition-transform duration-300 ease-in-out',
-            mobileOpen ? 'translate-x-0' : '-translate-x-full'
+            "fixed inset-0 z-40 transform transition-transform duration-300 ease-in-out",
+            mobileOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
           {/* Backdrop */}
           <div
             className={cn(
-              'absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity',
-              mobileOpen ? 'opacity-100' : 'opacity-0'
+              "absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity",
+              mobileOpen ? "opacity-100" : "opacity-0"
             )}
             onClick={() => setMobileOpen(false)}
           ></div>
@@ -121,10 +158,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
             <div className="flex items-center justify-between mb-8">
               <Link to={homeLink} className="flex items-center gap-2">
                 <div className="rounded-md bg-primary p-1.5">
-                  <span className="text-primary-foreground font-bold text-sm">A1</span>
+                  <span className="text-primary-foreground font-bold text-sm">
+                    A1
+                  </span>
                 </div>
                 <span className="font-display font-semibold text-lg text-sidebar-foreground">
-                  {isAdmin ? 'Admin Panel' : 'ApplyOnce'}
+                  {isAdmin ? "Admin Panel" : "ApplyOnce"}
                 </span>
               </Link>
               <Button
@@ -143,10 +182,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                   key={link.name}
                   to={link.path}
                   className={cn(
-                    'flex items-center px-3 py-2 rounded-md text-sm transition-colors',
+                    "flex items-center px-3 py-2 rounded-md text-sm transition-colors",
                     location.pathname === link.path
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                      : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                   )}
                 >
                   <span className="mr-3">{link.icon}</span>
@@ -174,48 +213,44 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   return (
     <aside
       className={cn(
-        'h-screen sticky top-0 flex flex-col bg-sidebar text-sidebar-foreground transition-all duration-300 overflow-y-auto',
-        collapsed ? 'w-[70px]' : 'w-64',
+        "h-screen sticky top-0 flex flex-col transition-all duration-300 bg-[#f9f9fb] border-r-[2px] border-stone-200/60 group",
+        collapsed ? "w-[70px]" : "w-64",
         className
       )}
     >
-      <div className="p-4 flex items-center justify-between">
+      <div className="p-4 flex items-center justify-between relative border-b-[2px] border-stone-200/60">
         {!collapsed && (
           <Link to={homeLink} className="flex items-center gap-2">
-            <div className="rounded-md bg-primary p-1.5">
-              <span className="text-primary-foreground font-bold text-sm">A1</span>
+            <div className="w-fit h-7 min-w-7">
+              <img src="./favicon.png" alt="" className="h-full" />
             </div>
             <span className="font-display font-semibold text-lg text-sidebar-foreground">
-              {isAdmin ? 'Admin Panel' : 'ApplyOnce'}
+              {isAdmin ? "Admin Panel" : "ApplyOnce"}
             </span>
           </Link>
         )}
         {collapsed && (
           <div className="mx-auto">
-            <div className="rounded-md bg-primary p-1.5">
-              <span className="text-primary-foreground font-bold text-sm">A1</span>
+            <div className="w-fit h-7 min-w-7">
+              <img src="./favicon.png" alt="" className="h-full" />
             </div>
           </div>
         )}
         {!collapsed && (
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={handleToggleCollapse}
-            className="text-sidebar-foreground hover:text-white hover:bg-sidebar-accent"
+            className="size-10 flex items-center justify-center rounded-xl text-sidebar-foreground hover:bg-foreground/5"
           >
-            <ChevronLeft size={18} />
-          </Button>
+            <ChevronLeft size={20} />
+          </button>
         )}
         {collapsed && (
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={handleToggleCollapse}
-            className="w-full text-sidebar-foreground hover:text-white hover:bg-sidebar-accent"
+            className="size-7 flex items-center justify-center rounded-lg text-sidebar-foreground transition-all opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 bg-white border border-[#e7e7e7] absolute -right-[14px] z-10"
           >
             <ChevronRight size={18} />
-          </Button>
+          </button>
         )}
       </div>
 
@@ -230,10 +265,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                       <Link
                         to={link.path}
                         className={cn(
-                          'flex items-center justify-center py-2 rounded-md transition-colors',
+                          "flex items-center justify-center py-2 rounded-md transition-colors",
                           location.pathname === link.path
-                            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                            : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                            : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                         )}
                       >
                         {link.icon}
@@ -250,10 +285,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                 key={link.name}
                 to={link.path}
                 className={cn(
-                  'flex items-center px-3 py-2 rounded-md text-sm transition-colors',
+                  "flex items-center px-3 py-2 rounded-md text-sm transition-colors",
                   location.pathname === link.path
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
+                    ? "bg-red-400 text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                 )}
               >
                 <span className="mr-3">{link.icon}</span>

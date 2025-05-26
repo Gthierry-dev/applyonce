@@ -100,7 +100,7 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
               <div className="space-y-3">
                 <Link
                   to="/signup"
-                  className="inline-flex items-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/80 h-9 px-4 py-2"
+                  className="inline-flex items-center rounded-xl text-sm font-medium focus-visible:outline-none bg-main_color text-white hover:brightness-110 transition h-9 px-4 py-2"
                 >
                   Sign Up
                   <ChevronRight className="ml-1 h-4 w-4" />
