@@ -300,7 +300,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
       </div>
 
       <div className="p-4">
-        {collapsed ? (
+        {/* {collapsed ? (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -322,7 +322,29 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
             <LogOut size={20} className="mr-3" />
             <span>Logout</span>
           </Button>
-        )}
+        )} */}
+
+<div className="mb-3 p-4 bg-white rounded-xl shadow-sm border border-stone-200/60"> 
+    <div className="flex justify-between align-center">
+    <div className="flex items-center gap-2 bg-black text-white rounded-xl px-3 py-1.5 mb-2 w-fit"> 
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange-500">
+      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+    </svg>
+    <span className="text-sm font-medium">20 days left</span> 
+  </div>
+  <button className=" flex py-2 items-top text-black">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    </div>
+  <p className="text-sm text-gray-600 mb-3">Upgrade to premium and enjoy the benefits for a long time</p>
+  <button className="w-full py-2 text-center bg-white hover:bg-[#306C6A] hover:text-white  border border-stone-200 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">
+    View plan
+  </button>
+</div>
       </div>
     </aside>
   );
