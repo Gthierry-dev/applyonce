@@ -101,7 +101,7 @@ const Dashboard = () => {
     },
   };
 
-  <WelcomeBanner />
+  
   // Filter applications based on selected filters
   const filteredApplications = applications?.filter(app => {
     // Status filter
@@ -140,7 +140,7 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Dashboard" />
-      
+      <WelcomeBanner />
       <div className="space-y-6">
         {/* Filters Section */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-gray-50 p-4 rounded-lg">
