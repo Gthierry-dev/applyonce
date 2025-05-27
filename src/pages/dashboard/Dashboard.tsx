@@ -11,6 +11,7 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DatePicker } from '@/components/ui/date-picker';
+import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
 
 interface Application {
   id: string;
@@ -100,6 +101,7 @@ const Dashboard = () => {
     },
   };
 
+  <WelcomeBanner />
   // Filter applications based on selected filters
   const filteredApplications = applications?.filter(app => {
     // Status filter
