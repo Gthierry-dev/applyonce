@@ -143,7 +143,7 @@ const Dashboard = () => {
       <WelcomeBanner />
       <div className="space-y-6">
         {/* Filters Section */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-gray-50 p-4 rounded-lg">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-gray-10 px-2 rounded-lg">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-gray-500" />
