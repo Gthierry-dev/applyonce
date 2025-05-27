@@ -169,7 +169,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
     if (collapsed) {
       return (
         <div className="mb-4">
-          {/* Remove the title div when collapsed */}
+          {/* Remove the title  when collapsed */}
           <div className="space-y-1">
             {linksList.map((link) => (
               <TooltipProvider key={link.name}>
@@ -252,26 +252,26 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
         {/* Mobile sidebar */}
         <div
           className={cn(
-            "fixed inset-0 z-40 transform transition-transform duration-300 ease-in-out",
+            "fixed  inset-0 z-40 transform transition-transform duration-300 ease-in-out",
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
           {/* Backdrop */}
           <div
             className={cn(
-              "absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity",
+              "absolute inset-0 bg-[#f9f9fb] w-64 backdrop-blur-sm transition-opacity",
               mobileOpen ? "opacity-100" : "opacity-0"
             )}
             onClick={() => setMobileOpen(false)}
           ></div>
 
           {/* Sidebar content */}
-          <nav className="relative w-64 h-full bg-sidebar text-sidebar-foreground p-4 flex flex-col overflow-y-auto">
+          <nav className="relative w-64 h-full bg-sidebar  text-sidebar-foreground p-4 flex flex-col overflow-y-auto">
             <div className="flex items-center justify-between mb-8">
               <Link to={homeLink} className="flex items-center gap-2">
                 <div className="rounded-md bg-primary p-1.5">
                   <span className="text-primary-foreground font-bold text-sm">
-                    A1
+                  <img src="./2.png" alt="" className="w-5" />
                   </span>
                 </div>
                 <span className="font-display font-semibold text-lg text-sidebar-foreground">
@@ -308,39 +308,22 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
               </div>
             ) : (
               <>
-                {renderLinkSection("MAIN MENU", mainMenuLinks)}
-                {renderLinkSection("TOOLS", toolsLinks, true, toolsExpanded)}
-                {renderLinkSection("PREFERENCES", preferencesLinks)}
+                <div className="flex-grow">
+                  {renderLinkSection("MAIN MENU", mainMenuLinks)}
+                  {renderLinkSection("TOOLS", toolsLinks, true, toolsExpanded)}
+                </div>
+                
+                {/* Preferences section moved to bottom */}
+                <div className="mt-auto mb-2">
+                  {renderLinkSection("PREFERENCES", preferencesLinks)}
+                </div>
+                
+                <div className="mt-auto">
+                  {/* Premium card and logout button */}
+                  {/* ... existing code ... */}
+                </div>
               </>
             )}
-
-            <div className="mt-auto">
-              <div className="mb-3 p-4 bg-white rounded-xl shadow-sm border border-stone-200/60">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2 bg-gradient-to-b from-[#3f8582] to-main_color text-white/90 rounded-lg px-3 py-2 mb-2 w-fit">
-                    <MdLocalFireDepartment className="text-xl text-white" />
-                    <span className="text-sm font-semibold">20 days left</span>
-                  </div>
-                  <button className="p-1 flex items-top text-foreground">
-                    <RiCloseLargeFill className="text-foreground" />
-                  </button>
-                </div>
-                <p className="text-sm text-gray-600 mb-3">
-                  Upgrade to premium and enjoy the benefits for a long time
-                </p>
-                <button className="w-full py-2 text-center bg-[#f9f9fb] hover:bg-[#f0f0f0] border border-stone-200 rounded-xl text-sm font-medium text-foreground/70 hover:text-foreground/90 transition-colors">
-                  View plan
-                </button>
-              </div>
-              
-              <Button
-                onClick={handleLogout}
-                className="flex items-center w-full px-3 py-2 rounded-md text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
-              >
-                <LogOut size={20} className="mr-3" />
-                <span>Logout</span>
-              </Button>
-            </div>
           </nav>
         </div>
       </>
@@ -393,7 +376,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
       </div>
 
       <div className="flex-1 py-3 overflow-y-auto">
-        <nav className="px-3 space-y-1">
+        <nav className="px-3 space-y-1 flex flex-col h-full">
           {isAdmin ? (
             links.map((link) => {
               if (collapsed) {
@@ -437,9 +420,15 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
             })
           ) : (
             <>
-              {renderLinkSection("MAIN MENU", mainMenuLinks)}
-              {renderLinkSection("TOOLS", toolsLinks, true, toolsExpanded)}
-              {renderLinkSection("PREFERENCES", preferencesLinks)}
+              <div className="flex-grow">
+                {renderLinkSection("MAIN MENU", mainMenuLinks)}
+                {renderLinkSection("TOOLS", toolsLinks, true, toolsExpanded)}
+              </div>
+              
+              {/* Preferences section moved to bottom */}
+              <div className="mt-auto mb-2">
+                {renderLinkSection("PREFERENCES", preferencesLinks)}
+              </div>
             </>
           )}
         </nav>
