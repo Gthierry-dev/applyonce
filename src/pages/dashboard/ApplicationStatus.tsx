@@ -1,5 +1,6 @@
 import React from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -104,6 +105,8 @@ const ApplicationStatus = () => {
 
   return (
     <DashboardLayout>
+      <DashboardHeader title="Application Status" />
+      
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

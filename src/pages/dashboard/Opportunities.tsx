@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import OpportunityCard from '@/components/cards/OpportunityCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -60,6 +61,8 @@ const Opportunities = () => {
 
   return (
     <DashboardLayout>
+      <DashboardHeader title="Opportunities" />
+      
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>

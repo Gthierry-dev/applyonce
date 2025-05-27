@@ -1,5 +1,6 @@
 import React from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import CategoryCard from '@/components/categories/CategoryCard';
 import { useCategories } from '@/hooks/useCategories';
 import { Loader2 } from 'lucide-react';
@@ -9,6 +10,8 @@ const Categories = () => {
 
   return (
     <DashboardLayout>
+      <DashboardHeader title="Categories" />
+      
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Categories</h1>

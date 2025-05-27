@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Filter, Calendar, Building2, CheckCircle2, XCircle, Clock, Loader2, FileText, BookmarkIcon } from 'lucide-react';
@@ -104,6 +105,7 @@ const Applications = () => {
 
       return (
     <DashboardLayout>
+      <DashboardHeader title="Applications" />
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
