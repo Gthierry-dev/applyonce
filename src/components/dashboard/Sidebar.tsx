@@ -37,6 +37,7 @@ import { TbClipboardList } from "react-icons/tb";
 import { TbFolder } from "react-icons/tb";
 import { MdLocalFireDepartment } from "react-icons/md";
 import { RiCloseLargeFill } from "react-icons/ri";
+import { Bounce, Fade, Hinge, JackInTheBox, Roll, Slide, Zoom } from "react-awesome-reveal";
 
 interface SidebarProps {
   className?: string;
@@ -47,7 +48,11 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [toolsExpanded, setToolsExpanded] = useState(false);
-  const [premiumCardClosed, setPremiumCardClosed] = useState(false); // New state for premium card
+  const [premiumCardClosed, setPremiumCardClosed] = useState<boolean>(() => {
+    // Read initial state from localStorage
+    const stored = localStorage.getItem("premiumCardClosed");
+    return stored === "true";
+  }); // New state for premium card
   const location = useLocation();
   const isMobile = useIsMobile();
   const { signOut } = useAuth();
@@ -96,10 +101,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
       icon: <TbClipboardList size={20} />,
       path: "/application-status",
     },
-    { 
-      name: "Categories", 
-      icon: <TbFolder size={20} />, 
-      path: "/categories" 
+    {
+      name: "Categories",
+      icon: <TbFolder size={20} />,
+      path: "/categories",
     },
   ];
 
@@ -122,10 +127,10 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
       icon: <HelpCircle size={20} />,
       path: "/help",
     },
-    { 
-      name: "Settings", 
-      icon: <Settings size={20} />, 
-      path: "/settings" 
+    {
+      name: "Settings",
+      icon: <Settings size={20} />,
+      path: "/settings",
     },
   ];
 
@@ -148,6 +153,17 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
     await signOut();
   };
 
+  // Handle premium card close
+  const handlePremiumCardClose = () => {
+    setPremiumCardClosed(true);
+    localStorage.setItem("premiumCardClosed", "true");
+  };
+
+  const handlePremiumCardOpen = () => {
+    setPremiumCardClosed(false);
+    localStorage.setItem("premiumCardClosed", "false");
+  };
+
   // Close mobile menu when changing routes
   useEffect(() => {
     if (isMobile && mobileOpen) {
@@ -165,7 +181,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
   }, [location.pathname, isAdmin]);
 
   // Render a section of links with a title
-  const renderLinkSection = (title, linksList, isCollapsible = false, isExpanded = false) => {
+  const renderLinkSection = (
+    title,
+    linksList,
+    isCollapsible = false,
+    isExpanded = false
+  ) => {
     if (collapsed) {
       return (
         <div className="mb-4">
@@ -199,15 +220,19 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
     return (
       <div className="mb-4">
         <div className="flex items-center justify-between">
-          <div className="text-xs uppercase text-gray-500 font-semibold px-3 mb-2">{title}</div>
+          <div className="text-xs uppercase text-gray-500 font-semibold px-3 mb-2">
+            {title}
+          </div>
           {isCollapsible && (
-            <button 
+            <button
               onClick={handleToolsToggle}
               className="p-1 rounded-md hover:bg-gray-200 transition-colors"
             >
-              <ChevronDown 
-                size={16} 
-                className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+              <ChevronDown
+                size={16}
+                className={`transition-transform ${
+                  isExpanded ? "rotate-180" : ""
+                }`}
               />
             </button>
           )}
@@ -271,7 +296,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
               <Link to={homeLink} className="flex items-center gap-2">
                 <div className="rounded-md bg-primary p-1.5">
                   <span className="text-primary-foreground font-bold text-sm">
-                  <img src="./2.png" alt="" className="w-5" />
+                    <img src="./2.png" alt="" className="w-5" />
                   </span>
                 </div>
                 <span className="font-display font-semibold text-lg text-sidebar-foreground">
@@ -312,12 +337,12 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                   {renderLinkSection("MAIN MENU", mainMenuLinks)}
                   {renderLinkSection("TOOLS", toolsLinks, true, toolsExpanded)}
                 </div>
-                
+
                 {/* Preferences section moved to bottom */}
                 <div className="mt-auto mb-2">
                   {renderLinkSection("PREFERENCES", preferencesLinks)}
                 </div>
-                
+
                 <div className="mt-auto">
                   {/* Premium card and logout button */}
                   {/* ... existing code ... */}
@@ -375,7 +400,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
         )}
       </div>
 
-      <div className="flex-1 py-3 overflow-y-auto">
+      <div className="flex-1 pt-3 overflow-y-auto">
         <nav className="px-3 space-y-1 flex flex-col h-full">
           {isAdmin ? (
             links.map((link) => {
@@ -424,9 +449,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                 {renderLinkSection("MAIN MENU", mainMenuLinks)}
                 {renderLinkSection("TOOLS", toolsLinks, true, toolsExpanded)}
               </div>
-              
+
               {/* Preferences section moved to bottom */}
-              <div className="mt-auto mb-2">
+              <div className="mt-auto">
                 {renderLinkSection("PREFERENCES", preferencesLinks)}
               </div>
             </>
@@ -440,55 +465,59 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
         <div className="px-3 pb-3">
           <div className="flex justify-center">
             <div className="p-2 bg-gradient-to-b from-[#3f8582] to-main_color text-white rounded-lg">
-              <span className="text-sm font-semibold">20</span>
+              <span className="text-sm font-semibold">30</span>
             </div>
           </div>
         </div>
       ) : (
         // Expanded state - show either full card or just the days indicator
-        <div className="w-full h-fit p-3">
+        <div className="w-full h-fit px-3 pb-3">
           {premiumCardClosed ? (
             // Closed state - show just the days indicator at the bottom
-            <div className="flex items-center gap-2 bg-gradient-to-b from-[#3f8582] to-main_color text-white/90 rounded-lg px-3 py-2 w-fit mx-auto">
-              <MdLocalFireDepartment className="text-xl text-white" />
-              <span className="text-sm font-semibold">20 days left</span>
-            </div>
+            <Fade duration={350} triggerOnce={true}>
+              <div
+                onClick={handlePremiumCardOpen}
+                className={`flex items-center justify-center gap-2 bg-gradient-to-b from-[#3f8582] to-main_color text-white/90 rounded-xl px-3 py-2.5 w-fit mx-auto transition-transform active:scale-[.98] cursor-pointer select-none ${
+                  premiumCardClosed ? "w-full" : "w-fit"
+                }`}
+              >
+                <MdLocalFireDepartment className="text-xl text-white" />
+                <span className="text-sm font-semibold">30 days left</span>
+              </div>
+            </Fade>
           ) : (
             // Open state - show full premium card
-            <div className="mb-0 p-3 bg-white rounded-xl shadow-sm border border-stone-200/60">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-2 bg-gradient-to-b from-[#3f8582] to-main_color text-white/90 rounded-lg px-3 py-2 mb-2 w-fit">
-                  <MdLocalFireDepartment className="text-xl text-white" />
-                  <span className="text-sm font-semibold">20 days left</span>
+            <Fade duration={350} triggerOnce={true}>
+              <div className="mb-0 p-3 bg-white rounded-xl shadow-sm border border-stone-200/60">
+                <div className="flex justify-between items-start">
+                  <div
+                    className={`flex items-center gap-2 bg-gradient-to-b from-[#3f8582] to-main_color text-white/90 rounded-xl px-3 py-2 mb-2`}
+                  >
+                    <MdLocalFireDepartment className="text-xl text-white" />
+                    <span className="text-sm font-semibold">30 days left</span>
+                  </div>
+                  <button
+                    className="p-1 flex items-top text-foreground"
+                    onClick={handlePremiumCardClose}
+                  >
+                    <RiCloseLargeFill className="text-foreground" />
+                  </button>
                 </div>
-                <button 
-                  className="p-1 flex items-top text-foreground"
-                  onClick={handlePremiumCardClose}
-                >
-                  <RiCloseLargeFill className="text-foreground" />
+                <p className="text-sm text-gray-600 mb-3">
+                  Upgrade to premium and enjoy the benefits for a long time
+                </p>
+                <button className="w-full py-2 text-center bg-[#f9f9fb] hover:bg-[#f0f0f0] border border-stone-200 rounded-xl text-sm font-medium text-foreground/70 hover:text-foreground/90 transition-colors">
+                  View plan
                 </button>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
-                Upgrade to premium and enjoy the benefits for a long time
-              </p>
-              <button className="w-full py-2 text-center bg-[#f9f9fb] hover:bg-[#f0f0f0] border border-stone-200 rounded-xl text-sm font-medium text-foreground/70 hover:text-foreground/90 transition-colors">
-                View plan
-              </button>
-            </div>
+            </Fade>
           )}
         </div>
       )}
-      
-      <div>
-         {/* Commented out logout button */}
-      </div>
+
+      <div>{/* Commented out logout button */}</div>
     </aside>
   );
 };
 
 export default Sidebar;
-
-// Handle premium card close
-const handlePremiumCardClose = () => {
-  setPremiumCardClosed(true);
-};

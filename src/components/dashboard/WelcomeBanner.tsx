@@ -11,7 +11,7 @@ interface WelcomeBannerProps {
 const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
   title = 'Empowering Your Career Growth!',
   subtitle = 'Explore job listings, track applications, and advance your professional journey.',
-  imagePath = '/presentation.jpg'
+  imagePath = '/green-bg.jpg'
 }) => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -21,7 +21,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
     <div className="relative overflow-hidden rounded-xl mb-6">
       {/* Background Image with Overlay */}
       <div 
-        className="absolute inset-0 bg-cover bg-center z-0" 
+        className="absolute inset-0 bg-cover bg-left-bottom z-0" 
         style={{ 
           backgroundImage: `url(${imagePath})`,
           filter: 'brightness(0.7)'
@@ -29,7 +29,7 @@ const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
       />
       
       {/* Purple Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/80 to-indigo-900/60 z-10" />
+      {/* <div className="absolute inset-0 bg-gradient-to-r from-main_color/40 to-main_color/20 z-10" /> */}
       
       {/* Content */}
       <div className="relative z-20 px-6 py-8">
