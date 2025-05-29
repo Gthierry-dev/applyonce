@@ -1,34 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
-import { FaBell } from 'react-icons/fa';
-import { BiMessageDetail } from 'react-icons/bi';
-import ContactSearch from './search';
+import React, { useState, useEffect } from "react";
+import { Search } from "lucide-react";
+import { FaBell } from "react-icons/fa";
+import { BiMessageDetail } from "react-icons/bi";
+import ContactSearch from "./search";
 
 interface DashboardHeaderProps {
   title?: string;
 }
 
-const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title = 'Dashboard' }) => {
+const DashboardHeader: React.FC<DashboardHeaderProps> = ({
+  title = "Dashboard",
+}) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Handle keyboard shortcut
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Check for Ctrl+K or Cmd+K (Mac)
-      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+      if ((event.ctrlKey || event.metaKey) && event.key === "k") {
         event.preventDefault(); // Prevent default browser behavior
         setIsSearchOpen(true);
       }
-      
+
       // Close search on Escape key
-      if (event.key === 'Escape' && isSearchOpen) {
+      if (event.key === "Escape" && isSearchOpen) {
         setIsSearchOpen(false);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isSearchOpen]);
 
@@ -45,13 +47,19 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title = 'Dashboard' }
   return (
     <>
       {isSearchOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={handleCloseSearch}>
-          <div onClick={(e) => e.stopPropagation()}>
-            <ContactSearch   onClose={handleCloseSearch} />
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+          onClick={handleCloseSearch}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center justify-center"
+          >
+            <ContactSearch onClose={handleCloseSearch} />
           </div>
         </div>
       )}
-      
+
       <header className="flex items-center justify-between py-[17px] mb-6 border-b-[2px] border-stone-200/60">
         <h2 className="text-xl font-semibold">{title}</h2>
         <div className="flex items-center gap-4">
@@ -59,9 +67,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title = 'Dashboard' }
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <Search className="h-4 w-4 text-gray-400" />
             </div>
-            <input 
-              type="text" 
-              placeholder="Search" 
+            <input
+              type="text"
+              placeholder="Search"
               className="pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-xl w-64 focus:outline-none focus:ring-2 focus:ring-main_color focus:border-transparent cursor-pointer"
               onClick={handleSearchClick}
               readOnly
@@ -85,9 +93,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title = 'Dashboard' }
           </button>
 
           <div className="h-8 w-8 rounded-full bg-gray-200 overflow-hidden">
-            <img 
-              src="https://ui-avatars.com/api/?name=User&background=random" 
-              alt="User avatar" 
+            <img
+              src="https://ui-avatars.com/api/?name=User&background=random"
+              alt="User avatar"
               className="h-full w-full object-cover"
             />
           </div>
