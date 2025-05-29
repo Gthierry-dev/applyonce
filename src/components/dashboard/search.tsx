@@ -39,7 +39,7 @@ const highlightText = (text: string, query: string) => {
   const parts = text.split(new RegExp(`(${query})`, 'gi'));
   return parts.map((part, i) => 
     part.toLowerCase() === query.toLowerCase() ? 
-    <span key={i} className="text-white px-1 rounded" style={{backgroundColor: '#306C6A'}}>{part}</span> : part
+    <span key={i} className="text-white px-1 rounded bg-[#306C6A]">{part}</span> : part
   );
 };
 
@@ -62,9 +62,9 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
                         contact.email?.includes(query);
     
     if (activeFilter === 'All') return matchesQuery;
-    if (activeFilter === 'People') return matchesQuery && contact.type === 'person';
-    if (activeFilter === 'Family') return matchesQuery && contact.type === 'family';
-    if (activeFilter === 'Company') return matchesQuery && contact.type === 'company';
+    if (activeFilter === 'Opportunities') return matchesQuery && contact.type === 'person';
+    if (activeFilter === 'Categories') return matchesQuery && contact.type === 'family';
+    if (activeFilter === 'Companies') return matchesQuery && contact.type === 'company';
     return matchesQuery;
   });
 
@@ -74,17 +74,18 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
   });
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center w-full gap-2">
+    <div className=" h-full max-vh-[70] bg-white rounded-xl shadow-2xl w-[700px]">
+      {/* Header with search input */}
+      {/* <div className="flex items-center justify-between px-72 mx-72 "></div> */}
+      <div className="flex  items-center justify-between  p-3 border-b">
+        <div className="flex items-center gap-2 flex-1"> 
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search ..."
-            className="px-3 py-2 mr-2 w-full rounded text-sm font-medium outline-none focus:ring-2 focus:ring-[#306C6A] min-w-0 w-32"
+            placeholder="search.."
+            className="bg-gray-100 px-3 w-full mr-2 py-2 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-[#306C6A] min-w-0 w-32"
           />
         </div>
         <button 
@@ -95,14 +96,14 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center justify-between p-4 border-b">
+      {/* Tabs */}
+      <div className="flex items-center justify-between p-2 border-b">
         <div className="flex gap-1">
-          {['All', 'People', 'Family', 'Company'].map(filter => (
+          {['All', 'Opportunities', 'Categories','Companies'].map(filter => (
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 activeFilter === filter 
                   ? 'text-white' 
                   : 'text-gray-600 hover:text-gray-800'
@@ -115,7 +116,7 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
         </div>
         <button 
           onClick={() => setSortBy(sortBy === 'A→Z' ? 'Z→A' : 'A→Z')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+          className="flex items-center gap-1 text-gray-600 hover:text-gray-800"
         >
           <span className="text-sm">↕</span>
           <span className="text-sm font-medium">Sort by: {sortBy}</span>
@@ -125,9 +126,9 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
       {/* Contacts List */}
       <div className="max-h-96 overflow-y-auto">
         {sortedContacts.map(contact => (
-          <div key={contact.id} className="flex items-center justify-between p-4 hover:bg-gray-50 border-b last:border-b-0">
+          <div key={contact.id} className="flex items-center justify-between p-3 hover:bg-gray-50 border-b last:border-b-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                 {getIcon(contact)}
               </div>
               <div>
@@ -154,10 +155,10 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 text-sm text-gray-600">
-        <span><kbd className="bg-white px-2 py-1 rounded">ESC</kbd> to close</span>
-        <span><kbd className="bg-white px-1 rounded">↑</kbd> <kbd className="bg-white px-1 rounded">↓</kbd> to navigate</span>
-        <span><kbd className="bg-white px-2 py-1 rounded">⏎</kbd> to select</span>
+      <div className="rounded-xl mt-4 flex items-center justify-between p-4 bg-gray-50 text-xs text-gray-600">
+        <span><kbd className="bg-white px-2 py-0.5 rounded border border-gray-200 text-pink-500 font-medium">ESC</kbd> to close</span>
+        <span><kbd className="bg-white px-1 py-0.5 rounded border border-gray-200">↑</kbd> <kbd className="bg-white px-1 py-0.5 rounded border border-gray-200">↓</kbd> to navigate</span>
+        <span><kbd className="bg-white px-2 py-0.5 rounded border border-gray-200">⏎</kbd> to select</span>
       </div>
     </div>
   );

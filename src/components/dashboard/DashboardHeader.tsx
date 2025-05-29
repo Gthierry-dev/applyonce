@@ -47,7 +47,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title = 'Dashboard' }
       {isSearchOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={handleCloseSearch}>
           <div onClick={(e) => e.stopPropagation()}>
-            <ContactSearch  onClose={handleCloseSearch} />
+            <ContactSearch   onClose={handleCloseSearch} />
           </div>
         </div>
       )}
@@ -62,7 +62,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title = 'Dashboard' }
             <input 
               type="text" 
               placeholder="Search" 
-              className="pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-main_color focus:border-transparent cursor-pointer"
+              className="pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-xl w-64 focus:outline-none focus:ring-2 focus:ring-main_color focus:border-transparent cursor-pointer"
               onClick={handleSearchClick}
               readOnly
             />
