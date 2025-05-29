@@ -129,7 +129,7 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
   });
 
   return (
-    <div className="h-[80vh] max-h-[600px] w-[700px] max-w-[90%] flex flex-col bg-white rounded-3xl shadow-2xl">
+    <div className="h-[80vh] max-h-[600px] w-[700px] max-md:w-full max-w-[90%] flex flex-col bg-white rounded-3xl shadow-2xl">
       {/* Header with search input */}
       {/* <div className="flex items-center justify-between px-72 mx-72 "></div> */}
       <div className="w-full h-fit flex flex-col gap-5 px-5 pt-5 pb-4 border-b">
@@ -153,14 +153,14 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center justify-between">
-          <div className="flex gap-0 overflow-x-auto pb-1">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex max-md:flex-wrap gap-0 max-md:gap-2 overflow-x-auto pb-1">
             {["All", "Opportunities", "Categories", "Companies"].map(
               (filter) => (
                 <button
                   key={filter}
                   onClick={() => setActiveFilter(filter)}
-                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors select-none ${
                     activeFilter === filter
                       ? "text-white"
                       : "text-text_color/60 hover:text-gray-800"
@@ -180,8 +180,9 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
             onClick={() => setSortBy(sortBy === "A→Z" ? "Z→A" : "A→Z")}
             className="flex items-center gap-1 ring-1 ring-stone-200 py-1.5 px-2 rounded-lg text-text_color/70 hover:text-gray-800"
           >
-            <span className="text-xl leading-3 translate-y-[-2px]">↕</span>
-            <span className="text-xs font-medium">Sort by: {sortBy}</span>
+            <span className="text-xl leading-3 translate-y-[-2px] max-md:hidden">↕</span>
+            <span className="text-xs font-medium max-md:hidden">Sort by: {sortBy}</span>
+            <span className="text-xs font-medium hidden max-md:flex">{sortBy}</span>
           </button>
         </div>
       </div>
@@ -190,14 +191,14 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
         {sortedContacts.map((contact) => (
           <div
             key={contact.id}
-            className="flex items-center justify-between px-5 py-2 cursor-pointer hover:bg-gray-50 border-b border-stone-100 last:border-b-0"
+            className="flex items-center justify-between max-md:flex-col max-md:items-start max-md:gap-2 px-5 py-2 cursor-pointer hover:bg-gray-50 border-b border-stone-100 last:border-b-0"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                 {getIcon(contact)}
               </div>
               <div>
-                <div className="font-medium text-base text-text_color/90">
+                <div className="font-medium text-base max-md:text-sm text-text_color/90">
                   {highlightText(contact.name, query)}
                   {contact.age && (
                     <span className="text-gray-500 ml-1">({contact.age})</span>
@@ -207,12 +208,12 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
             </div>
             <div className="text-right text-sm">
               {contact.phone && (
-                <div className="text-text_color/70">
+                <div className="text-text_color/70 truncate">
                   {highlightText(contact.phone, query)}
                 </div>
               )}
               {contact.email && (
-                <div className="text-text_color/70">
+                <div className="text-text_color/70 truncate">
                   {highlightText(contact.email, query)}
                 </div>
               )}
@@ -229,7 +230,7 @@ export default function ContactSearch({ onClose }: ContactSearchProps) {
           </kbd>{" "}
           to close
         </span>
-        <span>
+        <span className="max-md:hidden">
           <kbd className="bg-white px-1 py-0.5 rounded border border-gray-200">
             ↑
           </kbd>{" "}

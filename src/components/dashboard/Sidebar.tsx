@@ -42,11 +42,13 @@ import { Bounce, Fade, Hinge, JackInTheBox, Roll, Slide, Zoom } from "react-awes
 interface SidebarProps {
   className?: string;
   isAdmin?: boolean;
+  mobileOpen: any, 
+  setMobileOpen: any
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
+const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false, mobileOpen, setMobileOpen }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  
   const [toolsExpanded, setToolsExpanded] = useState(false);
   const [premiumCardClosed, setPremiumCardClosed] = useState<boolean>(() => {
     // Read initial state from localStorage
@@ -268,7 +270,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
           variant="ghost"
           size="icon"
           onClick={handleMobileToggle}
-          className="fixed top-4 left-4 z-50"
+          className="fixed top-4 left-4 z-40"
           aria-label="Toggle menu"
         >
           <Menu size={20} />
@@ -291,7 +293,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
           ></div>
 
           {/* Sidebar content */}
-          <nav className="relative w-64 h-full bg-sidebar  text-sidebar-foreground p-4 flex flex-col overflow-y-auto">
+          <nav className="relative w-64 h-full bg-sidebar  text-sidebar-foreground p-4 flex flex-col overflow-y-auto border-r border-stone-200">
             <div className="flex items-center justify-between mb-8">
               <Link to={homeLink} className="flex items-center gap-2">
                 <div className="rounded-md bg-primary p-1.5">
@@ -307,7 +309,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setMobileOpen(false)}
-                className="text-sidebar-foreground hover:text-white hover:bg-sidebar-accent"
+                className="text-sidebar-foreground hover:text-main_color hover:bg-main_color/10"
               >
                 <ChevronLeft size={20} />
               </Button>

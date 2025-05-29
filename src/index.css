@@ -282,3 +282,137 @@ html {
 .swiper-button-prev:active {
   scale: 0.91;
 }
+
+
+
+.step_input_dropdown,
+.step_input_text,
+.step_input_textarea {
+  margin-bottom: 8px;
+  border-radius: 12px;
+  padding: 6px 40px 6px 15px;
+  width: fit-content;
+  min-width: 120px;
+  height: fit-content;
+  min-height: 40px;
+  box-shadow: 0px 0px 0px 1px #e9eaeb;
+  background-color: #ffffff;
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: start;
+  gap: 4px;
+  position: relative;
+  user-select: none;
+  outline: none;
+  border: none;
+  &::placeholder {
+    color: #11111166;
+  }
+}
+
+.step_input_text.percentage {
+  margin-bottom: unset !important;
+  font-weight: 400;
+}
+
+.step_input_text.half {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.border_shadow {
+  box-shadow: 0px 0px 0px 1px #dadada;
+}
+
+.currency_symbol {
+  position: absolute;
+  top: 25px;
+  right: 16px;
+  transform: translateY(-50%);
+  color: #2e2e2e;
+  font-size: 16px;
+  pointer-events: none;
+  z-index: 10;
+  font-weight: 500;
+  border-left: 1px solid #dadada;
+  padding-left: 14px;
+}
+
+.step_input_text.date {
+  display: unset !important;
+}
+
+.step_input_text.price {
+  padding-right: 74px;
+}
+
+.step_input_dropdown.multiple {
+  padding: 15px;
+  /* max-height: 175px;  */
+  overflow-y: auto;
+}
+
+.step_input_textarea {
+  height: 100px;
+  max-height: 200px;
+  padding: 15px !important;
+}
+
+.step_input_dropdown_content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: fit-content;
+  min-width: 100%;
+  transform: translateY(-2px);
+  height: fit-content;
+  max-height: 230px;
+  border-radius: 10px;
+  overflow-y: auto;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  display: none;
+  box-shadow: 0 0 10px 0 #cccccc;
+  z-index: 20 !important;
+  padding: 6px;
+  user-select: none;
+}
+
+#business_type {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -99;
+}
+
+.step_input_dropdown_content.open {
+  display: block;
+}
+
+.step_input_dropdown.focus,
+.step_input_text:focus,
+.step_input_textarea:focus {
+  box-shadow: 0px 0px 0px 2px #3e3e3e;
+}
+
+.step_input_dropdown_option {
+  min-width: fit-content;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 2px 0px;
+  white-space: nowrap;
+  font-size: 14px;
+  &:hover {
+    background-color: #ecececa9;
+  }
+}
+
+.step_input_dropdown_option.active {
+  background-color: #d063242f;
+}
