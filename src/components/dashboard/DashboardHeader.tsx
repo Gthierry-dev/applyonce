@@ -9,7 +9,7 @@ interface DashboardHeaderProps {
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ title = 'Dashboard' }) => {
   return (
-    <header className="flex items-center justify-between pb-2 mb-6 border-b border-gray-200">
+    <header className="flex items-center justify-between py-[17px] mb-6 border-b-[2px] border-stone-200/60">
       <h2 className="text-xl font-semibold">{title}</h2>
       <div className="flex items-center gap-4">
         <div className="relative">

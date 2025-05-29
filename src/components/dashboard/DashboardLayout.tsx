@@ -22,7 +22,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, className }
           isMobile && 'pt-16', 
           className
         )}>
-          <main className="p-4 sm:p-6">{children}</main>
+          <main className="px-4 pb-4 sm:px-6 sm:pb-6">{children}</main>
         </div>
       </div>
    </Layout>
