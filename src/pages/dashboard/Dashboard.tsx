@@ -32,6 +32,8 @@ import {
 import { DatePicker } from "@/components/ui/date-picker";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 import RecentApplications from "@/components/cards/RecentApplications";
+import OpportunityDashboard from "@/components/dashboard/opportunity-dashboard";
+
 
 interface Application {
   id: string;
@@ -380,15 +382,15 @@ const Dashboard = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="text-green-600 font-medium">28%</span>
+                <span className="text-red-600 font-medium">22%</span>
               </div>
               <span className="text-gray-500">From The Last Month</span>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="bg-card text-card-foreground/60 rounded-lg border shadow">
+        <div className="grid gap-4   md:grid-cols-2">
+          <div className="  bg-card text-card-foreground/60 rounded-lg border shadow">
             <RecentApplications />
             {/* <CardContent>
               {applicationsLoading ? (
@@ -431,40 +433,16 @@ const Dashboard = () => {
             </CardContent> */}
           </div>
 
-          <Card className="bg-card text-card-foreground rounded-lg border shadow">
-            <CardHeader className="flex flex-row items-center justify-between">
+          <Card className=" bg-card text-card-foreground/60 rounded-lg border shadow">
+            <OpportunityDashboard />
+            {/* <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Recommended Opportunities</CardTitle>
               <Button variant="outline" size="sm" className="gap-1">
                 <ArrowUpDown className="h-3 w-3" />
                 Sort
               </Button>
-            </CardHeader>
+            </CardHeader> */}
             <CardContent>
-              {opportunitiesLoading ? (
-                <div className="flex items-center justify-center h-32">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                </div>
-              ) : filteredOpportunities?.length === 0 ? (
-                <div className="text-sm text-muted-foreground">
-                  No opportunities match your filters.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredOpportunities?.slice(0, 5).map((opportunity) => (
-                    <div key={opportunity.id} className="space-y-1">
-                      <p className="font-medium">{opportunity.title}</p>
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm text-muted-foreground">
-                          {opportunity.organization}
-                        </p>
-                        <Badge variant="outline">
-                          {opportunity.category.name}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>

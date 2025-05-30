@@ -91,9 +91,9 @@ function RecentApplications() {
   const formatK = (v: number) => (v >= 1000 ? `${v / 1000}k` : `${v}`);
 
   return (
-    <div className="p-5">
+    <div className="p-5  ">
       <div className="flex justify-between items-center">
-        <h2 className="text-sm font-medium text-text-color-black/80 pr-5">
+        <h2 className="text-2xl font-medium text-text-color-black/80 pr-5">
           RecentApplications
         </h2>
         <Dropdown
