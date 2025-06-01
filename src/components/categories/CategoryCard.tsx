@@ -38,7 +38,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   const IconComponent = iconMap[iconName];
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-all duration-300 relative">
+    <Card className="overflow-hidden hover:shadow-sm transition-all duration-300 relative">
       <CategoryFormDrawer 
         categoryName={title}
         categoryIcon={
@@ -57,7 +57,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
                   <div 
-                    className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                     style={{ backgroundColor: color }}
                   >
                     <span className="text-white text-base font-medium">
@@ -85,7 +85,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="p-4 pt-0 flex justify-between">
+            <CardFooter className="p-2 px-4 border-t  bg-[#F9F9FB]  flex justify-between">
               <Button 
                 variant="outline" 
                 size="sm" 

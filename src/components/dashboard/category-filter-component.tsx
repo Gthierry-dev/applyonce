@@ -1,13 +1,21 @@
-import { useState } from 'react';
-import { ChevronDown, Filter, X, Save } from 'lucide-react';
-import { useCategories } from '@/hooks/useCategories';
+import { useState, useRef } from 'react';
+import { ChevronDown, Filter, X, Save, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function CategoryFilter({ children }) {
   const [activeTab, setActiveTab] = useState('categories');
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('popularity');
   const [selectedTags, setSelectedTags] = useState([]);
-  const { categories } = useCategories();
+  const scrollRef = useRef(null);
+
+  const categories = [
+    { id: 1, icon_name: '💼', title: 'Business', auto_apply: false, count: 5 },
+    { id: 2, icon_name: '💻', title: 'Tech', auto_apply: true, count: 12 },
+    { id: 3, icon_name: '🎨', title: 'Design', auto_apply: false, count: 8 },
+    { id: 4, icon_name: '📱', title: 'Mobile', auto_apply: true, count: 6 },
+    { id: 5, icon_name: '🚀', title: 'Startup', auto_apply: false, count: 15 },
+    { id: 6, icon_name: '🎯', title: 'Marketing', auto_apply: true, count: 9 }
+  ];
 
   const tags = [
     'Experience', 'Learning', 'Funding', 'Competition', 'Contributing', 
@@ -24,12 +32,20 @@ export default function CategoryFilter({ children }) {
   };
 
   const updateCategory = (id, field, value) => {
-    // Implementation for updating category
     console.log('Updating category', id, field, value);
   };
 
+  const scroll = (direction) => {
+    const container = scrollRef.current;
+    const scrollAmount = 200;
+    container.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    });
+  };
+
   return (
-    <div className="w-full  bg-white-500  mb-6">
+    <div className="w-full bg-white mb-6">
       <div className="flex border-b items-center justify-between px-5 pb-5">
         <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
           <button
@@ -83,7 +99,7 @@ export default function CategoryFilter({ children }) {
       </div>
 
       {showFilters && (
-        <div className="border-t border-b    bg-gray-50 p-5">
+        <div className="border-t border-b bg-gray-50 p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-medium text-gray-900">Filter by tags</h3>
             {selectedTags.length > 0 && (
@@ -96,23 +112,43 @@ export default function CategoryFilter({ children }) {
             )}
           </div>
           
-          <div className="flex flex-wrap gap-2 pb-3">
-            {tags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => toggleTag(tag)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                  selectedTags.includes(tag)
-                    ? 'bg-[#E7F0F0] text-[#306C6A] border border-[#306C6A]'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <span>{tag}</span>
-                {selectedTags.includes(tag) && (
-                  <X size={14} className="ml-2 text-[#306C6A]" />
-                )}
-              </button>
-            ))}
+          <div className="relative flex items-center">
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-0 z-10 p-2 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 transition-colors"
+            >
+              <ChevronLeft size={16} className="text-gray-600" />
+            </button>
+            
+            <div 
+              ref={scrollRef}
+              className="flex gap-2 overflow-x-auto scrollbar-hide mx-10 py-2"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {tags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
+                    selectedTags.includes(tag)
+                      ? 'bg-[#E7F0F0] text-[#306C6A] border border-[#306C6A]'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  <span>{tag}</span>
+                  {selectedTags.includes(tag) && (
+                    <X size={14} className="ml-1 text-[#306C6A]" />
+                  )}
+                </button>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-0 z-10 p-2 bg-white border border-gray-200 rounded-full shadow-md hover:bg-gray-50 transition-colors"
+            >
+              <ChevronRight size={16} className="text-gray-600" />
+            </button>
           </div>
 
           {selectedTags.length > 0 && (
@@ -125,7 +161,6 @@ export default function CategoryFilter({ children }) {
         </div>
       )}
       
-      {/* Conditional rendering based on active tab */}
       {activeTab === 'categories' ? (
         <div className="p-5">
           {children}
@@ -143,7 +178,7 @@ export default function CategoryFilter({ children }) {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {categories && categories.map((category) => (
+                {categories.map((category) => (
                   <tr key={category.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
