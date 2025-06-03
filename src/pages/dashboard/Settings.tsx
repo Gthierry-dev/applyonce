@@ -3,11 +3,14 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Shield, CheckCircle } from 'lucide-react';
+import { Loader2, User, Shield, Bell, CreditCard, Users, CheckCircle } from 'lucide-react';
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
 const Settings = () => {
   const { user, profile } = useAuth();
@@ -15,21 +18,24 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('General');
   
-  // Form states
+  // Personal info
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // Security
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  
+  // Notification settings
   const [emailNotifications, setEmailNotifications] = useState(true);
+  const [appNotifications, setAppNotifications] = useState(true);
 
-  const tabs = ['General', 'Profile', 'Security', 'Billing and usage', 'Notifications', 'Refer a friend'];
+  const tabs = ['General', 'Profile', 'Security', 'Billing and Usage', 'Notifications', 'Refer a Friend'];
 
   useEffect(() => {
     if (user) {
       setEmail(user.email || '');
     }
+    
     if (profile) {
       setFullName(profile.full_name || '');
     }
@@ -37,10 +43,13 @@ const Settings = () => {
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!user) return;
     
     try {
       setLoading(true);
+      
+      // Update profile information
       const { error } = await supabase
         .from('profiles')
         .update({ 
@@ -56,49 +65,34 @@ const Settings = () => {
         description: 'Your profile information has been updated successfully.',
       });
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast({
         variant: 'destructive',
         title: 'Update failed',
-        description: 'Failed to update profile information.',
+        description: 'Failed to update profile information. Please try again.',
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePasswordChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (newPassword !== confirmPassword) {
-      toast({
-        variant: 'destructive',
-        title: 'Passwords do not match',
-      });
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) throw error;
-      
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      
-      toast({
-        title: 'Password updated successfully',
-      });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Update failed',
-      });
-    } finally {
-      setLoading(false);
+  // Tab icon mapping
+  const getTabIcon = (tab: string) => {
+    switch (tab) {
+      case 'General':
+        return <User className="w-5 h-5" />;
+      case 'Profile':
+        return <User className="w-5 h-5" />;
+      case 'Security':
+        return <Shield className="w-5 h-5" />;
+      case 'Billing and Usage':
+        return <CreditCard className="w-5 h-5" />;
+      case 'Notifications':
+        return <Bell className="w-5 h-5" />;
+      case 'Refer a Friend':
+        return <Users className="w-5 h-5" />;
+      default:
+        return null;
     }
   };
 
@@ -107,32 +101,55 @@ const Settings = () => {
       case 'General':
         return (
           <div className="space-y-6">
-            <form onSubmit={handleProfileUpdate} className="space-y-4">
-              <div>
-                <Label htmlFor="fullName" className="text-sm font-medium">Full Name</Label>
-                <Input 
-                  id="fullName" 
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  value={email}
-                  disabled 
-                  className="mt-1 bg-gray-50"
-                />
-                <p className="text-xs text-gray-500 mt-1">Email address cannot be changed</p>
-              </div>
-              <Button type="submit" disabled={loading} className="w-fit">
-                {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Save Changes
-              </Button>
-            </form>
+            <div>
+              <h3 className="text-lg font-medium mb-4">Account Information</h3>
+              <p className="text-sm text-gray-600 mb-4">Manage your account details and preferences</p>
+              
+              <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input 
+                    id="fullName" 
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Your full name" 
+                    className="max-w-md"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    value={email}
+                    disabled 
+                    placeholder="Your email address" 
+                    className="max-w-md"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Email address cannot be changed
+                  </p>
+                </div>
+                <Button type="submit" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving
+                    </>
+                  ) : (
+                    'Save changes'
+                  )}
+                </Button>
+              </form>
+            </div>
+            
+            <Separator className="my-6" />
+            
+            <div>
+              <h3 className="text-lg font-medium mb-4">Danger Zone</h3>
+              <p className="text-sm text-gray-600 mb-4">Permanently delete your account and all of your content</p>
+              <Button variant="destructive">Delete Account</Button>
+            </div>
           </div>
         );
 
@@ -141,29 +158,31 @@ const Settings = () => {
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-medium mb-4">Profile Information</h3>
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <div>
-                  <Label htmlFor="displayName" className="text-sm font-medium">Display Name</Label>
-                  <Input 
-                    id="displayName" 
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="bio" className="text-sm font-medium">Bio</Label>
+              <p className="text-sm text-gray-600 mb-4">Update your profile details</p>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Bio</Label>
                   <textarea 
-                    id="bio"
-                    rows={3}
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    placeholder="Tell us about yourself..."
+                    id="bio" 
+                    className="w-full max-w-md h-24 px-3 py-2 text-sm rounded-md border border-input bg-background"
+                    placeholder="Tell us about yourself"
                   />
                 </div>
-                <Button type="submit" disabled={loading} className="w-fit">
-                  Update Profile
+                
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Input 
+                    id="location" 
+                    placeholder="Your location" 
+                    className="max-w-md"
+                  />
+                </div>
+                
+                <Button>
+                  Save Profile
                 </Button>
-              </form>
+              </div>
             </div>
           </div>
         );
@@ -171,31 +190,28 @@ const Settings = () => {
       case 'Security':
         return (
           <div className="space-y-6">
-            {/* Security Score */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center space-x-3">
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-full border-4 border-blue-500 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-blue-600">90%</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-gray-900">Your account security is 90%</h3>
-                  <p className="text-sm text-gray-600">Please review your account security settings regularly and update your password.</p>
-                </div>
-                <div className="space-x-2">
-                  <Button variant="outline" size="sm">Dismiss</Button>
-                  <Button size="sm">Review security</Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Basics Section */}
             <div>
-              <h3 className="text-lg font-medium mb-4">Basics</h3>
+              <h3 className="text-lg font-medium mb-4">Security Settings</h3>
+              <p className="text-sm text-gray-600 mb-4">Manage your account security</p>
+              
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between py-3">
+                    <div>
+                      <h4 className="font-medium">Your account security is 90%</h4>
+                      <p className="text-sm text-gray-600">Please review your account security settings regularly and update your password.</p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Button variant="outline" size="sm">Dismiss</Button>
+                      <Button size="sm">Review security</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
               <div className="space-y-4">
                 {/* Password */}
-                <div className="flex items-center justify-between py-3 border-b">
+                <div className="flex items-center justify-between py-3">
                   <div>
                     <h4 className="font-medium">Password</h4>
                     <p className="text-sm text-gray-600">Set a password to protect your account.</p>
@@ -207,8 +223,8 @@ const Settings = () => {
                           <div key={i} className="w-1 h-1 bg-gray-800 rounded-full" />
                         ))}
                       </div>
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className="text-sm text-green-600 font-medium">Very secure</span>
+                      <CheckCircle className="w-4 h-4 text-main_color" />
+                      <span className="text-sm text-main_color font-medium">Very secure</span>
                     </div>
                     <Button variant="outline" size="sm">Edit</Button>
                   </div>
@@ -241,7 +257,7 @@ const Settings = () => {
                 {/* Current sessions */}
                 <div className="flex items-center justify-between p-3 bg-white border rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <Shield className="w-6 h-6 text-orange-500" />
+                    <Shield className="w-6 h-6 text-main_color" />
                     <div>
                       <p className="font-medium">Brave on Mac OS X</p>
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -260,11 +276,7 @@ const Settings = () => {
 
                 <div className="flex items-center justify-between p-3 bg-white border rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="w-6 h-6 bg-gray-800 rounded flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.024.041.051.080.051.080-.177.934-.545 3.623-.545 3.623-.051.402-.402.64-.402.64C4.422 18.963.029 14.776.029 11.987.029 5.367 5.396.001 12.017.001z"/>
-                      </svg>
-                    </div>
+                    <Shield className="w-6 h-6 text-main_color" />
                     <div>
                       <p className="font-medium">Clive's MacBook Pro</p>
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -280,36 +292,35 @@ const Settings = () => {
                     </svg>
                   </Button>
                 </div>
-
-                <div className="flex items-center justify-between p-3 bg-white border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Shield className="w-6 h-6 text-orange-500" />
-                    <div>
-                      <p className="font-medium">Brave on Mac OS X</p>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <div className="w-2 h-2 bg-red-500 rounded-full" />
-                        <span>Mexico City, Mexico</span>
-                        <span>1 month ago</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
         );
 
-      case 'Billing and usage':
+      case 'Billing and Usage':
         return (
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-medium mb-4">Billing Information</h3>
-              <p className="text-gray-600">Manage your subscription and billing details.</p>
+              <p className="text-sm text-gray-600 mb-4">Manage your subscription and billing details</p>
+              
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Free Plan</h4>
+                      <p className="text-sm text-gray-600">You are currently on the free plan</p>
+                    </div>
+                    <Button>Upgrade Plan</Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <div className="space-y-4">
+                <h4 className="font-medium">Payment Methods</h4>
+                <p className="text-sm text-gray-600">No payment methods added yet</p>
+                <Button variant="outline">Add Payment Method</Button>
+              </div>
             </div>
           </div>
         );
@@ -319,8 +330,10 @@ const Settings = () => {
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-medium mb-4">Notification Preferences</h3>
+              <p className="text-sm text-gray-600 mb-4">Manage how you receive notifications</p>
+              
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between py-3">
                   <div>
                     <h4 className="font-medium">Email Notifications</h4>
                     <p className="text-sm text-gray-600">Receive email updates about new opportunities</p>
@@ -330,17 +343,68 @@ const Settings = () => {
                     onCheckedChange={setEmailNotifications}
                   />
                 </div>
+                
+                <div className="flex items-center justify-between py-3">
+                  <div>
+                    <h4 className="font-medium">Application Updates</h4>
+                    <p className="text-sm text-gray-600">Receive notifications when your application status changes</p>
+                  </div>
+                  <Switch 
+                    checked={appNotifications}
+                    onCheckedChange={setAppNotifications}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between py-3">
+                  <div>
+                    <h4 className="font-medium">Marketing Emails</h4>
+                    <p className="text-sm text-gray-600">Receive emails about new features and promotions</p>
+                  </div>
+                  <Switch />
+                </div>
               </div>
             </div>
           </div>
         );
 
-      case 'Refer a friend':
+      case 'Refer a Friend':
         return (
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-medium mb-4">Refer a Friend</h3>
-              <p className="text-gray-600">Invite friends and earn rewards.</p>
+              <p className="text-sm text-gray-600 mb-4">Invite friends to ApplyOnce and earn rewards</p>
+              
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <div className="text-center space-y-4">
+                    <h4 className="font-medium text-xl">Share your referral link</h4>
+                    <p className="text-sm text-gray-600">For each friend who signs up, you'll both receive benefits</p>
+                    
+                    <div className="flex max-w-md mx-auto">
+                      <Input 
+                        value="https://applyonce.com/ref/yourcode" 
+                        readOnly 
+                        className="rounded-r-none"
+                      />
+                      <Button className="rounded-l-none">Copy</Button>
+                    </div>
+                    
+                    <div className="pt-4">
+                      <p className="text-sm font-medium mb-2">Or share via</p>
+                      <div className="flex justify-center space-x-4">
+                        <Button variant="outline" size="sm">Email</Button>
+                        <Button variant="outline" size="sm">Twitter</Button>
+                        <Button variant="outline" size="sm">Facebook</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <div>
+                <h4 className="font-medium mb-2">Your Referrals</h4>
+                <p className="text-sm text-gray-600">You haven't referred anyone yet</p>
+              </div>
             </div>
           </div>
         );
@@ -352,21 +416,30 @@ const Settings = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto">
-        <div className="flex">
+      <DashboardHeader title="Settings" />
+      <div className="max-w-6xl  mx-auto">
+        <div className="mb-6">
+          {/* <h1 className="text-2xl font-bold tracking-tight">Settings</h1> */}
+          <p className="text-muted-foreground">
+            Manage your account settings and preferences
+          </p>
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-6">
           {/* Sidebar */}
-          <div className="w-64 mr-8">
-            <nav className="space-y-1">
+          <div className="w-full md:w-64">
+            <nav className="space-y-1 sticky top-4">
               {tabs.map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                  className={`w-full flex items-center text-left px-3 py-2 text-sm rounded-md transition-colors ${
                     activeTab === tab
-                      ? 'bg-gray-100 text-gray-900 font-medium'
+                      ? 'bg-main_color/10 text-main_color font-medium'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >
+                  <span className="mr-3">{getTabIcon(tab)}</span>
                   {tab}
                 </button>
               ))}
@@ -375,7 +448,7 @@ const Settings = () => {
 
           {/* Main content */}
           <div className="flex-1">
-            <div className="bg-white rounded-lg p-6">
+            <div className="bg-white rounded-lg border p-6">
               {renderTabContent()}
             </div>
           </div>
