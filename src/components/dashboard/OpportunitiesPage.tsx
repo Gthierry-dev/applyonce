@@ -9,6 +9,7 @@ import {
   Bookmark,
   Filter,
   SortAsc,
+  ChevronDown,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Dropdown } from "../forms/Dropdown";
@@ -204,17 +205,17 @@ const OpportunitiesPage = () => {
                 />
               </div>
               <div className="w-[1px] h-full my-auto min-h-[32px] bg-foreground/40"></div>
-              <div className="flex-1">
-                <Dropdown
-                  options={[
-                    { label: "Last 7 Days", value: "7" },
-                    { label: "Last 30 Days", value: "30" },
-                  ]}
-                  label=""
-                  placeholder="Location or Category"
-                  value={""}
-                  size="large"
-                  onChange={(e) => null}
+              <div className="relative text-text_color flex-1">
+                <select
+                  className="w-full h-full appearance-none bg-white rounded-lg px-4 py-2.5 pr-8 text-sm font-medium focus:outline-none ring-2 ring-transparent focus:ring-[#306C6A]"
+                >
+                  <option value="popularity">Popularity</option>
+                  <option value="newest">Newest</option>
+                  <option value="alphabetical">A-Z</option>
+                </select>
+                <ChevronDown
+                  size={16}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
                 />
               </div>
               <Button className="bg-teal-600 hover:bg-teal-700 px-6">
