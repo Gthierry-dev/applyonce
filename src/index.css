@@ -313,6 +313,11 @@ html {
   }
 }
 
+.step_input_dropdown.large{
+  min-width: 100% !important;
+  margin-bottom: 0px !important;
+}
+
 .step_input_text.percentage {
   margin-bottom: unset !important;
   font-weight: 400;

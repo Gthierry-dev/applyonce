@@ -4,6 +4,10 @@ import { FaBell, FaSearch } from "react-icons/fa";
 import { BiMessageDetail } from "react-icons/bi";
 import ContactSearch from "./search";
 import { Link } from "react-router-dom";
+import {
+  HiOutlineArrowRightStartOnRectangle,
+  HiOutlineUser,
+} from "react-icons/hi2";
 
 interface DashboardHeaderProps {
   title?: string;
@@ -16,6 +20,18 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const notifpopupRef = useRef<HTMLDivElement | null>(null);
   const notifRef = useRef<HTMLButtonElement | null>(null);
   const [showNotifPopup, setShowNotifPopup] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // handle click outside
   useEffect(() => {
@@ -131,7 +147,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 ref={notifpopupRef}
                 className="absolute top-[150%] right-0 w-[340px] max-md:w-[270px] max-md:right-[-50px] h-[500px] max-h-[70vh] z-30 overflow-y-auto rounded-2xl ring-1 ring-stone-200 bg-white shadow-lg p-1.5"
               >
-                <h1 className="text-base font-medium text-left tracking-tight pt-1 pb-2 px-2 border-b border-card-bg-weak text-text-color/80 w-full">
+                <h1 className="text-base font-medium text-left tracking-tight pt-1 pb-2 px-2 border-b border-foubg-main_color/10 text-text-color/80 w-full">
                   Notifications
                 </h1>
                 <div className="w-full h-fit flex flex-col gap-1 pt-1.5">
@@ -187,12 +203,31 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
           </button> */}
 
-          <div className="h-8 w-8 ml-3 rounded-full bg-gray-200 overflow-hidden">
-            <img
-              src="https://ui-avatars.com/api/?name=User&background=random"
-              alt="User avatar"
-              className="h-full w-full object-cover"
-            />
+          <div ref={menuRef} className="w-fit h-fit relative">
+            <button onClick={() => setShowProfileMenu((prev) => !prev)}>
+              <div className="h-8 w-8 rounded-full bg-main_color/10 flex items-center justify-center text-main_color font-medium">
+                U
+              </div>
+            </button>
+            {showProfileMenu && (
+              <div className="absolute right-0.5 mt-2 w-52 bg-white ring-1 ring-foreground/20 shadow-xl rounded-2xl p-1.5 text-sm z-50">
+                <div className="w-full truncate px-3 pt-2 pb-2 text-sm font-normal text-text_color/60">
+                  user@gmail.com
+                </div>
+                <hr className="bg-card-bg mt-1 mb-1 w-[90%] mx-auto" />
+                {/* <button className="w-full px-3 py-2 text-left text-text_color/80 hover:text-text_color hover:bg-main_color/10 text-sm flex items-center justify-start gap-2 rounded-xl">
+                  <HiOutlineUser className="text-xl" />
+                  My Account
+                </button> */}
+                <button
+                  title="logout"
+                  className="w-full px-3 py-2 text-left text-red-500 hover:bg-main_color/10 text-sm flex items-center justify-start gap-2 rounded-xl"
+                >
+                  <HiOutlineArrowRightStartOnRectangle className="text-xl" />
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>

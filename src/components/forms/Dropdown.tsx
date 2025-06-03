@@ -2,15 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { BsCaretDownFill } from "react-icons/bs";
 
 type OptionsProps = {
-    value: string;
-    label: string;
-}
+  value: string;
+  label: string;
+};
 
 type DropdownProps = {
   label: string;
   value: string;
   options: OptionsProps[];
   placeholder: string;
+  size: string;
   onChange: (value: string) => void;
 };
 
@@ -20,6 +21,7 @@ export function Dropdown({
   options,
   onChange,
   placeholder,
+  size,
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -39,29 +41,36 @@ export function Dropdown({
   }, []);
 
   return (
-    <div className="w-fit relative" ref={dropdownRef}>
-        {label && (
-            <h2>
-            {label} <span className="text-main-color">*</span>
-            </h2>
-        )}
+    <div
+      className={`w-fit relative text-text_color ${size === "large" && "w-full"}`}
+      ref={dropdownRef}
+    >
+      {label && (
+        <h2>
+          {label} <span className="text-main-color">*</span>
+        </h2>
+      )}
       <label
-        className={`step_input_dropdown ${open ? "focus" : ""}`}
+        className={`step_input_dropdown ${size === "large" ? "large" : ""} ${
+          open ? "focus" : ""
+        }`}
         onClick={() => setOpen(!open)}
       >
         {value || (
-          <p className="text-text-color-black/40 capitalize line-clamp-1">
+          <p className="text-text_color/40 capitalize line-clamp-1">
             {placeholder}
           </p>
         )}
-        <BsCaretDownFill className="text-[12px] absolute top-0 bottom-0 my-auto right-4 text-text-color-black/30" />
+        <BsCaretDownFill className="text-[12px] absolute top-0 bottom-0 my-auto right-4 text-text_color/30" />
       </label>
       {open && (
         <div className="step_input_dropdown_content open">
           {options.map((option, index) => (
             <div
               key={index}
-              className={`step_input_dropdown_option ${value === option.value ? "active" : ""}`}
+              className={`step_input_dropdown_option ${
+                value === option.value ? "active" : ""
+              }`}
               onClick={() => {
                 onChange(option.value);
                 setOpen(false);

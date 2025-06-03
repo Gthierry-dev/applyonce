@@ -103,6 +103,7 @@ function RecentApplications() {
           ]}
           label=""
           placeholder=""
+          size=""
           value={`Last ${range} Days`}
           onChange={(e) => setRange(e as "7" | "30")}
         />
