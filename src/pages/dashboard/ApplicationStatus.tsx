@@ -176,7 +176,7 @@ const ApplicationStatus = () => {
       
       <div className="space-y-6">
         {/* Welcome Banner */}
-        <div className="relative overflow-hidden rounded-xl mb-6">
+        {/* <div className="relative overflow-hidden rounded-xl mb-6">
           <div 
             className="absolute inset-0 bg-cover bg-left-bottom z-0" 
             style={{ 
@@ -193,7 +193,7 @@ const ApplicationStatus = () => {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Filters Section */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-gray-50 p-4 rounded-lg">
