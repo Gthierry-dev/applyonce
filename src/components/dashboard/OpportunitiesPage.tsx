@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,9 +10,141 @@ import {
   Filter,
   SortAsc,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Dropdown } from "../forms/Dropdown";
+
+const FilterHeader = ({ children }) => {
+  const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState('popularity');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const scrollRef = useRef(null);
+
+  const tags = ['Remote', 'JavaScript', 'React', 'Python', 'Full-Time', 'Part-Time', 'Internship', 'Marketing', 'Analytics', 'Frontend', 'Backend', 'UI/UX'];
+
+  const toggleTag = (tag) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const scroll = (direction) => {
+    const container = scrollRef.current;
+    const scrollAmount = 200;
+    container.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    });
+  };
+
+  return (
+    <div>
+      <div className="flex border-b items-center justify-between px-5 pb-5">
+        <p className="font-bold text-2xl text-gray-900">Opportunites Result</p>
+
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
+              showFilters 
+                ? 'bg-[#E7F0F0] border-[#306C6A] text-[#306C6A]' 
+                : 'border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <Filter size={16} />
+            <span className="text-sm font-medium">Filter</span>
+          </button>
+
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#306C6A] focus:border-[#306C6A]"
+            >
+              <option value="popularity">Popularity</option>
+              <option value="newest">Newest</option>
+              <option value="alphabetical">A-Z</option>
+              <option value="salary">Salary</option>
+              <option value="location">Location</option>
+            </select>
+            <ChevronDown size={16} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+        </div>
+      </div>
+
+      {showFilters && (
+        <div className="border-b bg-gray-50 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-900">Filter by tags</h3>
+            {selectedTags.length > 0 && (
+              <button
+                onClick={() => setSelectedTags([])}
+                className="text-sm text-[#306C6A] hover:text-[#285856] font-medium"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+          
+          <div className="relative flex items-center">
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-0 z-10 p-2 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-colors"
+            >
+              <ChevronLeft size={16} className="text-gray-600" />
+            </button>
+            
+            <div 
+              ref={scrollRef}
+              className="flex gap-2 overflow-x-auto mx-10 py-2 scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {tags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                    selectedTags.includes(tag)
+                      ? 'bg-teal-50 text-[#306C6A] border border-[#306C6A]'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {tag}
+                  {selectedTags.includes(tag) && (
+                    <X size={14} className="ml-2 text-[#306C6A] hover:text-[#285856]" />
+                  )}
+                </button>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-0 z-10 p-2 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-colors"
+            >
+              <ChevronRight size={16} className="text-gray-600" />
+            </button>
+          </div>
+
+          {selectedTags.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <p className="text-sm text-gray-600">
+                {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''} selected
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+      
+      <div className="p-5">
+        {children}
+      </div>
+    </div>
+  );
+};
 
 const OpportunitiesPage = () => {
   const [appliedJobs, setAppliedJobs] = useState(new Set());
@@ -112,22 +244,16 @@ const OpportunitiesPage = () => {
       <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-start gap-3">
-            <div
-              className={`w-12 h-12 ${opportunity.avatarBg} rounded-lg flex items-center justify-center text-white font-semibold`}
-            >
+            <div className={`w-12 h-12 ${opportunity.avatarBg} rounded-lg flex items-center justify-center text-white font-semibold`}>
               {opportunity.avatar}
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-lg">
-                {opportunity.title}
-              </h3>
+              <h3 className="font-semibold text-gray-900 text-lg">{opportunity.title}</h3>
               <p className="text-gray-600">{opportunity.company}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className={`text-sm font-medium ${opportunity.statusColor}`}>
-              {opportunity.status}
-            </p>
+            <p className={`text-sm font-medium ${opportunity.statusColor}`}>{opportunity.status}</p>
             <p className="text-gray-500 text-sm">{opportunity.postedTime}</p>
           </div>
         </div>
@@ -150,30 +276,16 @@ const OpportunitiesPage = () => {
 
         <div className="flex flex-wrap gap-2 mb-6">
           {opportunity.skills.map((skill) => (
-            <Badge
-              key={skill}
-              variant="secondary"
-              className="bg-gray-100 text-gray-700 text-xs"
-            >
+            <Badge key={skill} variant="secondary" className="bg-gray-100 text-gray-700 text-xs">
               {skill}
             </Badge>
           ))}
         </div>
 
         <div className="flex gap-2">
-          <Button className="flex-1 bg-teal-600 hover:bg-teal-700 text-white">
-            Apply
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className={isSaved ? "bg-teal-50 border-teal-200" : ""}
-          >
-            <Bookmark
-              className={`w-4 h-4 ${
-                isSaved ? "fill-teal-600 text-teal-600" : ""
-              }`}
-            />
+          <Button className="flex-1 bg-teal-600 hover:bg-teal-700 text-white">Apply</Button>
+          <Button variant="outline" size="icon" className={isSaved ? "bg-teal-50 border-teal-200" : ""}>
+            <Bookmark className={`w-4 h-4 ${isSaved ? "fill-teal-600 text-teal-600" : ""}`} />
           </Button>
         </div>
       </div>
@@ -181,9 +293,13 @@ const OpportunitiesPage = () => {
   };
 
   return (
-    <div className="min-h-screen ">
-      <div className="bg-gradient-to-r from-teal-600 to-teal-700 rounded-3xl px-6 text-white">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="min-h-screen">
+      <div className="relative rounded-3xl px-6 text-white overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-[url('/green-bg.jpg')] bg-cover bg-center bg-no-repeat rounded-3xl"
+          style={{filter: 'brightness(0.7)'}}
+        ></div>
+        <div className="relative max-w-7xl mx-auto px-6 py-12 z-10">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-4">
               Explore Opportunities Across Careers,
@@ -191,82 +307,46 @@ const OpportunitiesPage = () => {
               Scholarships, Hackathons & More
             </h1>
             <p className="text-teal-100">
-              Find and apply to the best opportunities for your skills and
-              aspirations.
+              Find and apply to the best opportunities for your skills and aspirations.
             </p>
           </div>
 
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-xl p-2 flex gap-2">
               <div className="flex-1 relative">
-                <Input
+                <input
                   placeholder="Job title, keyword, or company"
-                  className="border-0 focus:ring-green-500 pl-4"
+                  className="w-full text-text_color border-0 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#306C6A]"
                 />
               </div>
-              <div className="w-[1px] h-full my-auto min-h-[32px] bg-foreground/40"></div>
+              <div className="w-[1px] h-full my-auto min-h-[32px] bg-gray-300"></div>
               <div className="relative text-text_color flex-1">
-                <select
-                  className="w-full h-full appearance-none bg-white rounded-lg px-4 py-2.5 pr-8 text-sm font-medium focus:outline-none ring-2 ring-transparent focus:ring-[#306C6A]"
-                >
-                  <option value="popularity">Popularity</option>
-                  <option value="newest">Newest</option>
-                  <option value="alphabetical">A-Z</option>
+                <select className="w-full h-full appearance-none bg-white rounded-lg px-4 py-2.5 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#306C6A]">
+                  <option value="All">All</option>
+                  <option value="Jobs">Jobs</option>
+                  <option value="Scholarships">Scholarships</option>
+                  <option value="internships">internships</option>
+                  <option value="grants">grants</option>
+                  <option value="Hackthons">Hackthons</option>
                 </select>
-                <ChevronDown
-                  size={16}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                />
+                <ChevronDown size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
               </div>
-              <Button className="bg-teal-600 hover:bg-teal-700 px-6">
+              <button className="bg-teal-600 hover:bg-teal-700 px-6 py-2.5 rounded-lg text-white font-medium flex items-center transition-colors">
                 <Search className="w-4 h-4 mr-2" />
                 Search
-              </Button>
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       <div className="w-full mx-auto px-0 py-6">
-        <div className="flex flex-wrap items-center gap-2 mb-6">
-          {[
-            "For You",
-            "Trending",
-            "New",
-            "Nearby",
-            "Urgent",
-            "Scholarships",
-            "Hackathons",
-            "Jobs",
-            "Internships",
-            "Remote",
-          ].map((tab) => (
-            <Button
-              key={tab}
-              variant={tab === "For You" ? "default" : "outline"}
-              size="sm"
-              className={
-                tab === "For You"
-                  ? "bg-teal-600 hover:bg-teal-700"
-                  : "hover:bg-teal-50 hover:text-teal-700"
-              }
-            >
-              {tab}
-            </Button>
-          ))}
-          <div className="ml-auto flex gap-2">
-            <Button variant="outline" size="sm">
-              <SortAsc className="w-4 h-4 mr-1" />
-              Sort By
-            </Button>
-            <Button variant="outline" size="sm">
-              <Filter className="w-4 h-4 mr-1" />
-              Filter
-            </Button>
-          </div>
-        </div>
+        
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 xl:gap-4">
+        <FilterHeader> 
+        </FilterHeader>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {opportunities.map((opportunity) => (
             <OpportunityCard key={opportunity.id} opportunity={opportunity} />
           ))}
