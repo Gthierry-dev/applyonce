@@ -46,6 +46,8 @@ import CompanyProfile from "./pages/company/Profile";
 import CompanyApplications from "./pages/company/Applications";
 import CompanyCategories from "./pages/company/Categories";
 import CompanySettings from "./pages/company/Settings";
+import Integrations from "./pages/dashboard/Integrations";
+import Help from "./pages/dashboard/Help";
 
 const queryClient = new QueryClient();
 
@@ -66,41 +68,51 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/social-auth-coming-soon" element={<SocialAuthComingSoon />} />
-            
+            <Route
+              path="/social-auth-coming-soon"
+              element={<SocialAuthComingSoon />}
+            />
+
             {/* Protected Dashboard Routes */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/applications" element={<Applications />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/application-status" element={<ApplicationStatus />} />
-              <Route path="/opportunities" element={<Opportunities />} />
-              <Route path="/settings" element={<Settings />} />
-            
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/applications" element={<Applications />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/application-status" element={<ApplicationStatus />} />
+            <Route path="/opportunities" element={<Opportunities />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/integrations" element={<Integrations />} />
+            <Route path="/help" element={<Help />} />
 
             {/* Protected Company Routes */}
             {/* <Route element={<ProtectedRoute />}> */}
-              <Route path="/company/dashboard" element={<CompanyDashboard />} />
-              <Route path="/company/profile" element={<CompanyProfile />} />
-              <Route path="/company/applications" element={<CompanyApplications />} />
-              <Route path="/company/categories" element={<CompanyCategories />} />
-              <Route path="/company/settings" element={<CompanySettings />} />
+            <Route path="/company/dashboard" element={<CompanyDashboard />} />
+            <Route path="/company/profile" element={<CompanyProfile />} />
+            <Route
+              path="/company/applications"
+              element={<CompanyApplications />}
+            />
+            <Route path="/company/categories" element={<CompanyCategories />} />
+            <Route path="/company/settings" element={<CompanySettings />} />
             {/* </Route> */}
 
             {/* Admin Dashboard Routes */}
-{/*             <Route element={<AdminRoute />}> */}
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/opportunities" element={<AdminOpportunities />} />
-              <Route path="/admin/categories" element={<AdminCategories />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/settings" element={<AdminSettings />} />
-{/*             </Route> */}
-            
+            {/*             <Route element={<AdminRoute />}> */}
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route
+              path="/admin/opportunities"
+              element={<AdminOpportunities />}
+            />
+            <Route path="/admin/categories" element={<AdminCategories />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+            {/*             </Route> */}
+
             {/* New Navigation Routes */}
             <Route path="/community" element={<Community />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/support" element={<Support />} />
-            
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
