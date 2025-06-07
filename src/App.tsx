@@ -48,6 +48,10 @@ import CompanyCategories from "./pages/company/Categories";
 import CompanySettings from "./pages/company/Settings";
 import Integrations from "./pages/dashboard/Integrations";
 import Help from "./pages/dashboard/Help";
+// Change this line (around line 46)
+// import Communities from "./pages/Communities";
+// To this
+import Communities from "./pages/dashboard/Communities";
 
 const queryClient = new QueryClient();
 

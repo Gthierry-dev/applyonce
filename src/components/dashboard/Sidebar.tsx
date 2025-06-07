@@ -128,7 +128,7 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false, mobileOpe
     {
       name: "Community",
       icon: <Users size={20} />,
-      path: "/community",
+      path: "/Communities",
     },
     {
       name: "Help & Center",
