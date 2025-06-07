@@ -274,7 +274,16 @@ const CommunityFeed = () => {
           </div>
         </div>
         
-        <div className="w-80">
+        <div className="w-80 sticky">
+            <div className='flex-col flex'>
+                <span>all</span>
+                <span>topics</span>
+                <span>rules</span>
+            </div>
+            <div className='border-t border-b mb-4'>
+                {/* i want to add a pop up where you will select a topic and then add title description image  and then post it */}
+              <button>add post</button>
+            </div>
           <TrendingCard />
           <AdSpace />
         </div>
