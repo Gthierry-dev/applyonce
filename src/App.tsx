@@ -82,6 +82,7 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/integrations" element={<Integrations />} />
             <Route path="/help" element={<Help />} />
+            <Route path="/Communities" element={<Communities />} />
 
             {/* Protected Company Routes */}
             {/* <Route element={<ProtectedRoute />}> */}

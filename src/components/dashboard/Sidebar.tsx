@@ -119,10 +119,16 @@ const Sidebar: React.FC<SidebarProps> = ({ className, isAdmin = false, mobileOpe
 
   // Preferences section
   const preferencesLinks = [
+    // Commented out Integrations page
+    // {
+    //   name: "Integrations",
+    //   icon: <Puzzle size={20} />,
+    //   path: "/integrations",
+    // },
     {
-      name: "Integrations",
-      icon: <Puzzle size={20} />,
-      path: "/integrations",
+      name: "Community",
+      icon: <Users size={20} />,
+      path: "/community",
     },
     {
       name: "Help & Center",
