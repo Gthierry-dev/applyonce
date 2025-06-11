@@ -276,6 +276,7 @@ const CommunityFeed = () => {
         
         <div className="w-80 sticky">
             <div className='flex-col flex'>
+                this should be anchored to the right with a aborder on the left to show that that is hwere the are station and when you hove rit shoudl 
                 <span>all</span>
                 <span>topics</span>
                 <span>rules</span>
