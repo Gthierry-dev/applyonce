@@ -60,10 +60,10 @@ const OpportunityDetailPanel: React.FC<Props> = ({ opportunity, onClose }) => {
         </button>
       </div>
 
-      <div className="flex gap-6 h-full px-5 pb-5">
+      <div className=" bg-red-00 flex gap-6 h-full px-5 pb-5">
         {/* Left content (scrollable) */}
         <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-[70vh] pr-4">
+          <ScrollArea className="  pr-4">
             <div className="space-y-6">
               {/* Meta row */}
               <div className="grid grid-cols-4 gap-4 text-xs">
@@ -74,7 +74,7 @@ const OpportunityDetailPanel: React.FC<Props> = ({ opportunity, onClose }) => {
               </div>
 
               {/* Green bar */}
-              <div className="bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl px-4 py-3 flex items-center justify-between text-white">
+              <div className="bg-gradient-to-r from-[#306C6A] to-emerald-500 rounded-xl px-4 py-3 flex items-center justify-between text-white">
                 <div className="text-sm font-medium">Maximize your interview chances</div>
                 <Button className="bg-white text-green-700 hover:bg-gray-100 text-xs font-semibold">Generate Custom Resume</Button>
               </div>
@@ -243,7 +243,7 @@ const OpportunityDetailPanel: React.FC<Props> = ({ opportunity, onClose }) => {
         </div>
 
         {/* Right column */}
-        <div className="w-64 flex-shrink-0">
+        {/* <div className="w-64 flex-shrink-0">
           <PercentageCard
             percentage={opportunity.matchScore || 98}
             title="STRONG MATCH"
@@ -255,7 +255,7 @@ const OpportunityDetailPanel: React.FC<Props> = ({ opportunity, onClose }) => {
             <Button className="w-full bg-[#306C6A] hover:bg-[#285856]">Apply with Autofill</Button>
             <Button variant="outline" className="w-full">Save</Button>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
