@@ -36,6 +36,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import PercentageCard from "@/components/cards/PercentageCard";
+import OttoChatBox from "@/components/chat/OttoChatBox";
 
 const FilterHeader = ({ children, activeTab, setActiveTab }) => {
   const [showFilters, setShowFilters] = useState(false);
@@ -45,7 +46,7 @@ const FilterHeader = ({ children, activeTab, setActiveTab }) => {
 
   const tabs = [
     { id: 'recommended', label: 'Recommended', count: null },
-    { id: 'liked', label: 'Liked', count: 2 }, 
+    { id: 'liked', label: 'Liked', count: 2 },
     { id: 'external', label: 'Add', count: 1 }
   ];
 
@@ -71,127 +72,127 @@ const FilterHeader = ({ children, activeTab, setActiveTab }) => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-shrink-0">
-        <div className="flex border-b items-center justify-between px-5 pb-5">
-          <div className="flex items-center gap-4"> 
-            <div className="flex gap-1">
-              {tabs.map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+      <div className="flex border-b items-center justify-between px-5 pb-5">
+        <div className="flex items-center gap-4">
+          <div className="flex gap-1">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-black text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  activeTab === tab.id
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {tab.label}
+                {tab.count && (
+                  <span className="ml-1 bg-white bg-opacity-20 px-1.5 py-0.5 rounded-full text-xs">
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
+              showFilters 
+                ? 'bg-[#E7F0F0] border-[#306C6A] text-[#306C6A]' 
+                : 'border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <Filter size={16} />
+            <span className="text-sm font-medium">Filter</span>
+          </button>
+
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#306C6A] focus:border-[#306C6A]"
+            >
+              <option value="popularity">Popularity</option>
+              <option value="newest">Newest</option>
+              <option value="alphabetical">A-Z</option>
+              <option value="salary">Salary</option>
+              <option value="location">Location</option>
+            </select>
+            <ChevronDown size={16} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+        </div>
+      </div>
+
+      {showFilters && (
+        <div className="border-b bg-gray-50 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-900">Filter by tags</h3>
+            {selectedTags.length > 0 && (
+              <button
+                onClick={() => setSelectedTags([])}
+                className="text-sm text-[#306C6A] hover:text-[#285856] font-medium"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+          
+          <div className="relative flex items-center">
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-0 z-10 p-2 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-colors"
+            >
+              <ChevronLeft size={16} className="text-gray-600" />
+            </button>
+            
+            <div 
+              ref={scrollRef}
+              className="flex gap-2 overflow-x-auto mx-10 py-2 scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {tags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                    selectedTags.includes(tag)
+                      ? 'bg-teal-50 text-[#306C6A] border border-[#306C6A]'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  {tab.label}
-                  {tab.count && (
-                    <span className="ml-1 bg-white bg-opacity-20 px-1.5 py-0.5 rounded-full text-xs">
-                      {tab.count}
-                    </span>
+                  {tag}
+                  {selectedTags.includes(tag) && (
+                    <X size={14} className="ml-2 text-[#306C6A] hover:text-[#285856]" />
                   )}
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
-                showFilters 
-                  ? 'bg-[#E7F0F0] border-[#306C6A] text-[#306C6A]' 
-                  : 'border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              <Filter size={16} />
-              <span className="text-sm font-medium">Filter</span>
-            </button>
-
-            <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#306C6A] focus:border-[#306C6A]"
-              >
-                <option value="popularity">Popularity</option>
-                <option value="newest">Newest</option>
-                <option value="alphabetical">A-Z</option>
-                <option value="salary">Salary</option>
-                <option value="location">Location</option>
-              </select>
-              <ChevronDown size={16} className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-            </div>
-          </div>
-        </div>
-
-        {showFilters && (
-          <div className="border-b bg-gray-50 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-gray-900">Filter by tags</h3>
-              {selectedTags.length > 0 && (
-                <button
-                  onClick={() => setSelectedTags([])}
-                  className="text-sm text-[#306C6A] hover:text-[#285856] font-medium"
-                >
-                  Clear all
-                </button>
-              )}
-            </div>
             
-            <div className="relative flex items-center">
-              <button
-                onClick={() => scroll('left')}
-                className="absolute left-0 z-10 p-2 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-colors"
-              >
-                <ChevronLeft size={16} className="text-gray-600" />
-              </button>
-              
-              <div 
-                ref={scrollRef}
-                className="flex gap-2 overflow-x-auto mx-10 py-2 scrollbar-hide"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              >
-                {tags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`flex items-center px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                      selectedTags.includes(tag)
-                        ? 'bg-teal-50 text-[#306C6A] border border-[#306C6A]'
-                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {tag}
-                    {selectedTags.includes(tag) && (
-                      <X size={14} className="ml-2 text-[#306C6A] hover:text-[#285856]" />
-                    )}
-                  </button>
-                ))}
-              </div>
-              
-              <button
-                onClick={() => scroll('right')}
-                className="absolute right-0 z-10 p-2 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-colors"
-              >
-                <ChevronRight size={16} className="text-gray-600" />
-              </button>
-            </div>
-
-            {selectedTags.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-gray-200">
-                <p className="text-sm text-gray-600">
-                  {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''} selected
-                </p>
-              </div>
-            )}
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-0 z-10 p-2 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 transition-colors"
+            >
+              <ChevronRight size={16} className="text-gray-600" />
+            </button>
           </div>
-        )}
+
+          {selectedTags.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <p className="text-sm text-gray-600">
+                {selectedTags.length} tag{selectedTags.length !== 1 ? 's' : ''} selected
+              </p>
+            </div>
+          )}
+        </div>
+      )}
       </div>
       
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full px-5 py-5">
-          {children}
+        {children}
         </ScrollArea>
       </div>
     </div>
@@ -235,9 +236,9 @@ const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick }) 
           <div className=" flex items-center gap-2 mb-3">
             {/* campany avatar */}
             <div className={`w-[100px] h-[100px] ${opportunity.avatarBg} rounded-lg flex items-center justify-center text-white font-bold text-xl`}>
-                 {opportunity.avatar}
-            </div>
-
+          {opportunity.avatar}
+        </div>
+        
             {/* first info */}
             
             
@@ -264,10 +265,10 @@ const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick }) 
           <div className="bg-red-00 pt-3 border-t border-gray-100 grid grid-cols-3 gap-6 text-sm text-gray-600 mb-4">
             {/* location */}
             <div> 
-              <div className="flex items-center gap-1">
-                <MapPin className="w-4 h-4" />
-                <span>{opportunity.location}</span>
-              </div> 
+            <div className="flex items-center gap-1">
+              <MapPin className="w-4 h-4" />
+              <span>{opportunity.location}</span>
+            </div>
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
                 {/* this should be remote or onsite */}
@@ -282,18 +283,18 @@ const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick }) 
                 <span>{opportunity.workType}</span>
               </div>
               {/* this should have job or position entry level in (Mid, Senior Level) */}
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>{opportunity.workType}</span>
+            <div className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              <span>{opportunity.workType}</span>
               </div>
             </div>
 
             <div>
-              <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1">
                 {opportunity.type === 'scholarship' ? (
                   <Award className="w-4 h-4" />
                 ) : (
-                  <DollarSign className="w-4 h-4" />
+              <DollarSign className="w-4 h-4" />
                 )}
                 <span>{opportunity.salary || opportunity.amount}</span>
               </div>
@@ -496,92 +497,29 @@ const OpportunitiesPage = () => {
 
   return (
     <div className="h-[84vh] flex bg-gray-50 rounded-lg overflow-hidden">
-      {/* Main Content */}
+        {/* Main Content */}
       <div className="flex-1 flex flex-col w-4/6">
-        <FilterHeader activeTab={activeTab} setActiveTab={setActiveTab}>
-          <div className="space-y-4">
-            {opportunities.map((opportunity) => (
-              <OpportunityCard
-                key={opportunity.id}
-                opportunity={opportunity}
-                isHovered={hoveredCard === opportunity.id}
-                onHover={setHoveredCard}
-                onLeave={() => setHoveredCard(null)}
+          <FilterHeader activeTab={activeTab} setActiveTab={setActiveTab}>
+            <div className="space-y-4">
+              {opportunities.map((opportunity) => (
+                <OpportunityCard
+                  key={opportunity.id}
+                  opportunity={opportunity}
+                  isHovered={hoveredCard === opportunity.id}
+                  onHover={setHoveredCard}
+                  onLeave={() => setHoveredCard(null)}
                 onClick={handleCardClick}
-              />
-            ))}
-          </div>
-        </FilterHeader>
-      </div>
-
-      {/* Sidebar */}
-      <div className="w-2/6 bg-white border-l border-gray-200 flex-shrink-0 overflow-hidden">
-        <div className="h-full flex flex-col">
-          <div className="flex-shrink-0 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">O</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Otto</h3>
-                <p className="text-sm text-gray-600">Your AI Copilot</p>
-              </div>
+                />
+              ))}
             </div>
-            
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-700 mb-2">
-                Welcome back, Gusenga Thierry!
-              </p>
-              <p className="text-sm text-gray-600">
-                It's great to see you again. Let's resume your journey towards your dream job.
-              </p>
-            </div>
-
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="any jobs in rwanda?"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full px-6">
-              <div className="space-y-4">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-red-900 mb-2">📍 Update Preferences</h4>
-                  <p className="text-sm text-red-700 mb-3">
-                    You've requested to update your job preferences, including 1 revision, 1 deletion.
-                  </p>
-                  
-                  <div className="space-y-2 text-sm">
-                    <div>
-                      <span className="font-medium">✏️ Revise</span>
-                      <p className="text-red-600 ml-4">Revised 'Work Model' from 'Onsite,Remote,Hybrid' to 'Remote'.</p>
-                    </div>
-                    <div>
-                      <span className="font-medium">❌ Delete</span>
-                      <p className="text-red-600 ml-4">Deleted 'Within US' from 'Preferred Locations'.</p>
-                    </div>
-                  </div>
-                  
-                  <button className="w-full mt-3 bg-gray-900 text-white py-2 rounded-lg hover:bg-gray-800 transition-colors">
-                    GO
-                  </button>
-                </div>
-
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="text-sm text-green-700">
-                    Success! I have found <strong>600 opportunities</strong> that match your criteria.
-                  </p>
-                </div>
-              </div>
-            </ScrollArea>
-          </div>
+          </FilterHeader>
         </div>
+
+      {/* Sidebar: Otto Chat */}
+      <div className="w-2/6 bg-white border-l border-gray-200 flex-shrink-0 overflow-hidden">
+        <OttoChatBox />
       </div>
-  
+
     </div>
   );
 };
