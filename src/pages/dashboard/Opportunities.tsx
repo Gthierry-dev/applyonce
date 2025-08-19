@@ -61,7 +61,7 @@ const Opportunities = () => {
   ].filter(Boolean).length;
 
   return (
-    <DashboardLayout>
+    <DashboardLayout >
       <DashboardHeader title="Opportunities" />
       <OpportunitiesPage/>
     </DashboardLayout>
