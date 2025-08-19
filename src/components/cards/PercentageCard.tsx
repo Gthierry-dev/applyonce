@@ -31,21 +31,21 @@ const PercentageCard: React.FC<PercentageCardProps> = ({
   const sizeClasses: Record<CardSize, { container: string; circle: string; text: string; title: string; features: string }> = {
     sm: {
       container: "h-[200px] min-w-[120px] p-3",
-      circle: "w-12 h-12",
+      circle: "w-16 h-16",
       text: "text-sm",
       title: "text-xs",
       features: "text-xs",
     },
     md: {
       container: "h-[250px] min-w-[140px] p-4",
-      circle: "w-16 h-16",
+      circle: "w-24 h-24",
       text: "text-lg",
       title: "text-sm",
       features: "text-xs",
     },
     lg: {
       container: "h-[300px] min-w-[160px] p-5",
-      circle: "w-20 h-20",
+      circle: "w-32 h-32",
       text: "text-xl",
       title: "text-base",
       features: "text-sm",
@@ -101,7 +101,7 @@ const PercentageCard: React.FC<PercentageCardProps> = ({
   const currentGlow = glowColors[glowColor];
 
   // Calculate stroke properties for circular progress
-  const radius = size === "sm" ? 20 : size === "md" ? 28 : 36;
+  const radius = size === "sm" ? 28 : size === "md" ? 36 : 48;
   const circumference = 2 * Math.PI * radius;
   const strokeDasharray = circumference;
   const strokeDashoffset = circumference - (animatedPercentage / 100) * circumference;
