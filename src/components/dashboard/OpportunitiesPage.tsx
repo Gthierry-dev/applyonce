@@ -32,11 +32,11 @@ import {
   Info,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import PercentageCard from "@/components/cards/PercentageCard";
 import OttoChatBox from "@/components/chat/OttoChatBox";
+import OpportunityDetailPanel from "@/components/dashboard/OpportunityDetailPanel";
 
 const FilterHeader = ({ children, activeTab, setActiveTab }) => {
   const [showFilters, setShowFilters] = useState(false);
@@ -341,40 +341,11 @@ const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick }) 
   );
 };
 
-const OpportunityDetailModal = ({ opportunity, isOpen, onClose }) => {
-  if (!opportunity) return null;
-
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'job':
-        return <Briefcase className="w-5 h-5" />;
-      case 'scholarship':
-        return <Award className="w-5 h-5" />;
-      case 'internship':
-        return <GraduationCap className="w-5 h-5" />;
-      default:
-        return <Briefcase className="w-5 h-5" />;
-    }
-  };
-
-  const getTypeBadge = (type) => {
-    const badges = {
-      job: { label: 'Job', color: 'bg-blue-100 text-blue-800' },
-      scholarship: { label: 'Scholarship', color: 'bg-green-100 text-green-800' },
-      internship: { label: 'Internship', color: 'bg-purple-100 text-purple-800' }
-    };
-    return badges[type] || badges.job;
-  };
-
- 
-};
-
 const OpportunitiesPage = () => {
   const [activeTab, setActiveTab] = useState('recommended');
   const [appliedJobs, setAppliedJobs] = useState(new Set());
   const [hoveredCard, setHoveredCard] = useState(null);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
-  const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   const opportunities = [
     {
@@ -492,14 +463,16 @@ const OpportunitiesPage = () => {
 
   const handleCardClick = (opportunity) => {
     setSelectedOpportunity(opportunity);
-    setDetailModalOpen(true);
   };
 
   return (
     <div className="h-[84vh] flex bg-gray-50 rounded-lg overflow-hidden">
         {/* Main Content */}
-      <div className="flex-1 flex flex-col w-4/6">
-          <FilterHeader activeTab={activeTab} setActiveTab={setActiveTab}>
+      <div className="flex-1 flex flex-col w-4/6 overflow-hidden">
+        <FilterHeader activeTab={activeTab} setActiveTab={setActiveTab}>
+          {selectedOpportunity ? (
+            <OpportunityDetailPanel opportunity={selectedOpportunity} onClose={() => setSelectedOpportunity(null)} />
+          ) : (
             <div className="space-y-4">
               {opportunities.map((opportunity) => (
                 <OpportunityCard
@@ -508,12 +481,13 @@ const OpportunitiesPage = () => {
                   isHovered={hoveredCard === opportunity.id}
                   onHover={setHoveredCard}
                   onLeave={() => setHoveredCard(null)}
-                onClick={handleCardClick}
+                  onClick={handleCardClick}
                 />
               ))}
             </div>
-          </FilterHeader>
-        </div>
+          )}
+        </FilterHeader>
+      </div>
 
       {/* Sidebar: Otto Chat */}
       <div className="w-2/6 bg-white border-l border-gray-200 flex-shrink-0 overflow-hidden">
