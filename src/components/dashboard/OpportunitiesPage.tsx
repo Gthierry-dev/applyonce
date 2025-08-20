@@ -33,6 +33,9 @@ import {
   MessageCircle,
   ChevronRight as ChevronRightIcon,
   ChevronLeft as ChevronLeftIcon,
+  MoreVertical,
+  Flag,
+  Check,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -205,7 +208,102 @@ const FilterHeader = ({ children, activeTab, setActiveTab }) => {
   );
 };
 
-const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick, isFavorite, onFavorite }) => {
+// Three Dot Dropdown Component
+const ThreeDotDropdown = ({ opportunity, appliedJobs, onMarkAsApplied }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleAction = (action, e) => {
+    e.stopPropagation();
+    
+    switch(action) {
+      case 'applied':
+        onMarkAsApplied(opportunity.id);
+        console.log('Marked as applied:', opportunity.id);
+        break;
+      case 'report':
+        console.log('Report opportunity:', opportunity.id);
+        // Add report logic here
+        break;
+      case 'share':
+        console.log('Share opportunity:', opportunity.id);
+        // Add share logic here - could open native share dialog
+        if (navigator.share) {
+          navigator.share({
+            title: opportunity.title,
+            text: `Check out this opportunity: ${opportunity.title} at ${opportunity.company}`,
+            url: window.location.href
+          });
+        }
+        break;
+    }
+    setIsOpen(false);
+  };
+
+  const isApplied = appliedJobs.has(opportunity.id);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className="bg-gray-100 hover:bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+      >
+        <MoreVertical className="w-4 h-4 text-gray-600" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <div className="py-1">
+            <button
+              onClick={(e) => handleAction('applied', e)}
+              className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 ${
+                isApplied ? 'text-green-600' : 'text-gray-700'
+              }`}
+            >
+              <Check className="w-4 h-4" />
+              {isApplied ? 'Applied' : 'Mark as Applied'}
+            </button>
+            
+            <button
+              onClick={(e) => handleAction('report', e)}
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Flag className="w-4 h-4" />
+              Report
+            </button>
+            
+            <button
+              onClick={(e) => handleAction('share', e)}
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Share2 className="w-4 h-4" />
+              Share
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick, isFavorite, onFavorite, appliedJobs, onMarkAsApplied }) => {
   const getTypeIcon = (type) => {
     switch (type) {
       case 'job':
@@ -254,6 +352,8 @@ const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick, is
     }
   };
 
+  const isApplied = appliedJobs.has(opportunity.id);
+
   return (
     <div 
       className="relative rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center gap-6"
@@ -274,15 +374,24 @@ const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick, is
             {/* first info */}
             
             
-            <div className=" gap-2">
+            <div className=" w-full gap-2">
               
-              <div className="flex items-center gap-2">
-                <span className="text-sm bg-gray-100 rounded-full px-4 py-1 text-gray-500">{opportunity.postedTime}</span>
-              
-                <Badge className={`${getTypeBadge(opportunity.type).color} text-xs`}>
+              <div className="bg-blue-00  mt-2 flex justify-between">
+                
+                <div className="bg-blue-00 flex items-center gap-2">
+                  <span className="text-sm bg-gray-100 rounded-full px-4 py-1 text-gray-500">{opportunity.postedTime}</span> 
+                  <Badge className={`${getTypeBadge(opportunity.type).color} text-xs`}>
                   {getTypeIcon(opportunity.type)}
                   <span className="ml-1 rounded-full px-1 py-1">{getTypeBadge(opportunity.type).label}</span>
-                </Badge>
+                  </Badge>
+                </div>
+                
+                {/* Three Dot Dropdown */}
+                <ThreeDotDropdown 
+                  opportunity={opportunity} 
+                  appliedJobs={appliedJobs}
+                  onMarkAsApplied={onMarkAsApplied}
+                />
               </div>
               
               <div className="bg-blue-0">
@@ -377,12 +486,17 @@ const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick, is
                 Ask Otto
               </button>
               
-              {/* Apply Button - conditional based on opportunity type */}
+              {/* Apply Button - conditional based on opportunity type and applied status */}
               <button 
-                className="px-6 py-1 bg-[#306C6A] text-white rounded-full hover:bg-green-600 font-medium"
+                className={`px-6 py-1 rounded-full font-medium transition-colors ${
+                  isApplied 
+                    ? 'bg-green-100 text-green-700 cursor-default' 
+                    : 'bg-[#306C6A] text-white hover:bg-green-600'
+                }`}
                 onClick={(e) => handleActionClick(e, 'apply')}
+                disabled={isApplied}
               >
-                {opportunity.hasAutofill ? 'Apply with autofill' : 'Apply'}
+                {isApplied ? 'Applied' : (opportunity.hasAutofill ? 'Apply with autofill' : 'Apply')}
               </button>
             </div>
           </div>
@@ -571,6 +685,19 @@ const OpportunitiesPage = () => {
     });
   };
 
+  // Handle marking as applied
+  const handleMarkAsApplied = (opportunityId) => {
+    setAppliedJobs(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(opportunityId)) {
+        newSet.delete(opportunityId);
+      } else {
+        newSet.add(opportunityId);
+      }
+      return newSet;
+    });
+  };
+
   // Handle adding a new opportunity
   const handleAddOpportunity = (formData) => {
     // In a real app, you would send this to your backend
@@ -636,6 +763,8 @@ const OpportunitiesPage = () => {
                   onClick={handleCardClick}
                   isFavorite={likedOpportunities.has(opportunity.id)}
                   onFavorite={(e) => handleFavorite(e, opportunity.id)}
+                  appliedJobs={appliedJobs}
+                  onMarkAsApplied={handleMarkAsApplied}
                 />
               ))}
               
