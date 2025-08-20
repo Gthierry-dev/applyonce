@@ -204,7 +204,7 @@ const FilterHeader = ({ children, activeTab, setActiveTab }) => {
   );
 };
 
-const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick }) => {
+const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick, isFavorite, onFavorite }) => {
   const getTypeIcon = (type) => {
     switch (type) {
       case 'job':
@@ -227,9 +227,35 @@ const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick }) 
     return badges[type] || badges.job;
   };
 
+  // Handle action button clicks without triggering the card click
+  const handleActionClick = (e, action) => {
+    e.stopPropagation(); // Prevent the click from bubbling up to the card
+    
+    // Handle different actions
+    switch(action) {
+      case 'notInterested':
+        console.log('Not interested in:', opportunity.id);
+        // Add your not interested logic here
+        break;
+      case 'favorite':
+        onFavorite(e);
+        break;
+      case 'askOtto':
+        console.log('Ask Otto about:', opportunity.id);
+        // Add your ask Otto logic here
+        break;
+      case 'apply':
+        console.log('Apply to:', opportunity.id);
+        // Add your apply logic here
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div 
-      className="relative  rounded-lg border border-gray-200   hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center gap-6"
+      className="relative rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-300 cursor-pointer flex items-center gap-6"
       onMouseEnter={() => onHover(opportunity.id)}
       onMouseLeave={onLeave}
       onClick={() => onClick(opportunity)}
@@ -313,20 +339,49 @@ const OpportunityCard = ({ opportunity, isHovered, onHover, onLeave, onClick }) 
             
           </div>
 
-          <div className=" bg-red-00 pt-2.5  border-t border-gray-100 flex items-center justify-between">
+          <div className=" bg-red-00 pt-2.5 border-t border-gray-100 flex items-center justify-between">
             <span className="text-sm text-gray-500">25 applicants</span>
             <div className="flex gap-3">
-              <button className="p-2 text-gray-400 hover:text-gray-600 rounded-full">
-                <Eye className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-gray-400 hover:text-red-500 rounded-full">
-                <Heart className="w-5 h-5" />
-              </button>
-              <button className="px-6 py-1 bg-[#F2F4F5] text-black rounded-full hover:bg-green-600 font-medium">
+              {/* Not Interested Button (X icon) with tooltip */}
+              <div className="relative group">
+                <button 
+                  className="p-2 text-gray-400 hover:text-gray-600 rounded-full" 
+                  onClick={(e) => handleActionClick(e, 'notInterested')}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Not Interested
+                </div>
+              </div>
+              
+              {/* Favorite Button with tooltip */}
+              <div className="relative group">
+                <button 
+                  className={`p-2 ${isFavorite ? 'text-red-500' : 'text-gray-400 hover:text-red-500'} rounded-full`}
+                  onClick={(e) => handleActionClick(e, 'favorite')}
+                >
+                  <Heart className="w-5 h-5" fill={isFavorite ? "currentColor" : "none"} />
+                </button>
+                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                </div>
+              </div>
+              
+              {/* Ask Otto Button */}
+              <button 
+                className="px-6 py-1 bg-[#F2F4F5] text-black rounded-full hover:bg-green-600 font-medium"
+                onClick={(e) => handleActionClick(e, 'askOtto')}
+              >
                 Ask Otto
               </button>
-              <button className="px-6 py-1 bg-[#306C6A] text-white rounded-full hover:bg-green-600 font-medium">
-                Apply with autofill
+              
+              {/* Apply Button - conditional based on opportunity type */}
+              <button 
+                className="px-6 py-1 bg-[#306C6A] text-white rounded-full hover:bg-green-600 font-medium"
+                onClick={(e) => handleActionClick(e, 'apply')}
+              >
+                {opportunity.hasAutofill ? 'Apply with autofill' : 'Apply'}
               </button>
             </div>
           </div>
@@ -352,13 +407,31 @@ const OpportunitiesPage = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
+  // Add these missing state declarations
+  const [likedOpportunities, setLikedOpportunities] = useState(new Set());
+  const [addedOpportunities, setAddedOpportunities] = useState([]);
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   
   // Chat is collapsed by default on mobile and tablet
   const isSmallScreen = isMobile || isTablet;
 
-  const opportunities = [
+  // Add the missing filteredOpportunities function
+  const filteredOpportunities = () => {
+    switch (activeTab) {
+      case 'liked':
+        return allOpportunities.filter(opp => likedOpportunities.has(opp.id));
+      case 'external':
+        return addedOpportunities;
+      case 'recommended':
+      default:
+        return allOpportunities;
+    }
+  };
+
+  // Sample opportunities data - in a real app, this would come from an API
+  const allOpportunities = [
     {
       id: "1",
       type: "job",
@@ -480,6 +553,49 @@ const OpportunitiesPage = () => {
     setIsChatOpen(!isChatOpen);
   };
 
+  // Handle adding to favorites
+  const handleFavorite = (e, opportunityId) => {
+    e.stopPropagation(); // Prevent card click
+    
+    setLikedOpportunities(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(opportunityId)) {
+        newSet.delete(opportunityId);
+      } else {
+        newSet.add(opportunityId);
+      }
+      return newSet;
+    });
+  };
+
+  // Handle adding a new opportunity
+  const handleAddOpportunity = (formData) => {
+    // In a real app, you would send this to your backend
+    const newOpportunity = {
+      id: `added-${Date.now()}`,
+      type: "job", // Default type
+      title: formData.title,
+      company: formData.company_name || "Your Company",
+      industry: formData.industry || "Technology",
+      location: formData.location || "Remote",
+      workType: formData.workType || "Full-time",
+      salary: formData.salary || "Competitive",
+      postedTime: "Just now",
+      status: "Open",
+      statusColor: "text-green-600",
+      skills: [],
+      avatar: formData.company_name?.[0] || "A",
+      avatarBg: "bg-[#306C6A]",
+      matchScore: 100,
+      description: formData.description,
+      hasAutofill: false
+    };
+    
+    setAddedOpportunities(prev => [newOpportunity, ...prev]);
+    setIsAddDrawerOpen(false);
+    setActiveTab('external'); // Switch to the "Added" tab
+  };
+
   return (
     <div className="h-[84vh] flex bg-gray-50 rounded-lg overflow-hidden relative">
       {/* Main Content */}
@@ -489,7 +605,7 @@ const OpportunitiesPage = () => {
             <OpportunityDetailPanel opportunity={selectedOpportunity} onClose={() => setSelectedOpportunity(null)} />
           ) : (
             <div className="space-y-4">
-              {opportunities.map((opportunity) => (
+              {filteredOpportunities().map((opportunity) => (
                 <OpportunityCard
                   key={opportunity.id}
                   opportunity={opportunity}
@@ -497,12 +613,36 @@ const OpportunitiesPage = () => {
                   onHover={setHoveredCard}
                   onLeave={() => setHoveredCard(null)}
                   onClick={handleCardClick}
+                  isFavorite={likedOpportunities.has(opportunity.id)}
+                  onFavorite={(e) => handleFavorite(e, opportunity.id)}
                 />
               ))}
+              
+              {activeTab === 'external' && filteredOpportunities().length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 mb-4">You haven't added any opportunities yet</p>
+                  <Button 
+                    onClick={() => setIsAddDrawerOpen(true)}
+                    className="bg-[#306C6A] hover:bg-[#1e4140] text-white"
+                  >
+                    Add Your First Opportunity
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </FilterHeader>
       </div>
+
+      {/* Add Opportunity Button - visible when on "Add" tab */}
+      {activeTab === 'external' && filteredOpportunities().length > 0 && (
+        <Button
+          onClick={() => setIsAddDrawerOpen(true)}
+          className="fixed bottom-24 right-6 z-40 bg-[#306C6A] hover:bg-[#1e4140] text-white rounded-full px-6 py-6 shadow-lg"
+        >
+          + Add Opportunity
+        </Button>
+      )}
 
       {/* Collapsible Chat Button for mobile and tablet */}
       {isSmallScreen && (
