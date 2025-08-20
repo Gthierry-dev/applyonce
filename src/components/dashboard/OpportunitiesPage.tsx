@@ -30,6 +30,9 @@ import {
   CheckCircle,
   AlertCircle,
   Info,
+  MessageCircle,
+  ChevronRight as ChevronRightIcon,
+  ChevronLeft as ChevronLeftIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -37,6 +40,8 @@ import { Separator } from "@/components/ui/separator";
 import PercentageCard from "@/components/cards/PercentageCard";
 import OttoChatBox from "@/components/chat/OttoChatBox";
 import OpportunityDetailPanel from "@/components/dashboard/OpportunityDetailPanel";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import { useIsTablet } from "@/hooks/useIsTablet";
 
 const FilterHeader = ({ children, activeTab, setActiveTab }) => {
   const [showFilters, setShowFilters] = useState(false);
@@ -346,6 +351,12 @@ const OpportunitiesPage = () => {
   const [appliedJobs, setAppliedJobs] = useState(new Set());
   const [hoveredCard, setHoveredCard] = useState(null);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  
+  // Chat is collapsed by default on mobile and tablet
+  const isSmallScreen = isMobile || isTablet;
 
   const opportunities = [
     {
@@ -465,10 +476,14 @@ const OpportunitiesPage = () => {
     setSelectedOpportunity(opportunity);
   };
 
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
+
   return (
-    <div className="h-[84vh] flex bg-gray-50 rounded-lg overflow-hidden">
-        {/* Main Content */}
-      <div className="flex-1 flex flex-col w-4/6 overflow-hidden">
+    <div className="h-[84vh] flex bg-gray-50 rounded-lg overflow-hidden relative">
+      {/* Main Content */}
+      <div className={`flex-1 flex flex-col ${isSmallScreen ? 'w-full' : 'w-4/6'} overflow-hidden`}>
         <FilterHeader activeTab={activeTab} setActiveTab={setActiveTab}>
           {selectedOpportunity ? (
             <OpportunityDetailPanel opportunity={selectedOpportunity} onClose={() => setSelectedOpportunity(null)} />
@@ -489,11 +504,39 @@ const OpportunitiesPage = () => {
         </FilterHeader>
       </div>
 
-      {/* Sidebar: Otto Chat */}
-      <div className="w-2/6 bg-white border-l border-gray-200 flex-shrink-0 overflow-hidden">
-        <OttoChatBox />
-      </div>
+      {/* Collapsible Chat Button for mobile and tablet */}
+      {isSmallScreen && (
+        <button 
+          onClick={toggleChat}
+          className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#306C6A] rounded-full flex items-center justify-center shadow-lg"
+        >
+          <MessageCircle className="w-6 h-6 text-white" />
+        </button>
+      )}
 
+      {/* Sidebar: Otto Chat */}
+      {isSmallScreen ? (
+        <div 
+          className={`fixed inset-0 bg-white z-40 transition-transform duration-300 transform ${isChatOpen ? 'translate-y-0' : 'translate-y-full'}`}
+          style={{ height: '80vh', top: 'auto' }}
+        >
+          <div className="h-full flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="font-semibold">Otto Chat</h3>
+              <button onClick={toggleChat} className="p-2">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <OttoChatBox />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="w-2/6 bg-white border-l border-gray-200 flex-shrink-0 overflow-hidden">
+          <OttoChatBox />
+        </div>
+      )}
     </div>
   );
 };
