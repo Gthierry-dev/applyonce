@@ -41,6 +41,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import PercentageCard from "@/components/cards/PercentageCard";
+import MobileOpportunityCard from "@/components/cards/MobileOpportunityCard";
 import OttoChatBox from "@/components/chat/OttoChatBox";
 import OpportunityDetailPanel from "@/components/dashboard/OpportunityDetailPanel";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -731,7 +732,7 @@ const OpportunitiesPage = () => {
       {/* Main Content */}
       <div className={`flex-1 flex flex-col ${isSmallScreen ? 'w-full' : 'w-4/6'} overflow-hidden`}>
         <FilterHeader activeTab={activeTab} setActiveTab={setActiveTab}>
-          {/* View mode toggle */}
+          {/* View mode toggle - hidden for mobile-friendly version 
           <div className="flex items-center justify-end px-5 py-2">
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
@@ -748,9 +749,35 @@ const OpportunitiesPage = () => {
               </button>
             </div>
           </div>
+          */}
           
           {selectedOpportunity ? (
             <OpportunityDetailPanel opportunity={selectedOpportunity} onClose={() => setSelectedOpportunity(null)} />
+          ) : isMobile ? (
+            <div className="space-y-4 px-4 py-2">
+              {filteredOpportunities().map((opportunity) => (
+                <MobileOpportunityCard
+                  key={opportunity.id}
+                  opportunity={opportunity}
+                  onLike={(id) => handleFavorite(null, id)}
+                  onDislike={(id) => console.log('Disliked opportunity:', id)}
+                  onInfo={handleCardClick}
+                  isFavorite={likedOpportunities.has(opportunity.id)}
+                />
+              ))}
+              
+              {activeTab === 'external' && filteredOpportunities().length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 mb-4">You haven't added any opportunities yet</p>
+                  <Button 
+                    onClick={() => setIsAddDrawerOpen(true)}
+                    className="bg-[#306C6A] hover:bg-[#1a4645]"
+                  >
+                    Add Opportunity
+                  </Button>
+                </div>
+              )}
+            </div>
           ) : viewMode === 'list' ? (
             <div className="space-y-4">
               {filteredOpportunities().map((opportunity) => (
@@ -784,7 +811,7 @@ const OpportunitiesPage = () => {
             <SwipeableOpportunities
               opportunities={filteredOpportunities()}
               onLike={(id) => handleFavorite(null, id)}
-              onDislike={() => {}}
+              onDislike={(id) => console.log('Disliked opportunity:', id)}
               likedOpportunities={likedOpportunities}
             />
           )}

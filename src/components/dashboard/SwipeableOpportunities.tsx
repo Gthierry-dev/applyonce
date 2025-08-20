@@ -21,19 +21,40 @@ const SwipeableOpportunities: React.FC<SwipeableOpportunitiesProps> = ({
   const [showDetails, setShowDetails] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState<any>(null);
   
-  // Reset index when opportunities change
+  // Only reset index when opportunities array length changes
   useEffect(() => {
-    setCurrentIndex(0);
-  }, [opportunities]);
+    // Only reset if the array length changes, not on every reference change
+    setCurrentIndex(prevIndex => {
+      // If current index is valid, keep it, otherwise reset to 0
+      return prevIndex < opportunities.length ? prevIndex : 0;
+    });
+  }, [opportunities.length]);
   
   const handleSwipeLeft = (id: string) => {
     onDislike(id);
-    setCurrentIndex(prev => Math.min(prev + 1, opportunities.length - 1));
+    // Safely increment index
+    setCurrentIndex(prev => {
+      const nextIndex = prev + 1;
+      return nextIndex < opportunities.length ? nextIndex : prev;
+    });
   };
   
   const handleSwipeRight = (id: string) => {
     onLike(id);
-    setCurrentIndex(prev => Math.min(prev + 1, opportunities.length - 1));
+    // Safely increment index
+    setCurrentIndex(prev => {
+      const nextIndex = prev + 1;
+      return nextIndex < opportunities.length ? nextIndex : prev;
+    });
+  };
+  
+  const handleSwipeUp = (id: string) => {
+    // Move to next opportunity without liking or disliking
+    // Safely increment index
+    setCurrentIndex(prev => {
+      const nextIndex = prev + 1;
+      return nextIndex < opportunities.length ? nextIndex : prev;
+    });
   };
   
   const handleInfoClick = (opportunity: any) => {
@@ -63,11 +84,7 @@ const SwipeableOpportunities: React.FC<SwipeableOpportunitiesProps> = ({
     <div className="h-full relative">
       {showDetails ? (
         <div className="h-full">
-          <div className="absolute top-4 right-4 z-50">
-            <Button variant="ghost" size="icon" onClick={handleCloseDetails}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          {/* Removed duplicate close button here */}
           <OpportunityDetailPanel 
             opportunity={selectedOpportunity} 
             onClose={handleCloseDetails} 
@@ -78,6 +95,7 @@ const SwipeableOpportunities: React.FC<SwipeableOpportunitiesProps> = ({
           opportunity={opportunities[currentIndex]}
           onSwipeLeft={handleSwipeLeft}
           onSwipeRight={handleSwipeRight}
+          onSwipeUp={handleSwipeUp}
           onInfoClick={handleInfoClick}
         />
       )}

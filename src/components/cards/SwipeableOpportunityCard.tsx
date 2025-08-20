@@ -49,39 +49,56 @@ const SwipeableOpportunityCard: React.FC<SwipeableOpportunityCardProps> = ({
     setIsDragging(false);
     setDragOffset({ x: 0, y: 0 });
     
-    const swipeThreshold = 120;
-    const upSwipeThreshold = -120;
+    // Simplified threshold for more reliable detection
+    const swipeThreshold = 80;
+    const upSwipeThreshold = -80;
     
-    if (info.offset.y < upSwipeThreshold) {
-      // Swipe up - next opportunity
-      controls.start({ 
-        y: -800, 
-        opacity: 0,
-        transition: { duration: 0.3, ease: "easeOut" }
-      }).then(() => {
-        onSwipeUp(opportunity.id);
-      });
-    } else if (info.offset.x > swipeThreshold) {
-      // Swipe right - like/apply
-      controls.start({ 
-        x: 400, 
-        opacity: 0,
-        transition: { duration: 0.3, ease: "easeOut" }
-      }).then(() => {
-        onSwipeRight(opportunity.id);
-      });
-    } else if (info.offset.x < -swipeThreshold) {
-      // Swipe left - reject
-      controls.start({ 
-        x: -400, 
-        opacity: 0,
-        transition: { duration: 0.3, ease: "easeOut" }
-      }).then(() => {
-        onSwipeLeft(opportunity.id);
-      });
+    // Detect tap first (very small movement)
+    if (Math.abs(info.offset.x) < 10 && Math.abs(info.offset.y) < 10) {
+      onInfoClick(opportunity);
+      return;
+    }
+    
+    // Determine primary direction of swipe (horizontal or vertical)
+    const isHorizontalSwipe = Math.abs(info.offset.x) > Math.abs(info.offset.y);
+    
+    if (isHorizontalSwipe) {
+      if (info.offset.x > swipeThreshold) {
+        // Swipe right - like/apply
+        controls.start({ 
+          x: 400, 
+          opacity: 0,
+          transition: { duration: 0.3, ease: "easeOut" }
+        }).then(() => {
+          onSwipeRight(opportunity.id);
+        });
+      } else if (info.offset.x < -swipeThreshold) {
+        // Swipe left - reject
+        controls.start({ 
+          x: -400, 
+          opacity: 0,
+          transition: { duration: 0.3, ease: "easeOut" }
+        }).then(() => {
+          onSwipeLeft(opportunity.id);
+        });
+      } else {
+        // Reset position if not swiped far enough
+        controls.start({ x: 0, y: 0, opacity: 1, transition: { type: "spring", damping: 20 } });
+      }
     } else {
-      // Reset position if not swiped far enough
-      controls.start({ x: 0, y: 0, opacity: 1, transition: { type: "spring", damping: 20 } });
+      if (info.offset.y < upSwipeThreshold) {
+        // Swipe up - next opportunity
+        controls.start({ 
+          y: -800, 
+          opacity: 0,
+          transition: { duration: 0.3, ease: "easeOut" }
+        }).then(() => {
+          onSwipeUp(opportunity.id);
+        });
+      } else {
+        // Reset position if not swiped far enough
+        controls.start({ x: 0, y: 0, opacity: 1, transition: { type: "spring", damping: 20 } });
+      }
     }
   };
 
@@ -105,6 +122,7 @@ const SwipeableOpportunityCard: React.FC<SwipeableOpportunityCardProps> = ({
         onDragStart={handleDragStart}
         onDrag={handleDrag}
         onDragEnd={handleDragEnd}
+        onClick={() => onInfoClick(opportunity)}
         animate={controls}
         style={{ 
           rotateX: tiltY,
@@ -260,15 +278,15 @@ const SwipeableOpportunityCard: React.FC<SwipeableOpportunityCardProps> = ({
               More
             </button>
             <button 
-              onClick={() => onSwipeLeft(opportunity.id)}
+              onClick={() => onSwipeRight(opportunity.id)}
               className="flex-1 bg-gray-100 text-gray-700 py-3 px-4 rounded-xl font-medium flex items-center justify-center"
             >
               <Heart className="w-4 h-4 mr-2" />
               Like
             </button>
             <button 
-              onClick={() => onSwipeRight(opportunity.id)}
-              className="flex-1 bg-green-600 text-white py-3 px-4 rounded-xl font-medium"
+              onClick={() => onSwipeUp(opportunity.id)}
+              className="flex-1 bg-green-600 text-white py-3 px-4 rounded-xl font-medium flex items-center justify-center"
             >
               Ask Otto
             </button>
