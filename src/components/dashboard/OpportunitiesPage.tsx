@@ -37,6 +37,7 @@ import {
   Flag,
   Check,
 } from "lucide-react";
+import AddOpportunityDrawer from "./AddOpportunityDrawer";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -82,9 +83,9 @@ const FilterHeader = ({ children, activeTab, setActiveTab }) => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-shrink-0">
-      <div className="flex border-b items-center justify-between px-5 pb-5">
-        <div className="flex items-center gap-4">
-          <div className="flex gap-1">
+      <div className="flex flex-col border-b px-5 pb-5">
+        <div className="flex items-center gap-4 mb-3">
+          <div className="flex gap-1 flex-wrap">
             {tabs.map(tab => (
               <button
                 key={tab.id}
@@ -106,10 +107,10 @@ const FilterHeader = ({ children, activeTab, setActiveTab }) => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 flex-wrap">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors mb-2 ${
               showFilters 
                 ? 'bg-[#E7F0F0] border-[#306C6A] text-[#306C6A]' 
                 : 'border-gray-300 hover:bg-gray-50'
@@ -119,7 +120,7 @@ const FilterHeader = ({ children, activeTab, setActiveTab }) => {
             <span className="text-sm font-medium">Filter</span>
           </button>
 
-          <div className="relative">
+          <div className="relative mb-2">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -754,7 +755,7 @@ const OpportunitiesPage = () => {
           {selectedOpportunity ? (
             <OpportunityDetailPanel opportunity={selectedOpportunity} onClose={() => setSelectedOpportunity(null)} />
           ) : isMobile ? (
-            <div className="space-y-4 px-4 py-2">
+            <div className="space-y-3 px-3 py-3 overflow-y-auto max-h-[calc(100vh-180px)]">
               {filteredOpportunities().map((opportunity) => (
                 <MobileOpportunityCard
                   key={opportunity.id}
@@ -767,7 +768,7 @@ const OpportunitiesPage = () => {
               ))}
               
               {activeTab === 'external' && filteredOpportunities().length === 0 && (
-                <div className="text-center py-12">
+                <div className="text-center py-8">
                   <p className="text-gray-500 mb-4">You haven't added any opportunities yet</p>
                   <Button 
                     onClick={() => setIsAddDrawerOpen(true)}
@@ -827,6 +828,13 @@ const OpportunitiesPage = () => {
           + Add Opportunity
         </Button>
       )}
+      
+      {/* Add Opportunity Drawer */}
+      <AddOpportunityDrawer 
+        isOpen={isAddDrawerOpen}
+        onOpenChange={setIsAddDrawerOpen}
+        onSubmit={handleAddOpportunity}
+      />
 
       {/* Collapsible Chat Button for mobile and tablet */}
       {isSmallScreen && (

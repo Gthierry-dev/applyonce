@@ -50,7 +50,7 @@ const MobileOpportunityCard: React.FC<MobileOpportunityCardProps> = ({
 
   return (
     <div 
-      className="w-full bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-4"
+      className="w-full bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-3 touch-manipulation"
       onClick={() => onInfo(opportunity)}
     >
       {/* Card Header */}
@@ -121,7 +121,7 @@ const MobileOpportunityCard: React.FC<MobileOpportunityCardProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 w-9 rounded-full p-0 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50"
+          className="h-10 w-10 rounded-full p-0 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50"
           onClick={(e) => handleActionClick(e, 'dislike')}
         >
           <X className="h-5 w-5" />
@@ -131,7 +131,7 @@ const MobileOpportunityCard: React.FC<MobileOpportunityCardProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className="h-9 px-4 text-xs flex items-center justify-center"
+          className="h-10 px-5 text-xs font-medium flex items-center justify-center"
           onClick={(e) => handleActionClick(e, 'info')}
         >
           View Details
@@ -142,7 +142,7 @@ const MobileOpportunityCard: React.FC<MobileOpportunityCardProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          className={`h-9 w-9 rounded-full p-0 flex items-center justify-center ${isFavorite ? 'text-red-500' : 'text-gray-400 hover:text-red-500 hover:bg-red-50'}`}
+          className={`h-10 w-10 rounded-full p-0 flex items-center justify-center ${isFavorite ? 'text-red-500' : 'text-gray-400 hover:text-red-500 hover:bg-red-50'}`}
           onClick={(e) => handleActionClick(e, 'like')}
         >
           <Heart className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
